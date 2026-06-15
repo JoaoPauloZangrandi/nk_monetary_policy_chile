@@ -1,0 +1,2 @@
+scenario,status,n_forward,n_both,n_unstable,n_eigenvalues
+hybrid_nkpc,determinate_bk_count,2,1,2,4

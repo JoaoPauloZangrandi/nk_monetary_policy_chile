@@ -1,0 +1,2 @@
+observations,selected_lags_bic,estimated_lags,lag_choice_reason,aic,bic,hqic,stable,max_inverse_root,whiteness_test_pvalue,normality_test_pvalue,cholesky_ordering,monetary_shock,impact_normalization_annual_pp
+97,2,4,smallest lag with residual-whiteness p>=0.05,-31.197271789488457,-30.162078715657202,-30.778690400153664,True,0.8792961695916977,0.16875688189080287,0.0,"x,pi,i",third orthogonal innovation,0.25

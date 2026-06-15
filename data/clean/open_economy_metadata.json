@@ -1,0 +1,21 @@
+{
+  "access_date": "2026-06-15",
+  "is_synthetic": false,
+  "frequency": "quarterly averages built from monthly series",
+  "series": {
+    "exchange_rate": {
+      "id": "CCUSMA02CLM618N",
+      "title": "CLP per USD, average daily rate",
+      "source": "OECD Main Economic Indicators via FRED",
+      "url": "https://fred.stlouisfed.org/series/CCUSMA02CLM618N"
+    },
+    "copper": {
+      "id": "PCOPPUSDM",
+      "title": "Global price of copper, USD per metric ton",
+      "source": "IMF Primary Commodity Prices via FRED",
+      "url": "https://fred.stlouisfed.org/series/PCOPPUSDM"
+    }
+  },
+  "transformations": "Monthly levels to quarterly averages; natural logs; HP-filter cycles with lambda=1600. Calibration uses AR(1) persistence and innovation std.",
+  "warning": "Open-economy parameters are illustrative and are not jointly estimated structural coefficients."
+}

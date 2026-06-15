@@ -1,0 +1,2 @@
+method,sample_start,sample_end,observations,converged,latest_rstar_smoothed_pct,latest_rstar_filtered_pct,sample_mean_rstar_pct,sample_min_rstar_pct,sample_max_rstar_pct,variance_irregular,variance_level,gap_coefficient,fixed_grid_low_pct,fixed_grid_baseline_pct,fixed_grid_high_pct,interpretation
+local_level_state_space_proxy,2001Q1,2026Q1,101,True,0.8487342639479198,0.8487342639479198,0.18155598790585287,-4.724807724874728,3.049765969529208,5.405293650659148,1.159412068643975,0.09265868040140018,2.0,3.0,4.0,statistical proxy; not structural Laubach-Williams r-star

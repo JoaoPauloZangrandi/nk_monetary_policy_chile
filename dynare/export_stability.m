@@ -18,8 +18,15 @@ function export_stability(scenario_id)
   end
 
   n_forward = NaN;
+  n_both = 0;
   if isfield(M_, 'nfwrd')
     n_forward = M_.nfwrd;
+  end
+  % Variables with both a lead and a lag count as forward-looking for the
+  % Blanchard-Kahn root count (e.g. inflation in the hybrid NKPC model).
+  if isfield(M_, 'nboth')
+    n_both = M_.nboth;
+    n_forward = n_forward + n_both;
   end
   n_unstable = sum(abs(eigvals) > 1.0 + 1e-6);
 
@@ -32,8 +39,8 @@ function export_stability(scenario_id)
   end
 
   fid = fopen(fullfile(out_dir, 'stability.csv'), 'w');
-  fprintf(fid, 'scenario,status,n_forward,n_unstable,n_eigenvalues\n');
-  fprintf(fid, '%s,%s,%g,%d,%d\n', scenario_id, status, n_forward, ...
+  fprintf(fid, 'scenario,status,n_forward,n_both,n_unstable,n_eigenvalues\n');
+  fprintf(fid, '%s,%s,%g,%g,%d,%d\n', scenario_id, status, n_forward, n_both, ...
           n_unstable, length(eigvals));
   fclose(fid);
 
