@@ -67,6 +67,22 @@ function export_results(scenario_id)
   end
   fclose(fid);
 
+  if isfield(oo_, 'var') && size(oo_.var, 1) >= length(variables)
+    covariance = oo_.var(1:length(variables), 1:length(variables));
+    standard_deviations = sqrt(max(diag(covariance), 0));
+    correlation = covariance ./ (standard_deviations * standard_deviations');
+    fid = fopen(fullfile(out_dir, 'correlations.csv'), 'w');
+    fprintf(fid, 'variable,x,pi,i\n');
+    for v = 1:length(variables)
+      fprintf(fid, '%s', variables{v});
+      for other = 1:length(variables)
+        fprintf(fid, ',%.12g', correlation(v, other));
+      end
+      fprintf(fid, '\n');
+    end
+    fclose(fid);
+  end
+
   if isfield(oo_, 'variance_decomposition') && ...
      ~isempty(oo_.variance_decomposition)
     decomposition = oo_.variance_decomposition;

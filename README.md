@@ -5,7 +5,8 @@ three-equation New Keynesian model for **Chile**. It uses official Banco Central
 de Chile (BCCh) data when credentials are available, solves the model with
 **Octave + Dynare**, and uses **Python** for data preparation, econometrics,
 tables, figures, and exploratory scenarios. The written report is in
-`report/relatorio_final.md` (Portuguese).
+`report/relatorio_final.md` (Portuguese). The evaluator-facing, self-contained
+deliverable is **`Entrega Final.html`**.
 
 ## Public repository and private material
 
@@ -92,13 +93,16 @@ python python/estimate_nkpc.py            # Phillips-curve slope kappa (OLS + IV
 python python/estimate_rstar.py           # empirical r* anchors
 python python/calibrate_shocks.py         # shock sigmas for an illustrative FEVD target
 python python/make_tables.py              # parameter<->target and r*/beta tables
-python python/generate_dynare_models.py   # regenerate baseline + 16 scenarios + manifest
+python python/generate_dynare_models.py   # regenerate baseline + 18 scenarios + manifest
 python python/run_dynare_batch.py --all   # Dynare: baseline + scenarios (omit --all for baseline only)
 python python/run_bayesian.py             # optional posterior-mode DSGE exercise
 python python/collect_outputs.py          # aggregate IRFs/moments/FEVD/determinacy
 python python/analyze_determinacy.py      # determinacy map vs phi_pi
-python python/forecast_model.py           # optional 8-quarter illustrative scenarios
+python python/analyze_model_results.py    # moments, correlations, signs and transition coefficients
+python python/run_forecast.py             # NATIVE Dynare forecast=8 + conditional_forecast (pages 48-55)
+python python/forecast_model.py           # level fan chart + current-state-anchored scenario figures
 python python/plot_irfs.py                # figures
+python python/build_final_html.py         # self-contained Entrega Final.html
 ```
 
 ## How the Dynare runner avoids OneDrive problems
@@ -142,17 +146,28 @@ posterior exercise and not the source of the baseline calibration.
 ## Outputs
 
 `outputs/tables/` (CSV): `parameter_targets`, `rstar_beta_table`, `rhoi_estimate`,
-`taylor_rule_estimates`, `nkpc_estimates`, `rstar_estimates`, `shock_calibration`, `shock_sigmas`,
-`scenario_manifest`, `scenario_determinacy`, `determinacy_map`, `irfs_long`, `moments`,
-`fevd_summary`, `forecast`, `bayesian_estimates`.
+`taylor_rule_estimates`, `nkpc_estimates`, `rstar_estimates`, `shock_calibration`,
+`shock_sigmas`, `shock_sigmas_comparison`, `fevd_calibration_comparison`,
+`scenario_manifest`, `scenario_determinacy`, `determinacy_map`, `irfs_long`,
+`irf_summary_metrics`, `irf_sign_checks`, `moments`, `moments_model_vs_data`,
+`correlations_model_vs_data`, `fevd_summary`, `forecast`, `forecast_summary`,
+`policy_transition_coefficients`, `bayesian_estimates`.
 
 `outputs/figures/` (PNG): `data_overview`, `irf_baseline_all_shocks`, `irf_kappa_comparison`,
-`irf_phi_pi_comparison`, `determinacy_map`, `forecast_fanchart`.
+`irf_kappa_tradeoffs`, `irf_phi_pi_comparison`, `irf_phi_pi_tradeoffs`,
+`irf_rho_comparison`, `determinacy_map`, `moments_model_vs_data`,
+`fevd_calibration_comparison`, `forecast_fanchart`, `conditional_scenarios`,
+`conditional_policy_shocks`.
 
 `outputs/dynare/<scenario>/`: per-scenario `irfs.csv`, `moments.csv`, `fevd.csv`, `stability.csv`,
-`eigenvalues.csv` for the 17 models (baseline and the rstar/kappa/phi_pi grids).
+`eigenvalues.csv` for the 19 models (baseline, rstar/kappa/phi_pi grids, rho_i comparison and
+didactic-FEVD scenario).
 `outputs/logs/`: run logs. When Dynare output is unavailable for a scenario, Python fills it with the
 **exact linear-RE solution** of the same model (labelled `synthetic_model_fallback`) as a cross-check.
+
+`Entrega Final.html`: self-contained report in Portuguese. It embeds all public figures, the main
+CSV tables, the assignment compliance review, the monetary-policy interpretation and the complete
+Python/Octave/Dynare source code used by the project.
 
 ## Source labelling and honesty
 
@@ -166,12 +181,15 @@ scenarios, not forecasts from the BCCh or investment advice.
 - [ ] BCCh credentials provided via env vars or `data/raw/bcch_credentials.json` (never committed).
 - [ ] `data/clean/dataset_metadata.json` reports `is_synthetic=false` with series codes and access date.
 - [ ] `requirements.txt` installs in a clean environment.
-- [ ] All 17 `.mod` models regenerated before the Dynare batch; `steady`/`check`/`stoch_simul` complete.
-- [ ] Required tables and the six figures exist in `outputs/`.
+- [ ] All 19 `.mod` models regenerated before the Dynare batch; `steady`/`check`/`stoch_simul` complete.
+- [ ] Required tables and all 13 figures exist in `outputs/`.
+- [ ] `python python/build_final_html.py` regenerates `Entrega Final.html`.
 - [ ] `git status` shows no PDFs, credentials, `__pycache__`, or compiled `+model` folders.
 
 ## Documentation
 
 - `docs/assignment_brief.md` — the assignment in original words.
+- `docs/assignment_review_pages_26_55.md` — compliance audit of the calibration/forecast block.
 - `docs/model_notes.md` — variables, equations, calibration and sensitivity design.
 - `report/relatorio_final.md` — full report (Portuguese) with all results.
+- `Entrega Final.html` — complete self-contained final deliverable.

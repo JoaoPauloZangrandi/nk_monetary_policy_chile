@@ -13,6 +13,7 @@ from common import (
     TABLES,
     calibration_rho,
     complete_parameters,
+    course_benchmark_shock_std,
     ensure_directories,
 )
 
@@ -70,6 +71,11 @@ def main() -> None:
     generated.mkdir(parents=True, exist_ok=True)
 
     rho_i = calibration_rho()
+    baseline_shocks = {
+        "std_e_x": SHOCK_STD["e_x"],
+        "std_e_pi": SHOCK_STD["e_pi"],
+        "std_e_i": SHOCK_STD["e_i"],
+    }
 
     # Regenerate the baseline .mod so it stays consistent with the estimated rho_i
     # and the current shock calibration (single source of truth for the baseline).
@@ -77,9 +83,7 @@ def main() -> None:
     (ROOT / "dynare" / "nk_chile_base.mod").write_text(
         TEMPLATE.format(
             scenario="baseline",
-            std_e_x=SHOCK_STD["e_x"],
-            std_e_pi=SHOCK_STD["e_pi"],
-            std_e_i=SHOCK_STD["e_i"],
+            **baseline_shocks,
             **baseline_params,
         ),
         encoding="ascii",
@@ -92,6 +96,7 @@ def main() -> None:
             {
                 "scenario": scenario_name("rstar", annual * 100, 0),
                 "scenario_type": "rstar",
+                **baseline_shocks,
                 **params,
             }
         )
@@ -101,6 +106,7 @@ def main() -> None:
             {
                 "scenario": scenario_name("kappa", kappa, 2),
                 "scenario_type": "kappa",
+                **baseline_shocks,
                 **params,
             }
         )
@@ -111,17 +117,38 @@ def main() -> None:
             {
                 "scenario": scenario_name("phi_pi", phi_pi, 1),
                 "scenario_type": "phi_pi",
+                **baseline_shocks,
                 **params,
             }
         )
 
+    # "Calibrate or estimate rho_i": retain the empirical baseline and add the
+    # lecture-style calibrated route as a clean one-parameter robustness case.
+    scenarios.append(
+        {
+            "scenario": "rho_calibrated_0p80",
+            "scenario_type": "rho_i",
+            **baseline_shocks,
+            **complete_parameters({"rho_i": BASELINE["rho_i"]}),
+        }
+    )
+
+    # Alternative shock calibration fitted to the didactic FEVD benchmark,
+    # holding all structural parameters at the Chilean empirical baseline.
+    benchmark_shocks = course_benchmark_shock_std()
+    scenarios.append(
+        {
+            "scenario": "fevd_didactic_benchmark",
+            "scenario_type": "fevd",
+            "std_e_x": benchmark_shocks["e_x"],
+            "std_e_pi": benchmark_shocks["e_pi"],
+            "std_e_i": benchmark_shocks["e_i"],
+            **baseline_params,
+        }
+    )
+
     for row in scenarios:
-        content = TEMPLATE.format(
-            **row,
-            std_e_x=SHOCK_STD["e_x"],
-            std_e_pi=SHOCK_STD["e_pi"],
-            std_e_i=SHOCK_STD["e_i"],
-        )
+        content = TEMPLATE.format(**row)
         (generated / f"{row['scenario']}.mod").write_text(
             content, encoding="ascii"
         )
@@ -148,6 +175,9 @@ def main() -> None:
         "rho_i",
         "phi_pi",
         "phi_x",
+        "std_e_x",
+        "std_e_pi",
+        "std_e_i",
     ]
     pd.DataFrame(scenarios)[manifest_columns].to_csv(
         TABLES / "scenario_manifest.csv", index=False

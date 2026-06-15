@@ -25,6 +25,23 @@ O exercício distingue rigorosamente três tipos de número: **calibração** (v
 modelo). A base de dados é real e oficial; as conclusões empíricas são apresentadas com cautela
 diante da pequena amostra, das hipóteses de identificação e das limitações do modelo fechado.
 
+### 1.1 Auditoria das páginas 26–55 da Aula 5
+
+O projeto foi confrontado item a item com o bloco da aula dedicado à calibração, solução, momentos,
+FEVD, IRFs e previsões. A matriz completa está em
+`docs/assignment_review_pages_26_55.md`. Além dos exercícios obrigatórios, foram executadas **as duas
+alternativas** sempre que o roteiro oferecia uma escolha:
+
+1. \(\rho_i\) **estimado** por AR(1) e \(\rho_i=0{,}80\) **calibrado**;
+2. calibração dos choques para a **matriz didática de FEVD** e para uma **matriz alternativa**;
+3. previsão condicional impondo uma trajetória para o **juro** e impondo uma trajetória para a
+   **inflação**, além da previsão incondicional;
+4. calibração transparente e verificações econométricas por MQO, VI/2SLS e moda posterior.
+
+Essa ampliação torna visível quais conclusões são robustas à escolha metodológica e quais dependem
+do alvo adotado. O material privado serviu apenas para orientar a auditoria; nenhum texto, página ou
+figura da aula foi reproduzido.
+
 ## 2. Por que o Chile
 
 O Chile é um caso instrutivo para um NK mínimo: o BCCh conduz a política em um regime de
@@ -135,22 +152,29 @@ inclui a unidade. Além disso, um AR(1) em níveis pode misturar suavização de
 de regime e movimentos da taxa neutra. Por isso, \(\rho_i=0{,}934\) é usado como alvo descritivo
 solicitado pelo exercício, mantendo-se 0,80 como fallback quando não há dados reais.
 
-## 8. Estratégia de choques e calibração da FEVD
+## 8. Estratégia de choques e duas calibrações da FEVD
 
-Os desvios-padrão são escolhidos para produzir IRFs e momentos legíveis. Para tornar essa escolha
-auditável, `python/calibrate_shocks.py` declara uma FEVD **ilustrativa**, escolhida pelo pesquisador:
-45/10/45 para o hiato, 2/80/18 para a inflação e 10/15/75 para os juros. Esses números não vêm de
-uma decomposição histórica nem de um relatório do BCCh. Com \(\rho_i=0{,}934\), uma inovação
-monetária relativamente grande se propaga por muitos trimestres e domina a variância. Ancorando
-\(\sigma_{e_x}=0{,}005\), o solver linear ajusta os outros dois desvios:
+Os desvios-padrão dos choques são escolhidos para produzir IRFs e momentos legíveis e aproximar
+participações de variância declaradas. Para testar as duas possibilidades do roteiro,
+`python/calibrate_shocks.py` resolve **duas calibrações**:
 
-\[
-\sigma_{e_x}=0{,}00500,\quad \sigma_{e_\pi}=0{,}00277,\quad \sigma_{e_i}=0{,}00068.
-\]
+| Calibração | \(\sigma_{e_x}\) | \(\sigma_{e_\pi}\) | \(\sigma_{e_i}\) | RMSE |
+|---|---:|---:|---:|---:|
+| Referência didática da aula | 0,00500 | 0,00331 | 0,00080 | 1,82 p.p. |
+| Alternativa do pesquisador | 0,00500 | 0,00277 | 0,00068 | 0,95 p.p. |
 
-A intuição é clara: sob forte suavização, o choque monetário precisa ser **pequeno** para não
-dominar a variância. A FEVD resultante descreve essa calibração e não deve ser interpretada como
-identificação empírica dos choques chilenos.
+A alternativa do pesquisador, usada no baseline, mira 45/10/45 para o hiato, 2/80/18 para a
+inflação e 10/15/75 para o juro. A referência didática mira aproximadamente 37,5/10,0/52,4,
+1,4/82,3/16,2 e 8,7/14,7/76,6, respectivamente. A solução didática alcança
+37,4/11,6/51,0 para \(x\), 1,1/80,3/18,6 para \(\pi\) e 5,9/17,4/76,6 para \(i\).
+
+![Comparação das calibrações de FEVD](../outputs/figures/fevd_calibration_comparison.png)
+
+Não é possível acertar nove parcelas arbitrárias com apenas três desvios-padrão; o algoritmo
+minimiza o erro conjunto, ancorando \(\sigma_{e_x}=0{,}005\). Sob \(\rho_i=0{,}934\), uma inovação
+monetária se propaga por vários trimestres, de modo que \(\sigma_{e_i}\) precisa ser pequeno. Em
+ambas as alternativas, a FEVD é propriedade do modelo calibrado, **não** decomposição histórica
+identificada para o Chile.
 
 ## 9. Solução, estabilidade e determinação
 
@@ -171,13 +195,29 @@ persistência: quanto menor, mais rápido o retorno ao equilíbrio.
 
 ![Mapa de determinação](../outputs/figures/determinacy_map.png)
 
-## 10. Resultados baseline
+## 10. Resultados baseline e confronto com os dados
 
 **Momentos teóricos** (`outputs/dynare/baseline/moments.csv`): desvios-padrão
 \(\sigma_x=0{,}0061\), \(\sigma_\pi=0{,}0027\), \(\sigma_i=0{,}0007\); autocorrelações de 1ª ordem
 \(0{,}30\) (hiato), \(0{,}05\) (inflação) e \(0{,}66\) (juros). A alta autocorrelação dos juros reflete
 \(\rho_i=0{,}934\); a inflação é quase serialmente não correlacionada. A média dos juros é \(r^*\),
 enquanto \(x\) e \(\pi\) têm média zero por construção (desvios).
+
+O confronto com os dados deixa uma limitação importante visível. Em pontos percentuais trimestrais,
+o baseline gera desvios-padrão de **0,607** para \(x\), **0,267** para \(\pi\) e **0,073** para \(i\),
+contra **2,415**, **0,919** e **0,578** nos dados. Excluindo 2020Q2–2021Q4, o hiato ainda tem
+desvio-padrão de **1,585**. As autocorrelações observadas, 0,695, 0,411 e 0,934, também excedem as
+do modelo. Os choques calibrados entregam uma dinâmica ilustrativa e uma FEVD controlada, mas
+**subestimam a volatilidade e a persistência empíricas**.
+
+![Momentos do modelo e dos dados](../outputs/figures/moments_model_vs_data.png)
+
+As correlações também diferem. O modelo produz
+\(\operatorname{corr}(x,i)=-0{,}594\) e
+\(\operatorname{corr}(\pi,i)=-0{,}143\), enquanto nos dados brutos elas são positivas, 0,348 e
+0,277. As correlações históricas misturam resposta endógena do banco central, regimes e choques, de
+modo que não constituem um teste causal isolado. Ainda assim, confirmam que o NK mínimo não foi
+estimado para reproduzir toda a distribuição conjunta das séries chilenas.
 
 **FEVD baseline** (`outputs/dynare/baseline/fevd.csv`), em %:
 
@@ -198,14 +238,19 @@ A Figura `irf_baseline_all_shocks.png` mostra a grade 3×3 de IRFs (linhas \(x,\
 
 ![IRFs baseline](../outputs/figures/irf_baseline_all_shocks.png)
 
-- **Choque de demanda (\(e_x>0\))**: eleva o hiato e, via NKPC, a inflação; o BC reage subindo o juro
-  nominal, e a regra suavizada produz um ajuste gradual de volta ao estado estacionário.
+- **Choque de demanda (\(e_x>0\))**: no impacto, eleva \(x\) em 0,400 p.p., \(\pi\) em
+  0,021 p.p. e \(i\) em 0,016 p.p. Contudo, \(x\) e \(\pi\) cruzam zero no horizonte 1 porque a
+  resposta prospectiva da política gera *overshooting*. A resposta não é monotônica.
 - **Choque de custo (\(e_\pi>0\))**: eleva a inflação e induz aperto monetário; o hiato **cai** — o
-  *trade-off* clássico (não há "divina coincidência" com choques de custo). A força de \(\phi_\pi\) é
-  decisiva aqui.
+  *trade-off* clássico. A inflação sobe 0,236 p.p. no impacto, mas também cruza zero no horizonte 1
+  por causa do aperto e do caráter prospectivo da NKPC.
 - **Choque monetário (\(e_i>0\))**: eleva inesperadamente o juro nominal e o juro real *ex ante*,
-  contrai a demanda e o hiato e, com defasagem, reduz a inflação; a reversão é lenta por causa de
-  \(\rho_i\).
+  contrai imediatamente a demanda e **reduz a inflação já no impacto**. Para um choque de um
+  desvio-padrão, as respostas são +0,048 p.p. no juro, −0,307 p.p. no hiato e −0,088 p.p. na
+  inflação.
+
+`irf_sign_checks.csv` confirma que os **nove sinais de impacto** coincidem com a teoria. Essa é uma
+verificação mais adequada do que exigir monotonicidade de um sistema prospectivo.
 
 ## 11. Sensibilidade a \(\kappa\) (inclinação da curva de Phillips)
 
@@ -219,22 +264,42 @@ atividade para os preços.
 Há, porém, *trade-offs*: maior \(\kappa\) não "melhora tudo". Diante de um **choque de custo**, uma
 NKPC mais inclinada faz o aperto monetário (que contrai o hiato) ser **mais eficaz** em desinflacionar,
 de modo que o pico de inflação é até ligeiramente **menor** (0,245 → 0,228 p.p.). Em contrapartida,
-maior \(\kappa\) tende a reduzir o custo real da desinflação, mas amplifica a resposta inflacionária a
-choques de demanda. A interação com a reação do banco central (\(\phi_\pi\)) é central: \(\kappa\) e
-\(\phi_\pi\) atuam em conjunto sobre o quão rápido e a que custo a inflação se estabiliza.
+o custo real acumulado do choque de custo, medido pela soma absoluta da IRF do hiato, cai de
+**0,463 para 0,385 p.p.**. O módulo da raiz estável dominante recua de 0,687 para 0,630, reduzindo a
+meia-vida de convergência de 1,85 para 1,50 trimestre. Ao mesmo tempo, maior \(\kappa\) amplifica a
+inflação causada por demanda e a queda inflacionária causada por um aperto monetário.
+
+![Trade-offs de kappa](../outputs/figures/irf_kappa_tradeoffs.png)
 
 ## 12. Sensibilidade a \(\phi_\pi\) (princípio de Taylor)
 
-Variando \(\phi_\pi\) de 1,3 a 2,2 com \(\phi_x=0{,}5\) (Figura `irf_phi_pi_comparison.png`), e como
-toda a grade é determinada (Seção 9), o efeito relevante é sobre a **velocidade de convergência** e a
-**volatilidade**. Um \(\phi_\pi\) maior eleva mais o juro real quando a inflação sobe, ancorando as
-expectativas e acelerando a estabilização da inflação após um choque de custo; o custo é maior
-volatilidade dos juros e pressão adicional sobre o hiato. O diagnóstico de Blanchard–Kahn (e não uma
-regra verbal) confirma determinação em toda a grade; abaixo de \(\phi_\pi=1\) o modelo torna-se
-indeterminado (`outputs/tables/determinacy_map.csv`). A `scenario_determinacy.csv` registra, para os
-17 modelos, autovalores, contagens e status — todos determinados.
+Variando \(\phi_\pi\) de 1,3 a 2,2 com \(\phi_x=0{,}5\), toda a grade é determinada. Um coeficiente
+maior reduz o impacto inflacionário inicial do choque de custo de **0,242 para 0,230 p.p.** e diminui
+o módulo da raiz estável dominante de 0,663 para 0,649, com meia-vida de 1,69 para 1,60 trimestre.
+Mas a estabilização não é gratuita: a soma absoluta da resposta do juro cresce de
+**0,050 para 0,080 p.p.** e a do hiato de **0,352 para 0,473 p.p.**.
+
+A soma absoluta da IRF da inflação sobe ligeiramente, de 0,311 para 0,317 p.p., porque a inflação
+cruza zero e apresenta *undershooting*. É correto afirmar que uma resposta mais forte reduz o
+impacto e acelera marginalmente a convergência; seria incorreto dizer que reduz monotonicamente toda
+medida de variabilidade inflacionária. Abaixo de \(\phi_\pi=1\), o modelo torna-se indeterminado na
+grade ampliada. A `scenario_determinacy.csv` registra **19 modelos**, todos determinados nos
+cenários principais.
 
 ![Sensibilidade a phi_pi](../outputs/figures/irf_phi_pi_comparison.png)
+
+![Trade-offs de phi_pi](../outputs/figures/irf_phi_pi_tradeoffs.png)
+
+### 12.1 Persistência estimada versus calibrada
+
+Também se executa a alternativa \(\rho_i=0{,}80\). Em comparação com o baseline estimado
+\(\rho_i=0{,}934\), um choque monetário tem efeitos acumulados muito menores: a soma absoluta cai
+de **0,139 para 0,098 p.p.** no juro, de **0,256 para 0,059 p.p.** na inflação e de
+**0,891 para 0,278 p.p.** no hiato. A raiz estável dominante cai de 0,656 para 0,535. Usar o AR(1)
+como \(\rho_i\) amplia fortemente a persistência do canal monetário, mas também expõe a limitação de
+interpretar persistência reduzida como suavização estrutural.
+
+![Persistência estimada e calibrada](../outputs/figures/irf_rho_comparison.png)
 
 ## 13. Análise econométrica I — regra de Taylor
 
@@ -298,30 +363,61 @@ demanda. Como `mh_replic=0`, esse exercício não produz amostras MCMC nem inter
 posteriores integrais; os intervalos são aproximações locais de Laplace e devem ser tratados como
 exploratórios. Extensões naturais incluem erros de medida, tratamento explícito da Covid e MCMC.
 
-## 16. Cenários ilustrativos
+## 16. Previsões incondicional e condicionais
 
-Usando o modelo calibrado e as observáveis, geram-se cenários mecânicos de **8 trimestres**
-(`python/forecast_model.py`, Figura `forecast_fanchart.png`): uma **incondicional** (decaimento
-autônomo do estado atual com choques esperados nulos e bandas de 5–95% por Monte Carlo dos choques
-calibrados) e duas **condicionais** que impõem trajetórias de juros (TPM constante; e +100 p.b. por 4
-trimestres) resolvendo o bloco IS/NKPC por previsão perfeita. No horizonte de 8 trimestres, o
-cenário incondicional converge para ~**3,8% a.a.** de inflação (banda simulada [2,0; 5,6]),
-~**4,1% a.a.** de TPM e hiato próximo de zero. Esses números são resultados mecânicos do modelo,
-não previsão oficial do BCCh e não incorporam câmbio, commodities, novas informações ou julgamento.
+A previsão segue o roteiro das páginas 48–55: é gerada **pelo próprio Dynare**
+(`dynare/nk_chile_forecast.mod`, executado por `python/run_forecast.py`). O comando
+`estimation(datafile='chile_observables_dynare.csv', mode_compute=0, forecast=8)` mantém a calibração
+fixa — não há estimação bayesiana —, roda o suavizador de Kalman sobre o histórico de 2001Q1 a 2026Q1
+e projeta oito trimestres à frente. O Dynare devolve `oo_.forecast.Mean` e as bandas
+`HPDinf`/`HPDsup`. Os observáveis estão em desvios da média amostral (`pi = infl_q − média`,
+`i = i_q − média`, `x = hiato − média`); as séries são reapresentadas em nível anualizado somando de
+volta as médias (TPM média **4,09% a.a.**; inflação média **3,79% a.a.**; meta oficial de **3%**).
 
-![Cenários ilustrativos](../outputs/figures/forecast_fanchart.png)
+No cenário **incondicional**, o modelo parte do estado suavizado do último trimestre (a taxa passada é
+o único estado). A inflação projetada vai de **3,30%** no horizonte 1 a **3,76%** no horizonte 8,
+convergindo para a média amostral; a TPM cai de **4,36%** para **4,11%**; e o hiato fecha de −0,42%
+para ≈0. Como a curva de Phillips é puramente *forward-looking* (sem indexação), o modelo **não tem
+inércia de inflação** e reverte rápido à média — daí o salto visível entre os 5,7% observados e a
+projeção. A média incondicional do Dynare coincide, até o último dígito, com a forma reduzida exata
+(`a_i = 0{,}656`), o que valida a solução.
+
+![Previsão incondicional](../outputs/figures/forecast_fanchart.png)
+
+Para as duas formas de condicionamento da aula, usou-se `conditional_forecast` no Dynare e a mesma
+forma reduzida ancorada no estado atual, com três cenários:
+
+1. **trajetória do juro:** manter a TPM em 4,5% por dois trimestres (juro constante);
+2. **trajetória do juro:** apertar para ~5,1% (≈ +1 p.p. sobre a média) por quatro trimestres;
+3. **trajetória da inflação:** forçar a inflação à meta de 3% a.a. por quatro trimestres.
+
+![Cenários condicionais](../outputs/figures/conditional_scenarios.png)
+
+Manter a TPM em 4,5% (acima da média de 4,09%) já é levemente contracionista: a inflação no horizonte
+1 cai para **3,04%** e o hiato para −0,63%. O aperto para 5,1% derruba a inflação a **1,91%** ao custo
+de um hiato de −1,60% — a amplificação típica de fixar o juro num modelo *forward-looking*. Forçar a
+meta de 3% (abaixo da média de 3,79%) exige aperto: a TPM sobe a **4,52%** e o hiato vai a −0,67%. A
+figura de choques implícitos `e_i` torna explícito o custo de cada caminho.
+
+![Choques de política implícitos](../outputs/figures/conditional_policy_shocks.png)
+
+O `conditional_forecast` nativo do Dynare parte do estado estacionário; por isso o cenário de meta foi
+calibrado com o desvio correto (3% = `pi_dev = −0,00192`, já que o estado estacionário corresponde à
+média de 3,79%). Os choques controlados são tratados, na solução de primeira ordem, como não
+antecipados antes de cada período: **não** é previsão perfeita. E como o único estado predeterminado é
+\(i_{t-1}\), o algoritmo não carrega de forma independente o último hiato e a última inflação. As
+trajetórias são testes de mecanismo, não recomendação de política nem previsão oficial.
 
 ## 17. Implicações de política monetária
 
-O modelo calibrado sintetiza três mensagens. Primeiro, uma resposta suficientemente forte à inflação
-é central para a determinação; na grade usada, a fronteira ocorre em torno de \(\phi_\pi=1\), mas a
-evidência econométrica sobre o coeficiente é imprecisa. Segundo, **a suavização é alta**
-(\(\rho_i\approx0{,}93\)): a política é gradual e
-persistente, o que torna os choques de política — embora pequenos — importantes para a dinâmica.
-Terceiro, **choques de custo impõem um *trade-off*** entre estabilizar inflação e atividade; a
-calibração de \(\kappa\) e \(\phi_\pi\) determina como esse *trade-off* é resolvido. A FEVD calibrada
-reproduz a narrativa usual de um BC (inflação por custos, juros por política), mas **descreve o modelo
-calibrado**, não uma decomposição histórica da economia chilena.
+O modelo sintetiza quatro mensagens. Primeiro, uma resposta ativa à inflação é central para a
+determinação; na parametrização usada, a fronteira está em torno de \(\phi_\pi=1\), mas a evidência
+econométrica é imprecisa. Segundo, **a suavização estimada é muito alta** e amplia a persistência dos
+efeitos monetários em relação à alternativa de 0,80, embora o AR(1) possa misturar gradualismo,
+regime e taxa neutra. Terceiro, choques de custo impõem um *trade-off*: elevar \(\phi_\pi\) reduz o
+impacto inflacionário, porém aumenta o deslocamento de produto e juros e pode gerar
+*undershooting*. Quarto, FEVD e cenários condicionais mostram quais choques seriam necessários
+**dentro do modelo**, não o que ocorreu historicamente nem o que o BCCh deveria fazer.
 
 ## 18. Limitações
 
@@ -344,13 +440,15 @@ bayesiana completa** com MCMC, *priors* alternativos e *dummies*/erros de medida
 ## 20. Conclusão
 
 Recalibrou-se o NK mínimo para o Chile com **dados reais do BCCh**, usando
-\(\rho_i=0{,}934\) do AR(1) como alvo descritivo e ajustando os desvios dos choques a uma FEVD
-ilustrativa explicitamente declarada. O baseline é determinado (Blanchard–Kahn 2/2), com IRFs de
-sinais coerentes com o mecanismo do modelo. As extensões econométricas mostram elevada persistência
-dos juros, uma curva de Phillips backward próxima de 0,10 e grande incerteza na identificação
-prospectiva e na regra de Taylor. As sensibilidades a \(\kappa\) e \(\phi_\pi\) e os cenários
-ilustrativos organizam os mecanismos centrais da política monetária, sem transformar um modelo
-fechado e pequeno em descrição completa da economia chilena.
+\(\rho_i=0{,}934\) do AR(1) como alvo descritivo e comparando-o com 0,80. Foram calibradas tanto a
+FEVD didática quanto uma alternativa explicitamente declarada. O baseline é determinado
+(Blanchard–Kahn 2/2), e os nove sinais de impacto das IRFs são coerentes com o mecanismo do modelo,
+embora várias respostas apresentem *overshooting*. As extensões econométricas mostram elevada
+persistência dos juros, uma Phillips backward próxima de 0,10 e grande incerteza na identificação
+prospectiva e na regra de Taylor. O confronto com os dados revela que o modelo subestima
+volatilidades e persistências. As sensibilidades e previsões condicionais dos dois tipos organizam
+os mecanismos centrais sem transformar o modelo em descrição completa, previsão oficial ou
+recomendação para a economia chilena.
 
 ## 21. Fontes e reprodutibilidade
 

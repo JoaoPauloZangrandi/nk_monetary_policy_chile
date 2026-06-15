@@ -1,0 +1,4 @@
+top: controlled_variables, instruments, cond, controlled_exo_variables, uncond, graph
+cond: Mean, ci
+uncond: Mean, ci
+cond.Mean: i, x, pi

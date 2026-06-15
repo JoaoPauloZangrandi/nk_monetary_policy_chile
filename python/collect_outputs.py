@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import pandas as pd
 
 from common import (
@@ -106,45 +107,58 @@ def collect_irfs(manifest: pd.DataFrame) -> pd.DataFrame:
 
 def collect_moments(manifest: pd.DataFrame) -> None:
     frames = []
-    for scenario in ("baseline",):
+    for _, row in manifest.iterrows():
+        scenario = str(row["scenario"])
         path = DYNARE_OUTPUTS / scenario / "moments.csv"
         if path.exists():
             moment = pd.read_csv(path)
             moment.insert(0, "scenario", scenario)
             moment["source"] = "dynare"
             frames.append(moment)
-    if frames:
-        moments = pd.concat(frames, ignore_index=True)
-    else:
+        else:
+            params = complete_parameters(row_parameters(row))
+            moment = fallback_moments(params)
+            moment.insert(0, "scenario", scenario)
+            frames.append(moment)
+    if not frames:
         baseline = manifest.loc[manifest["scenario"] == "baseline"].iloc[0]
-        moments = fallback_moments(complete_parameters(row_parameters(baseline)))
-        moments.insert(0, "scenario", "baseline")
-    moments.to_csv(TABLES / "moments.csv", index=False)
+        moment = fallback_moments(complete_parameters(row_parameters(baseline)))
+        moment.insert(0, "scenario", "baseline")
+        frames.append(moment)
+    moments_all = pd.concat(frames, ignore_index=True)
+    moments_all.to_csv(TABLES / "moments_all_scenarios.csv", index=False)
+    moments_all[moments_all["scenario"] == "baseline"].to_csv(
+        TABLES / "moments.csv", index=False
+    )
 
 
-def collect_fevd(irfs: pd.DataFrame) -> None:
-    frames = [
-        frame
-        for scenario in ("baseline",)
-        if (frame := read_dynare_fevd(scenario)) is not None
-    ]
-    if frames:
-        fevd = pd.concat(frames, ignore_index=True)
-    else:
-        baseline = irfs[irfs["scenario"] == "baseline"].copy()
-        baseline["squared_response"] = baseline["response"] ** 2
+def collect_fevd(irfs: pd.DataFrame, manifest: pd.DataFrame) -> None:
+    frames = []
+    for scenario in manifest["scenario"].astype(str):
+        frame = read_dynare_fevd(scenario)
+        if frame is not None:
+            frames.append(frame)
+            continue
+        selected = irfs[irfs["scenario"] == scenario].copy()
+        selected["squared_response"] = selected["response"] ** 2
         totals = (
-            baseline.groupby(["variable", "shock"], as_index=False)["squared_response"]
+            selected.groupby(["variable", "shock"], as_index=False)["squared_response"]
             .sum()
             .rename(columns={"squared_response": "shock_contribution"})
         )
         totals["variance_share"] = totals["shock_contribution"] / totals.groupby(
             "variable"
         )["shock_contribution"].transform("sum")
-        totals["scenario"] = "baseline"
+        totals["scenario"] = scenario
         totals["source"] = "synthetic_irf_share_fallback"
-        fevd = totals[["scenario", "variable", "shock", "variance_share", "source"]]
-    fevd.to_csv(TABLES / "fevd_summary.csv", index=False)
+        frames.append(
+            totals[["scenario", "variable", "shock", "variance_share", "source"]]
+        )
+    fevd_all = pd.concat(frames, ignore_index=True)
+    fevd_all.to_csv(TABLES / "fevd_all_scenarios.csv", index=False)
+    fevd_all[fevd_all["scenario"] == "baseline"].to_csv(
+        TABLES / "fevd_summary.csv", index=False
+    )
 
 def collect_determinacy(manifest: pd.DataFrame) -> None:
     rows = []
@@ -163,6 +177,25 @@ def collect_determinacy(manifest: pd.DataFrame) -> None:
                 "n_eigenvalues": None,
                 "source": "no_dynare_diagnostic",
             }
+        eigen_path = DYNARE_OUTPUTS / scenario / "eigenvalues.csv"
+        if eigen_path.exists():
+            eigenvalues = pd.read_csv(eigen_path)
+            stable = eigenvalues[eigenvalues["modulus"] < 1.0]["modulus"]
+            unstable = eigenvalues[eigenvalues["modulus"] > 1.0]["modulus"]
+            dominant = float(stable.max()) if not stable.empty else math.nan
+            row["dominant_stable_modulus"] = dominant
+            row["convergence_half_life_quarters"] = (
+                math.log(0.5) / math.log(dominant)
+                if 0.0 < dominant < 1.0
+                else math.nan
+            )
+            row["smallest_unstable_modulus"] = (
+                float(unstable.min()) if not unstable.empty else math.nan
+            )
+        else:
+            row["dominant_stable_modulus"] = math.nan
+            row["convergence_half_life_quarters"] = math.nan
+            row["smallest_unstable_modulus"] = math.nan
         row["scenario_type"] = scenario_row.get("scenario_type", "")
         row["phi_pi"] = scenario_row.get("phi_pi", None)
         rows.append(row)
@@ -174,7 +207,7 @@ def main() -> None:
     manifest = manifest_with_baseline()
     irfs = collect_irfs(manifest)
     collect_moments(manifest)
-    collect_fevd(irfs)
+    collect_fevd(irfs, manifest)
     collect_determinacy(manifest)
     print(f"Collected outputs in {TABLES}")
     print(irfs.groupby("source")["scenario"].nunique().to_string())

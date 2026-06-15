@@ -1,0 +1,4 @@
+scenario,index,real,imaginary,modulus
+fevd_didactic_benchmark,1,0.65607698161,0,0.65607698161
+fevd_didactic_benchmark,2,1.37905839588,0,1.37905839588
+fevd_didactic_benchmark,3,1.0400709991,0,1.0400709991

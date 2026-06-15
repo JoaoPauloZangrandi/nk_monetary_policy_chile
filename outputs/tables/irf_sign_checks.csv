@@ -1,0 +1,10 @@
+shock,variable,expected_impact_sign,observed_impact_sign,impact_sign_matches,impact_pp,first_sign_change_horizon
+e_i,i,1,1,True,0.0477609080701,
+e_pi,i,1,1,True,0.0224387447377,
+e_x,i,1,1,True,0.015622643319199998,
+e_i,pi,-1,-1,True,-0.08789820998560001,
+e_pi,pi,1,1,True,0.235704187662,1.0
+e_x,pi,1,1,True,0.0212484029619,1.0
+e_i,x,-1,-1,True,-0.30654796198199996,
+e_pi,x,-1,-1,True,-0.14402053367,
+e_x,x,1,1,True,0.39972783885799995,1.0

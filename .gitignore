@@ -3,6 +3,11 @@ _private_course_pdfs/
 **/_private_course_pdfs/
 *.pdf
 *.PDF
+# Exception: the deliverable PDFs in entrega_aula5/ are original work (no course
+# material is reproduced) and are meant to be published on GitHub.
+!entrega_aula5/Comprehend.pdf
+!entrega_aula5/Apresentacao.pdf
+!entrega_aula5/Roteiro.pdf
 
 # Python
 __pycache__/

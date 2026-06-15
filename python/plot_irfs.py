@@ -53,6 +53,31 @@ def plot_kappa(irfs: pd.DataFrame) -> None:
     plt.close(fig)
 
 
+def plot_kappa_tradeoffs(irfs: pd.DataFrame) -> None:
+    selected = irfs[irfs["scenario"].str.startswith("kappa_")]
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4.8), sharex=True)
+    for scenario, frame in selected.groupby("scenario"):
+        label = scenario.removeprefix("kappa_").replace("p", ".")
+        for ax, shock, title in (
+            (axes[0], "e_x", "Demand shock"),
+            (axes[1], "e_pi", "Cost-push shock"),
+        ):
+            line = frame[(frame["variable"] == "pi") & (frame["shock"] == shock)]
+            ax.plot(line["horizon"], 100 * line["response"], linewidth=2, label=label)
+            ax.set_title(title)
+            ax.set_xlabel("Quarters")
+            ax.grid(alpha=0.25)
+    axes[0].set_ylabel("Inflation response (percentage points)")
+    axes[0].legend(title="kappa")
+    for ax in axes:
+        ax.axhline(0, color="black", linewidth=0.8)
+    fig.suptitle("Phillips-curve slope: transmission and stabilization trade-offs")
+    fig.text(0.01, 0.01, source_note(selected), fontsize=8)
+    fig.tight_layout(rect=(0, 0.03, 1, 0.94))
+    fig.savefig(FIGURES / "irf_kappa_tradeoffs.png", dpi=180)
+    plt.close(fig)
+
+
 def plot_phi_pi(irfs: pd.DataFrame) -> None:
     selected = irfs[
         irfs["scenario"].str.startswith("phi_pi_")
@@ -83,6 +108,79 @@ def plot_phi_pi(irfs: pd.DataFrame) -> None:
     fig.text(0.01, 0.01, source_note(selected), fontsize=8)
     fig.tight_layout(rect=(0, 0.03, 1, 1))
     fig.savefig(FIGURES / "irf_phi_pi_comparison.png", dpi=180)
+    plt.close(fig)
+
+
+def plot_phi_pi_tradeoffs(irfs: pd.DataFrame) -> None:
+    scenarios = {
+        "phi_pi_1p3": ("1.3", "#5B8FF9"),
+        "baseline": ("1.75 baseline", "#111827"),
+        "phi_pi_2p2": ("2.2", "#F4664A"),
+    }
+    fig, axes = plt.subplots(1, 3, figsize=(14, 4.8), sharex=True)
+    for scenario, (label, color) in scenarios.items():
+        selected = irfs[
+            (irfs["scenario"] == scenario) & (irfs["shock"] == "e_pi")
+        ]
+        for ax, variable, title in zip(
+            axes,
+            ("pi", "x", "i"),
+            ("Inflation", "Output gap", "Policy rate"),
+        ):
+            line = selected[selected["variable"] == variable]
+            ax.plot(
+                line["horizon"],
+                100 * line["response"],
+                linewidth=2,
+                label=label,
+                color=color,
+            )
+            ax.axhline(0, color="black", linewidth=0.7)
+            ax.set_title(title)
+            ax.set_xlabel("Quarters")
+            ax.grid(alpha=0.25)
+    axes[0].set_ylabel("Response (percentage points)")
+    axes[0].legend(title="phi_pi")
+    fig.suptitle("Cost-push shock: inflation-output-interest trade-off")
+    fig.text(0.01, 0.01, source_note(irfs[irfs["scenario"].isin(scenarios)]), fontsize=8)
+    fig.tight_layout(rect=(0, 0.03, 1, 0.94))
+    fig.savefig(FIGURES / "irf_phi_pi_tradeoffs.png", dpi=180)
+    plt.close(fig)
+
+
+def plot_rho_comparison(irfs: pd.DataFrame) -> None:
+    scenarios = {
+        "baseline": ("Estimated rho_i = 0.934", "#1E4E79"),
+        "rho_calibrated_0p80": ("Calibrated rho_i = 0.80", "#FF6B35"),
+    }
+    fig, axes = plt.subplots(1, 3, figsize=(14, 4.8), sharex=True)
+    for scenario, (label, color) in scenarios.items():
+        selected = irfs[
+            (irfs["scenario"] == scenario) & (irfs["shock"] == "e_i")
+        ]
+        for ax, variable, title in zip(
+            axes,
+            ("i", "x", "pi"),
+            ("Policy rate", "Output gap", "Inflation"),
+        ):
+            line = selected[selected["variable"] == variable]
+            ax.plot(
+                line["horizon"],
+                100 * line["response"],
+                linewidth=2.2,
+                label=label,
+                color=color,
+            )
+            ax.axhline(0, color="black", linewidth=0.7)
+            ax.set_title(title)
+            ax.set_xlabel("Quarters")
+            ax.grid(alpha=0.25)
+    axes[0].set_ylabel("Response (percentage points)")
+    axes[0].legend(fontsize=8)
+    fig.suptitle("Interest-rate smoothing route: calibrated versus estimated rho_i")
+    fig.text(0.01, 0.01, source_note(irfs[irfs["scenario"].isin(scenarios)]), fontsize=8)
+    fig.tight_layout(rect=(0, 0.03, 1, 0.94))
+    fig.savefig(FIGURES / "irf_rho_comparison.png", dpi=180)
     plt.close(fig)
 
 
@@ -168,7 +266,10 @@ def main() -> None:
     plot_data_overview()
     irfs = load_irfs()
     plot_kappa(irfs)
+    plot_kappa_tradeoffs(irfs)
     plot_phi_pi(irfs)
+    plot_phi_pi_tradeoffs(irfs)
+    plot_rho_comparison(irfs)
     plot_baseline(irfs)
     print(f"Wrote IRF figures to {FIGURES}")
 

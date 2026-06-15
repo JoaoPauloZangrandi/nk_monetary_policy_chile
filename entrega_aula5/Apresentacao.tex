@@ -1,0 +1,295 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usetheme{metropolis}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[portuguese]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+
+\definecolor{azul}{HTML}{1E4E79}
+\definecolor{verdee}{HTML}{16A34A}
+\definecolor{laranja}{HTML}{B45309}
+\setbeamercolor{frametitle}{bg=azul}
+\setbeamercolor{progress bar}{fg=azul,bg=azul!20}
+\setbeamercolor{title separator}{fg=azul}
+\metroset{numbering=none, progressbar=frametitle, block=fill}
+
+% Bottom bar showing the current section of the presentation.
+\setbeamercolor{secao rodape}{fg=white,bg=azul}
+\setbeamerfont{secao rodape}{size=\scriptsize}
+\setbeamertemplate{footline}{%
+  \hbox{\begin{beamercolorbox}[wd=\paperwidth,ht=3.2ex,dp=1.4ex,leftskip=1.4em,rightskip=1.4em]{secao rodape}%
+    \usebeamerfont{secao rodape}\strut
+    \ifx\insertsectionhead\empty\textit{Introdução}\else\insertsectionhead\fi
+    \hfill
+    \insertframenumber\,/\,\inserttotalframenumber\strut%
+  \end{beamercolorbox}}%
+}
+
+% Both width AND height are constrained with keepaspectratio, so any figure
+% (tall, square or very wide) always scales to fit the slide without spilling.
+% \fig  -> figure-only slides (more vertical room).
+% \figw -> slides that also carry a footnote line (leaves room below).
+\newcommand{\fig}[1]{\centering\includegraphics[width=\linewidth,height=0.84\textheight,keepaspectratio]{figures/#1}}
+\newcommand{\figw}[1]{\centering\includegraphics[width=\linewidth,height=0.72\textheight,keepaspectratio]{figures/#1}}
+
+\title{Política monetária no Chile}
+\subtitle{Um modelo Novo-Keynesiano mínimo: calibração, diagnósticos e previsão (Dynare)}
+\author{Daniel Colli e João Zangrandi}
+\institute{FGV EESP --- Teoria e Prática da Política Monetária}
+\date{Aula 5 --- Dynare e Calibração (pp.\ 26--55)}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}{Roteiro}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \begin{enumerate}
+        \item A pergunta e as três variáveis
+        \item O modelo em três equações
+        \item Calibração e a tabela parâmetro\,$\leftrightarrow$\,alvo
+        \item Os dados do Chile
+        \item Solução e determinação
+      \end{enumerate}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{enumerate}\setcounter{enumi}{5}
+        \item IRFs, momentos e FEVD
+        \item Sensibilidades ($\kappa$, $\phi_\pi$, $\rho_i$)
+        \item \textbf{Previsão: incondicional e condicional}
+        \item Econometria e limitações
+        \item Mensagens
+      \end{enumerate}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{A pergunta e o modelo}
+
+\begin{frame}{A pergunta da política monetária}
+  \begin{itemize}
+    \item O Banco Central move \textbf{um} instrumento --- a \textbf{taxa de juros} (TPM no Chile).
+    \item Objetivo: manter a \textbf{inflação} na \textbf{meta} (3\% a.a.) com a menor oscilação
+          possível da \textbf{atividade}.
+    \item Para estudar isso de forma disciplinada, usamos um \textbf{modelo Novo-Keynesiano mínimo}:
+          3 equações, 3 variáveis, 3 choques.
+  \end{itemize}
+  \begin{alertblock}{Três variáveis (em desvios do equilíbrio)}
+    $x_t$ = hiato do produto \quad $\pi_t$ = inflação \quad $i_t$ = juro nominal (TPM)
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}{O modelo em três equações}
+  \begin{block}{IS --- demanda}
+    \[ x_t = \mathbb{E}_t x_{t+1} - \tfrac{1}{\sigma}\big(i_t - \mathbb{E}_t\pi_{t+1} - r^\ast\big) + \varepsilon^x_t \]
+    Demanda cai quando o \emph{juro real} sobe acima do \emph{neutro} $r^\ast$.
+  \end{block}
+  \begin{block}{NKPC --- oferta (Phillips)}
+    \[ \pi_t = \beta\,\mathbb{E}_t\pi_{t+1} + \kappa\,x_t + \varepsilon^\pi_t \]
+    Inflação sobe com o aquecimento ($\kappa$) e com a inflação esperada.
+  \end{block}
+  \begin{block}{Regra de Taylor --- o Banco Central}
+    \[ i_t = \rho_i\,i_{t-1} + (1-\rho_i)\big(r^\ast + \phi_\pi\pi_t + \phi_x x_t\big) + \varepsilon^i_t \]
+    Reage à inflação ($\phi_\pi$) e ao hiato ($\phi_x$), com suavização ($\rho_i$).
+  \end{block}
+\end{frame}
+
+\section{Calibração}
+
+\begin{frame}{A tarefa (slide 26) e a calibração para o Chile}
+  \centering
+  \begin{tabular}{lll}
+    \toprule
+    Parâmetro & Valor (baseline) & Alvo / origem \\
+    \midrule
+    $r^\ast$ anual & 3\% & cenários 2/3/4\% $\Rightarrow$ deriva $\beta$ \\
+    $\beta$ & 0,9926 & $1/(1+r^\ast)$ \\
+    $\sigma$ & 1,0 & utilidade log \\
+    $\kappa$ & 0,10 & grade 0,07 / 0,10 / 0,13 \\
+    $\rho_i$ & 0,934 & \textbf{AR(1)} da TPM (estimado) \\
+    $\phi_\pi$ & 1,75 & grade 1,3--2,2 (princípio de Taylor) \\
+    $\phi_x$ & 0,50 & fixo \\
+    $\sigma_{\varepsilon x},\sigma_{\varepsilon\pi},\sigma_{\varepsilon i}$ & 0,0050 / 0,0028 / 0,0007 & calibrados p/ a FEVD \\
+    \bottomrule
+  \end{tabular}
+  \vspace{2mm}
+  {\footnotesize $r^\ast$ anual $\to$ trimestral $\to$ $\beta=1/(1+r^\ast_{\text{trim}})$: 2/3/4\% $\Rightarrow$ 0,9951 / 0,9926 / 0,9902.}
+\end{frame}
+
+\section{Dados do Chile}
+
+\begin{frame}{Dados oficiais do Banco Central do Chile (2001--2026)}
+  \figw{data_overview.png}
+  \vspace{1mm}
+  {\footnotesize Picos de inflação em 2008 e 2022; tombo do hiato de $-15\%$ na COVID. Meta de 3\%
+  (linha pontilhada). 101 trimestres.}
+\end{frame}
+
+\section{Solução e determinação}
+
+\begin{frame}{Resolver = expectativas racionais + Blanchard--Kahn}
+  \begin{itemize}
+    \item Estado estacionário: $x=\pi=0$, $i=r^\ast$ (modelo em desvios).
+    \item \textbf{2 variáveis de salto} ($x,\pi$) e \textbf{1 estado} ($i_{t-1}$) $\Rightarrow$
+          precisamos de exatamente 2 raízes explosivas.
+    \item Dynare confirma: autovalores $0{,}656$ (estável), $1{,}04$, $1{,}379$ (explosivas)
+          $\Rightarrow$ \textbf{solução única e estável}.
+  \end{itemize}
+  \begin{exampleblock}{Princípio de Taylor}
+    A determinação exige $\phi_\pi>1$: o BC tem de reagir à inflação \emph{mais que
+    proporcionalmente} para ancorar as expectativas.
+  \end{exampleblock}
+\end{frame}
+
+\section{IRFs, momentos e FEVD}
+
+\begin{frame}{IRFs do baseline --- resposta a cada choque}
+  \fig{irf_baseline_all_shocks.png}
+\end{frame}
+
+\begin{frame}{IRFs do baseline --- leitura}
+  \begin{itemize}
+    \item \textbf{Demanda} ($\varepsilon^x>0$): hiato $\uparrow$, inflação $\uparrow$, juro $\uparrow$.
+    \item \textbf{Custo} ($\varepsilon^\pi>0$): inflação $\uparrow$, juro $\uparrow$, hiato $\downarrow$
+          --- o \emph{trade-off} clássico.
+    \item \textbf{Política} ($\varepsilon^i>0$): aperto $\Rightarrow$ hiato $\downarrow$, inflação
+          $\downarrow$; resposta gradual pela suavização $\rho_i$.
+    \item Convergência rápida (estabilidade confirmada).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Momentos: modelo \emph{versus} dados}
+  \figw{moments_model_vs_data.png}
+  \vspace{1mm}
+  {\footnotesize O modelo \textbf{subestima} a volatilidade e a \textbf{persistência da inflação}
+  (modelo $\approx 0{,}05$ vs dados $\approx 0{,}4$): a NKPC pura não tem inércia.}
+\end{frame}
+
+\begin{frame}{FEVD --- de onde vem a variância de cada variável}
+  \fig{fevd_calibration_comparison.png}
+\end{frame}
+
+\begin{frame}{FEVD --- leitura}
+  \begin{itemize}
+    \item \textbf{Hiato}: demanda + política ($\sim$45\% + 45\%).
+    \item \textbf{Inflação}: dominada por choques de \textbf{custo} ($\sim$80\%).
+    \item \textbf{Juro}: pelo seu \textbf{próprio} choque ($\sim$75\%).
+    \item A calibração dos choques \emph{atinge} os alvos (``Target'' $\approx$ ``Achieved'').
+  \end{itemize}
+\end{frame}
+
+\section{Sensibilidades}
+
+\begin{frame}{Sensibilidade a $\kappa$ (inclinação de Phillips)}
+  \fig{irf_kappa_comparison.png}
+\end{frame}
+
+\begin{frame}{Sensibilidade a $\kappa$ --- \emph{trade-offs}}
+  \figw{irf_kappa_tradeoffs.png}
+  \vspace{1mm}
+  {\footnotesize $\kappa$ maior $\Rightarrow$ aquecimento vira inflação mais rápido; o BC reage mais.}
+\end{frame}
+
+\begin{frame}{Sensibilidade a $\phi_\pi$ (1,3 a 2,2)}
+  \fig{irf_phi_pi_comparison.png}
+\end{frame}
+
+\begin{frame}{Sensibilidade a $\phi_\pi$ --- \emph{trade-offs}}
+  \figw{irf_phi_pi_tradeoffs.png}
+  \vspace{1mm}
+  {\footnotesize $\phi_\pi$ maior reduz o impacto inflacionário, mas exige mais juro e produto.}
+\end{frame}
+
+\begin{frame}{Mapa de determinação --- o princípio de Taylor desenhado}
+  \fig{determinacy_map.png}
+\end{frame}
+
+\begin{frame}{Mapa de determinação --- leitura}
+  \begin{itemize}
+    \item \textcolor{laranja}{\textbf{Vermelho}} ($\phi_\pi<1$): 2 raízes estáveis $\Rightarrow$
+          \textbf{indeterminação}.
+    \item \textcolor{verdee}{\textbf{Verde}} ($\phi_\pi\geq 1$): 1 raiz estável $\Rightarrow$
+          \textbf{determinação}.
+    \item A raiz dominante despenca de $\approx 1{,}0$ para $\approx 0{,}66$ ao cruzar $\phi_\pi=1$:
+          mais ativismo $\Rightarrow$ convergência mais rápida.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Persistência: $\rho_i$ estimado (0,934) vs calibrado (0,80)}
+  \fig{irf_rho_comparison.png}
+\end{frame}
+
+\section{Previsão (pp.\ 48--55)}
+
+\begin{frame}{Como a previsão é feita --- \emph{nativa no Dynare}}
+  \begin{block}{Receita das páginas 48--49}
+    \texttt{varobs pi i x;}\\
+    \texttt{estimation(datafile='...', mode\_compute=0, forecast=8);}
+  \end{block}
+  \begin{itemize}
+    \item \texttt{mode\_compute=0}: mantém a \textbf{calibração fixa} (sem estimar).
+    \item Filtro/suavizador de \textbf{Kalman} sobre o histórico $\Rightarrow$ projeta 8 trimestres.
+    \item Devolve \texttt{oo\_.forecast.Mean} e as bandas \texttt{HPDinf/HPDsup}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Previsão incondicional --- \emph{fan chart}}
+  \figw{forecast_fanchart.png}
+  \vspace{1mm}
+  {\footnotesize Inflação 3,30\%\,$\to$\,3,76\% (volta à média); TPM 4,36\%\,$\to$\,4,11\%. Sem inércia
+  $\Rightarrow$ reversão rápida.}
+\end{frame}
+
+\begin{frame}{Previsões condicionais --- cenários de política}
+  \figw{conditional_scenarios.png}
+  \vspace{1mm}
+  {\footnotesize Manter TPM 4,5\%; apertar p/ 5,1\%; forçar inflação à meta de 3\%. \texttt{conditional\_forecast}.}
+\end{frame}
+
+\begin{frame}{Quanto custa cada cenário --- choques implícitos}
+  \figw{conditional_policy_shocks.png}
+  \vspace{1mm}
+  {\footnotesize As inovações $\varepsilon^i$ necessárias tornam explícito o esforço de política de
+  cada caminho.}
+\end{frame}
+
+\section{Síntese}
+
+\begin{frame}{Econometria --- deixar os dados falarem}
+  \begin{itemize}
+    \item \textbf{AR(1)} da TPM: $\rho_i=0{,}934$ (muito persistente).
+    \item \textbf{Regra de Taylor} (MQO/VI): $\phi_\pi$ entre 0,83 e 3,05 --- evidência imprecisa.
+    \item \textbf{Curva de Phillips}: $\kappa\approx 0{,}10$.
+    \item \textbf{Moda posterior bayesiana}: estima tudo de uma vez (checagem).
+  \end{itemize}
+  \begin{alertblock}{Calibração \emph{e} estimação}
+    Na dúvida, o projeto roda as duas versões e mostra o que é robusto.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}{Limitações (honestas)}
+  \begin{itemize}
+    \item Modelo \textbf{fechado e pequeno}; Chile é economia \textbf{aberta} (câmbio, cobre).
+    \item \textbf{Único estado} ($i_{t-1}$): ``esquece'' o último hiato e inflação.
+    \item \textbf{Sem inércia de inflação}: reversão rápida demais.
+    \item $r^\ast$ fixo; choques calibrados, não identificados historicamente.
+    \item Não é previsão oficial nem recomendação --- é um laboratório transparente.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Mensagens}
+  \begin{enumerate}
+    \item Uma regra \textbf{ativa} ($\phi_\pi>1$) é o que garante a \textbf{determinação}.
+    \item A \textbf{suavização} estimada é alta e estica os efeitos monetários.
+    \item Choques de custo impõem um \textbf{trade-off} inflação\,$\times$\,produto.
+    \item A previsão nativa do Dynare conecta o modelo calibrado à \textbf{comunicação de cenários}.
+  \end{enumerate}
+  \begin{center}\large\color{azul}\textbf{Obrigado!}\end{center}
+\end{frame}
+
+\end{document}

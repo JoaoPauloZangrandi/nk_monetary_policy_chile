@@ -1,0 +1,616 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[portuguese]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage[a4paper,margin=2.3cm]{geometry}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[most]{tcolorbox}
+\usepackage[colorlinks=true,linkcolor=blue!55!black,urlcolor=blue!55!black]{hyperref}
+\usepackage{titlesec}
+
+\definecolor{azul}{HTML}{1E4E79}
+\definecolor{verdee}{HTML}{16A34A}
+\definecolor{laranja}{HTML}{B45309}
+
+\titleformat{\section}{\Large\bfseries\color{azul}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries\color{azul!85!black}}{\thesubsection}{0.6em}{}
+
+\newtcolorbox{intuicao}{colback=verdee!6,colframe=verdee!60!black,
+  title=\textbf{Intuição},fonttitle=\bfseries,boxrule=0.6pt,left=3mm,right=3mm,top=2mm,bottom=2mm}
+\newtcolorbox{atencao}{colback=laranja!7,colframe=laranja!75!black,
+  title=\textbf{Atenção / armadilha comum},fonttitle=\bfseries,boxrule=0.6pt,left=3mm,right=3mm,top=2mm,bottom=2mm}
+\newtcolorbox{resumo}{colback=azul!6,colframe=azul!70!black,
+  title=\textbf{Em uma frase},fonttitle=\bfseries,boxrule=0.6pt,left=3mm,right=3mm,top=2mm,bottom=2mm}
+
+\newcommand{\fig}[2]{\begin{figure}[ht]\centering
+  \includegraphics[width=\linewidth]{figures/#1}\caption{#2}\end{figure}}
+
+\title{\textbf{Comprehend}\\[2mm]
+\large Guia didático completo do projeto de Política Monetária:\\
+um modelo Novo-Keynesiano mínimo calibrado para o Chile\\[3mm]
+\normalsize Teoria, código e gráficos explicados do zero --- Aula 5 (Dynare e Calibração), páginas 26--55}
+\author{Material de estudo}
+\date{\today}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+\noindent Este documento foi escrito para quem está começando. Ele explica, passo a passo e sem
+pressupor conhecimento prévio, \emph{toda} a teoria por trás do projeto: o que é um modelo
+Novo-Keynesiano (NK), o que cada equação significa, o que cada parâmetro faz, como o modelo é
+resolvido no Dynare, como se leem todos os gráficos, como os dados do Chile entram e como se faz a
+previsão das páginas 48--55. Sempre que aparece um termo técnico, ele é definido. As caixas verdes
+trazem a intuição; as laranjas, as armadilhas; as azuis, o resumo de uma frase.
+\end{abstract}
+
+\tableofcontents
+\bigskip
+
+% ======================================================================
+\section{Para que serve tudo isso}
+% ======================================================================
+
+\textbf{Política monetária} é o conjunto de decisões do Banco Central sobre a \textbf{taxa básica de
+juros}. No Chile, essa taxa se chama \textbf{TPM} (\emph{Tasa de Política Monetaria}); no Brasil, é a
+Selic. Subir o juro esfria a economia e tende a reduzir a inflação; baixar o juro aquece a economia.
+O Banco Central mexe no juro tentando manter a \textbf{inflação} perto de uma \textbf{meta} (no Chile,
+3\% ao ano) sem causar oscilações desnecessárias na \textbf{atividade econômica}.
+
+Para estudar esse mecanismo de forma disciplinada, os economistas usam um \textbf{modelo}: um conjunto
+pequeno de equações que descreve como juros, inflação e atividade se influenciam. O modelo deste
+projeto é o \textbf{Novo-Keynesiano (NK) mínimo}, com apenas três equações e três variáveis. Ele é a
+espinha dorsal de modelos muito maiores usados por bancos centrais de verdade.
+
+\begin{intuicao}
+Pense no modelo como um ``simulador de voo'' da economia. Ele não é a economia real, mas captura as
+forças principais. Com ele podemos perguntar: \emph{``e se o Banco Central subir o juro?''} ou
+\emph{``e se houver um choque de custos?''} --- e ver a resposta sem precisar fazer o experimento na
+economia de verdade.
+\end{intuicao}
+
+\subsection{As três variáveis do modelo}
+O modelo acompanha três grandezas, todas medidas trimestralmente:
+\begin{itemize}[nosep]
+  \item $x_t$ --- o \textbf{hiato do produto} (\emph{output gap}): a diferença percentual entre o PIB
+        observado e o ``PIB potencial'' (o que a economia produziria sem pressões). $x_t>0$ significa
+        economia ``aquecida''; $x_t<0$, economia ``abaixo do potencial''.
+  \item $\pi_t$ --- a \textbf{inflação} (variação dos preços) no trimestre, medida como desvio da sua
+        média/meta.
+  \item $i_t$ --- a \textbf{taxa de juros nominal} de política (a TPM), também trimestral.
+\end{itemize}
+
+\begin{atencao}
+``Hiato'' não é o nível do PIB, é o \emph{desvio} do PIB em relação à sua tendência. Um país rico e um
+país pobre podem ter o mesmo hiato (zero) se ambos estiverem exatamente no seu potencial. O hiato mede
+\emph{ciclo}, não \emph{tamanho}.
+\end{atencao}
+
+\subsection{Três ideias que aparecem o tempo todo}
+Antes da matemática, três conceitos que voltam sempre:
+
+\paragraph{1. Desvios em torno do equilíbrio (log-linearização).} O modelo não trabalha com os níveis
+``brutos'' (PIB em reais, inflação em \%), mas com \textbf{desvios} em relação a um ponto de
+equilíbrio chamado \textbf{estado estacionário}. Por isso as variáveis são pequenas e ficam ``em torno
+de zero''. Trabalhar com desvios transforma equações curvas (não lineares) em equações de linha reta
+(lineares), que são fáceis de resolver. É como usar uma régua para aproximar uma curva perto de um
+ponto: funciona muito bem para pequenas oscilações.
+
+\paragraph{2. Expectativas racionais (\emph{forward-looking}).} As pessoas e empresas tomam decisões
+hoje pensando no \emph{futuro}. Uma empresa que fixa preço hoje pensa na inflação dos próximos
+trimestres. No modelo, isso aparece como termos $x_{t+1}$ e $\pi_{t+1}$ (variáveis ``do futuro''). A
+notação $\pi_{t+1}$ dentro de uma equação de hoje significa ``a inflação que se \emph{espera} para o
+próximo trimestre''.
+
+\paragraph{3. Choques.} São surpresas imprevisíveis que empurram a economia: um choque de demanda
+($\varepsilon^x$), um choque de custos ($\varepsilon^\pi$) e um choque de política monetária
+($\varepsilon^i$). Tudo o que é ``dinâmico'' no modelo vem da reação a esses choques.
+
+\begin{resumo}
+O modelo descreve como hiato, inflação e juros --- medidos como pequenos desvios do equilíbrio e
+influenciados pelas expectativas de futuro --- reagem a três tipos de choque.
+\end{resumo}
+
+% ======================================================================
+\section{O modelo, equação por equação}
+% ======================================================================
+
+O modelo NK mínimo tem três equações. Vamos dissecar cada uma. Em forma compacta:
+\begin{align}
+x_t      &= \mathbb{E}_t x_{t+1} - \tfrac{1}{\sigma}\big(i_t - \mathbb{E}_t\pi_{t+1} - r^\ast\big) + \varepsilon^x_t, \tag{IS}\\[1mm]
+\pi_t    &= \beta\,\mathbb{E}_t\pi_{t+1} + \kappa\,x_t + \varepsilon^\pi_t, \tag{NKPC}\\[1mm]
+i_t      &= \rho_i\,i_{t-1} + (1-\rho_i)\big(r^\ast + \phi_\pi\,\pi_t + \phi_x\,x_t\big) + \varepsilon^i_t. \tag{Taylor}
+\end{align}
+O símbolo $\mathbb{E}_t$ significa ``valor esperado, dado o que se sabe no trimestre $t$''.
+
+\subsection{Equação IS --- o lado da demanda}
+\[
+x_t = \underbrace{\mathbb{E}_t x_{t+1}}_{\text{hiato futuro esperado}} - \tfrac{1}{\sigma}\big(\underbrace{i_t - \mathbb{E}_t\pi_{t+1}}_{\text{juro real esperado}} - \underbrace{r^\ast}_{\text{juro neutro}}\big) + \varepsilon^x_t.
+\]
+\textbf{O que ela diz:} a demanda hoje ($x_t$) depende de (a)~quanto se espera de demanda amanhã e
+(b)~do \textbf{juro real} comparado ao \textbf{juro neutro}.
+
+\begin{itemize}[nosep]
+  \item \textbf{Juro real} $= i_t - \mathbb{E}_t\pi_{t+1}$: é o juro nominal \emph{descontada} a
+        inflação esperada. Se o banco cobra 10\% e a inflação esperada é 6\%, o juro real é $\approx$
+        4\%. O que importa para poupar/gastar é o juro real, não o nominal.
+  \item $r^\ast$ (lê-se ``r-estrela''): o \textbf{juro neutro} --- o juro real que mantém a economia
+        equilibrada (nem aquecendo, nem esfriando). Se o juro real está \emph{acima} de $r^\ast$, a
+        política está apertada e a demanda cai ($x_t$ diminui).
+  \item $\sigma$ (sigma): mede o quanto a demanda reage ao juro real. $1/\sigma$ é a sensibilidade.
+        Com $\sigma$ grande, as pessoas quase não mudam o consumo quando o juro muda.
+\end{itemize}
+
+\begin{intuicao}
+A equação IS é a regra do ``vale a pena gastar agora ou esperar?''. Juro real alto (acima do neutro)
+$\Rightarrow$ vale a pena poupar $\Rightarrow$ consumo/demanda caem hoje $\Rightarrow$ $x_t$ cai. O
+termo $\mathbb{E}_t x_{t+1}$ aparece porque a decisão de consumo é \emph{intertemporal}: comparo hoje
+com o futuro.
+\end{intuicao}
+
+\subsection{Curva de Phillips Novo-Keynesiana (NKPC) --- o lado da oferta}
+\[
+\pi_t = \beta\,\mathbb{E}_t\pi_{t+1} + \kappa\,x_t + \varepsilon^\pi_t.
+\]
+\textbf{O que ela diz:} a inflação de hoje depende da inflação \emph{esperada} para amanhã e do
+aquecimento da economia ($x_t$).
+
+\begin{itemize}[nosep]
+  \item $\beta$ (beta): o \textbf{fator de desconto}, um número pouco abaixo de 1 (aqui $\approx
+        0{,}993$). Mede o peso que se dá ao futuro. Como as empresas são \emph{forward-looking}, a
+        inflação esperada quase ``passa direto'' para a inflação de hoje.
+  \item $\kappa$ (kappa): a \textbf{inclinação da curva de Phillips}. Mede o quanto o aquecimento
+        ($x_t>0$) pressiona os preços. $\kappa$ grande $\Rightarrow$ economia aquecida vira inflação
+        rapidamente; $\kappa$ pequeno $\Rightarrow$ os preços reagem pouco ao ciclo.
+\end{itemize}
+
+\paragraph{De onde vem $\kappa$? O modelo de Calvo.} Imagine que, a cada trimestre, só uma
+\emph{fração} das empresas pode reajustar o preço (a probabilidade de \emph{não} reajustar é
+$\theta$). Quem reajusta o faz pensando em todo o futuro. Desse mecanismo (chamado ``preços de
+Calvo'') deduz-se uma fórmula heurística:
+\[
+\kappa \;\approx\; \frac{(1-\theta)(1-\beta\theta)}{\theta}\,\zeta,
+\]
+onde $\zeta$ agrega elasticidades e \emph{markups}. Quanto mais ``rígidos'' os preços (maior
+$\theta$), menor o $\kappa$, e mais devagar a inflação responde. Na aula de calibração, tratamos
+$\kappa$ como um parâmetro reduzido (escolhido diretamente), sem precisar abrir todo o Calvo.
+
+\begin{atencao}
+A NKPC \emph{não} tem um termo de inflação passada ($\pi_{t-1}$). Ela é puramente voltada para o
+futuro. Consequência importante (que veremos nos gráficos): este modelo mínimo \textbf{não tem inércia
+de inflação}. A inflação não ``gruda'' --- ela reverte rápido. Modelos maiores adicionam indexação
+($\pi_{t-1}$) para corrigir isso.
+\end{atencao}
+
+\subsection{Regra de Taylor --- o comportamento do Banco Central}
+\[
+i_t = \rho_i\,i_{t-1} + (1-\rho_i)\big(r^\ast + \phi_\pi\,\pi_t + \phi_x\,x_t\big) + \varepsilon^i_t.
+\]
+\textbf{O que ela diz:} o Banco Central define o juro reagindo à inflação e ao hiato, mas com
+\textbf{suavização} (não muda o juro de forma brusca).
+
+\begin{itemize}[nosep]
+  \item $\phi_\pi$ (phi-pi): quanto o juro sobe quando a inflação sobe. \textbf{Princípio de Taylor:}
+        para a economia ser estável, $\phi_\pi$ precisa ser $>1$ (ver Seção~\ref{sec:det}). Aqui
+        $\phi_\pi=1{,}75$.
+  \item $\phi_x$ (phi-x): quanto o juro reage ao hiato. Mantido fixo em $0{,}5$.
+  \item $\rho_i$ (rho-i): \textbf{suavização de juros} (\emph{interest-rate smoothing}). É a inércia: o
+        juro de hoje ``puxa'' o de amanhã. $\rho_i=0{,}80$ a $0{,}93$ significa que o BC move o juro em
+        passos pequenos e graduais, como de fato fazem os bancos centrais.
+  \item $\varepsilon^i_t$: o \textbf{choque de política monetária} --- a parte do juro que \emph{não}
+        é explicada pela regra (uma decisão ``surpresa'', mais apertada ou mais frouxa que o usual).
+\end{itemize}
+
+\begin{intuicao}
+A regra de Taylor é o ``piloto automático'' do BC: se a inflação passa da meta, suba o juro mais que
+proporcionalmente ($\phi_\pi>1$); se a economia esfria, alivie um pouco ($\phi_x>0$); e faça isso
+gradualmente ($\rho_i$ alto), para não dar solavancos.
+\end{intuicao}
+
+\begin{resumo}
+IS = demanda reage ao juro real; NKPC = inflação reage ao aquecimento e ao futuro; Taylor = o BC
+move o juro contra a inflação e o hiato, devagar.
+\end{resumo}
+
+% ======================================================================
+\section{Os parâmetros e a calibração}
+% ======================================================================
+
+\textbf{Calibrar} é escolher os números (os parâmetros) do modelo. A tarefa do trabalho (slide~26)
+pede exatamente isto, para o Chile:
+
+\begin{enumerate}[nosep]
+  \item Fixar $r^\ast \in \{2\%,3\%,4\%\}$ ao ano e \textbf{derivar} $\beta$.
+  \item Estimar $\rho_i$ por um \textbf{AR(1)} na taxa de política trimestral.
+  \item Escolher $\kappa \in \{0{,}07,\,0{,}10,\,0{,}13\}$ e comparar as IRFs.
+  \item Variar $\phi_\pi$ entre $1{,}3$ e $2{,}2$ (com $\phi_x=0{,}5$) e avaliar estabilidade.
+  \item Calibrar os desvios-padrão dos choques ($\sigma_{\varepsilon x},\sigma_{\varepsilon \pi},
+        \sigma_{\varepsilon i}$) para obter uma FEVD ``parecida com a de um relatório de BC''.
+\end{enumerate}
+Resultado esperado: uma tabela ``parâmetro $\leftrightarrow$ alvo'', as IRFs e os momentos.
+
+\subsection{$r^\ast$ e $\beta$: o juro neutro e o desconto}
+O fator de desconto $\beta$ e o juro neutro $r^\ast$ estão amarrados por
+\[
+\beta = \frac{1}{1+r^\ast_{\text{trim}}}, \qquad r^\ast_{\text{trim}} = (1+r^\ast_{\text{anual}})^{1/4}-1.
+\]
+\textbf{Por quê?} Em equilíbrio, poupar rende $r^\ast$; descontar o futuro por $\beta$ tem que
+compensar exatamente esse rendimento. Daí $\beta(1+r^\ast)=1$. A conversão de anual para trimestral usa
+raiz quarta porque há 4 trimestres no ano.
+
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+$r^\ast$ anual & $r^\ast$ trimestral & $\beta$ \\
+\midrule
+2\% & 0,496\% & 0,99506 \\
+3\% & 0,742\% & 0,99264 \\
+4\% & 0,985\% & 0,99024 \\
+\bottomrule
+\end{tabular}
+\end{center}
+O \emph{baseline} usa $r^\ast=3\%$, logo $\beta=0{,}99264$. (Arquivo: \texttt{rstar\_beta\_table.csv}.)
+
+\subsection{O que cada parâmetro faz (resumo)}
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Símbolo & Nome & Papel \\
+\midrule
+$\sigma=1{,}0$ & elast.\ intertemporal inversa & sensibilidade da demanda ao juro real \\
+$\beta=0{,}993$ & fator de desconto & peso do futuro (vem de $r^\ast$) \\
+$\kappa=0{,}10$ & inclinação de Phillips & força do canal hiato $\to$ inflação \\
+$\rho_i=0{,}93$ & suavização de juros & inércia da TPM \\
+$\phi_\pi=1{,}75$ & resposta à inflação & ativismo do BC (princípio de Taylor) \\
+$\phi_x=0{,}50$ & resposta ao hiato & reação do BC à atividade \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Calibração \emph{versus} estimação}
+Há duas formas de obter os números:
+\begin{itemize}[nosep]
+  \item \textbf{Calibração}: escolher valores ``razoáveis'' (da literatura, de relatórios, do bom
+        senso). É o foco desta aula.
+  \item \textbf{Estimação}: deixar os dados ``escolherem'' os valores por métodos estatísticos
+        (econometria, Bayesiano). O projeto também faz isso, como \emph{checagem} (Seção~\ref{sec:econ}).
+\end{itemize}
+Seguindo a orientação de ``na dúvida, mostrar mais de uma versão'', o projeto roda os dois lados:
+$\rho_i$ calibrado (0,80) e estimado (0,934); duas matrizes-alvo de FEVD; etc.
+
+\subsection{Os choques e a FEVD-alvo}
+Cada choque tem um tamanho típico (desvio-padrão). O \emph{baseline} usa
+$\sigma_{\varepsilon x}=0{,}0050$, $\sigma_{\varepsilon \pi}=0{,}00277$,
+$\sigma_{\varepsilon i}=0{,}00068$. Esses números foram \textbf{calibrados} para que a
+\textbf{decomposição da variância} (FEVD, Seção~\ref{sec:fevd}) tenha um formato realista: a inflação
+dominada por choques de custo, o juro pelo próprio choque, o hiato por demanda e política. Não são uma
+decomposição histórica oficial do Chile --- são uma escolha de modelagem.
+
+% ======================================================================
+\section{Resolvendo e diagnosticando o modelo}
+% ======================================================================
+
+\subsection{Estado estacionário}
+O \textbf{estado estacionário} é o ponto de repouso: sem choques, onde as variáveis ficam paradas.
+Aqui, $x=0$, $\pi=0$ e $i=r^\ast$ (o juro fica no neutro). Em modelos lineares, o estado estacionário
+serve apenas como ``ponto de apoio'': toda a ação acontece \emph{em torno} dele. Como os observáveis
+do Chile estão em desvios da média, na prática trabalhamos com $x=\pi=i=0$.
+
+\subsection{Expectativas racionais e a condição de Blanchard--Kahn}
+\label{sec:det}
+Modelos com $\mathbb{E}_t x_{t+1}$ e $\mathbb{E}_t\pi_{t+1}$ têm um desafio: as variáveis dependem do
+futuro, que depende do futuro do futuro\ldots Existe solução única e estável? A resposta vem da
+\textbf{condição de Blanchard--Kahn (BK)}.
+
+A ideia: o sistema tem ``raízes'' (autovalores). Cada variável que ``salta'' (não tem passado, como
+$\pi$ e $x$) precisa de exatamente uma raiz \emph{explosiva} (módulo $>1$) para ser ``amarrada''. Aqui
+há \textbf{2 variáveis de salto} ($x,\pi$) e \textbf{1 variável de estado} ($i_{t-1}$). Logo,
+precisamos de \emph{exatamente} 2 raízes explosivas e 1 estável. O Dynare confirma:
+\[
+\text{autovalores: } 0{,}656 \;(\text{estável}), \quad 1{,}04, \quad 1{,}379 \;(\text{explosivas}).
+\]
+\begin{itemize}[nosep]
+  \item Raízes demais dentro do círculo $\Rightarrow$ \textbf{indeterminação} (infinitas soluções).
+  \item Raízes de menos $\Rightarrow$ \textbf{explosão} (sem solução estável).
+  \item O número certo $\Rightarrow$ solução \textbf{única e estável} (``determinação'').
+\end{itemize}
+
+\begin{intuicao}
+O \textbf{princípio de Taylor} ($\phi_\pi>1$) é o que garante a determinação: se o BC reage à inflação
+mais que proporcionalmente, as expectativas ficam ``ancoradas'' e o sistema converge. Se o BC reage
+pouco ($\phi_\pi<1$), profecias auto-realizáveis de inflação tomam conta (indeterminação). Veremos
+isso no mapa de determinação (Figura~\ref{fig:det}).
+\end{intuicao}
+
+\subsection{O que o Dynare imprime}
+\textbf{Dynare} é o programa (rodando aqui no Octave) que resolve o modelo. Ao rodar, ele:
+\begin{enumerate}[nosep]
+  \item \emph{Pré-processa} o arquivo \texttt{.mod} (lê as equações, calcula derivadas).
+  \item Calcula o \emph{estado estacionário} e verifica \emph{Blanchard--Kahn}.
+  \item Imprime as \textbf{funções de política} (\emph{policy functions}): como cada variável reage à
+        taxa passada e a cada choque.
+  \item Reporta \textbf{momentos teóricos} (desvios-padrão, correlações), a \textbf{FEVD} e as
+        \textbf{IRFs}.
+\end{enumerate}
+As funções de política são a ``solução'' do modelo: por exemplo, um choque de custo
+($\varepsilon^\pi>0$) eleva a inflação ($+0{,}86$), eleva o juro ($+0{,}23$) e reduz o hiato
+($-0{,}67$). (Arquivos em \texttt{outputs/dynare/baseline/}.)
+
+% ======================================================================
+\section{Lendo os resultados: todos os gráficos}
+% ======================================================================
+
+\subsection{IRFs do baseline (os três choques)}
+\textbf{IRF} (\emph{Impulse Response Function}, função de resposta ao impulso) responde: ``se eu der
+\emph{um} choque hoje, o que acontece com cada variável nos próximos trimestres?''. É o gráfico mais
+importante do modelo.
+
+\fig{irf_baseline_all_shocks.png}{IRFs do baseline. Linhas: hiato, inflação, juro. Colunas: choque de
+demanda, de custo, de política monetária.}
+
+Lendo coluna por coluna:
+\begin{itemize}[nosep]
+  \item \textbf{Choque de demanda} ($\varepsilon^x>0$): o hiato sobe ($+0{,}4$~p.p.), a inflação sobe
+        um pouco, e o BC reage subindo o juro; tudo volta ao normal em poucos trimestres.
+  \item \textbf{Choque de custo} ($\varepsilon^\pi>0$): a inflação sobe ($+0{,}25$), mas o hiato
+        \emph{cai} (o BC aperta para conter a inflação). Esse é o \textbf{trade-off} clássico: conter
+        inflação custa atividade.
+  \item \textbf{Choque de política} ($\varepsilon^i>0$, aperto surpresa): hiato \emph{e} inflação
+        caem; o juro sobe e desce gradualmente (por causa da suavização $\rho_i$).
+\end{itemize}
+
+\begin{atencao}
+As respostas convergem rápido, e algumas trocam de sinal por um trimestre (não são perfeitamente
+monótonas). Isso é normal num modelo \emph{forward-looking} com suavização: há um pequeno
+``\emph{undershooting}'' antes de voltar ao equilíbrio.
+\end{atencao}
+
+\subsection{Momentos e volatilidades: modelo \emph{versus} dados}
+\textbf{Momentos} são estatísticas resumo: desvio-padrão (o quanto a variável oscila) e
+autocorrelação (o quanto o valor de hoje se parece com o de ontem --- ``persistência'').
+
+\fig{moments_model_vs_data.png}{Momentos do modelo \emph{versus} dados do Chile. Esquerda:
+desvios-padrão. Direita: autocorrelação de 1ª ordem.}
+
+Duas lições importantes:
+\begin{itemize}[nosep]
+  \item O modelo \textbf{subestima a volatilidade} dos dados (barras azuis/laranjas bem menores que as
+        pretas/cinzas). A economia real teve choques enormes (crise de 2008, COVID-2020, inflação de
+        2022) que um modelo mínimo não reproduz.
+  \item A \textbf{persistência da inflação} nos dados ($\approx 0{,}4$) é muito maior que no modelo
+        ($\approx 0{,}05$). É a confirmação numérica da armadilha que vimos: a NKPC pura não tem
+        inércia. Esse é um limite conhecido do modelo mínimo.
+\end{itemize}
+
+\subsection{FEVD --- decomposição da variância}
+\label{sec:fevd}
+\textbf{FEVD} (\emph{Forecast Error Variance Decomposition}) responde: ``de toda a oscilação de uma
+variável, quanto \% vem de cada choque?''. É como dividir a ``culpa'' pela variabilidade.
+
+\fig{fevd_calibration_comparison.png}{FEVD: alvos declarados \emph{versus} alcançado pelo modelo, em
+duas calibrações dos choques.}
+
+No baseline (didático): o \textbf{hiato} vem de demanda ($\sim$45\%) e política ($\sim$45\%); a
+\textbf{inflação} é dominada por choques de \textbf{custo} ($\sim$80\%); o \textbf{juro} pelo seu
+próprio choque ($\sim$75\%). Esse padrão é coerente com a estrutura NK e ``parecido com um relatório
+de BC''. A figura mostra que a calibração \emph{atinge} os alvos (barras ``Target'' e ``Achieved''
+quase iguais).
+
+\subsection{Sensibilidade a $\kappa$ (inclinação de Phillips)}
+\fig{irf_kappa_comparison.png}{IRF da inflação a um choque, para $\kappa\in\{0{,}07,0{,}10,0{,}13\}$.}
+Quanto maior $\kappa$, mais forte o repasse do aquecimento para a inflação: a curva de inflação
+responde mais e o BC precisa reagir mais. O arquivo \texttt{irf\_kappa\_tradeoffs.png} resume o
+\emph{trade-off} (impacto, persistência e custo em produto) para cada $\kappa$.
+
+\fig{irf_kappa_tradeoffs.png}{Métricas de \emph{trade-off} para cada $\kappa$.}
+
+\subsection{Sensibilidade a $\phi_\pi$ e o mapa de determinação}
+\fig{irf_phi_pi_comparison.png}{IRFs variando $\phi_\pi$ entre 1,3 e 2,2 (com $\phi_x=0{,}5$).}
+Um $\phi_\pi$ maior reduz o impacto inicial de um choque de custo sobre a inflação e acelera um pouco a
+convergência, mas exige movimentos maiores de juros e produto.
+
+\fig{determinacy_map.png}{Mapa de determinação: número de raízes estáveis (barras) e raiz estável
+dominante (linha) em função de $\phi_\pi$.}
+\label{fig:det}
+Este é, talvez, o gráfico mais bonito do projeto. À esquerda (vermelho, $\phi_\pi<1$): \textbf{2}
+raízes estáveis --- raízes \emph{demais} $\Rightarrow$ \textbf{indeterminação}. À direita (verde,
+$\phi_\pi\geq 1$): \textbf{1} raiz estável $\Rightarrow$ \textbf{determinação}. A linha (raiz dominante)
+despenca de $\approx 1{,}0$ para $\approx 0{,}66$ ao cruzar $\phi_\pi=1$ e continua caindo: quanto mais
+ativo o BC, mais rápida a convergência. É o \textbf{princípio de Taylor} desenhado.
+
+\subsection{Persistência: $\rho_i$ estimado \emph{versus} calibrado}
+\fig{irf_rho_comparison.png}{IRFs com $\rho_i$ estimado (0,934) e calibrado (0,80).}
+Com $\rho_i$ mais alto, o juro se move mais devagar e os efeitos duram mais (respostas mais
+``esticadas''). A suavização alta estimada para o Chile amplia a persistência dos efeitos monetários.
+
+% ======================================================================
+\section{Dados do Chile e econometria}
+\label{sec:econ}
+% ======================================================================
+
+\subsection{Os dados}
+Os dados são \textbf{oficiais do Banco Central do Chile (BCCh)}, trimestrais, de 2001Q1 a 2026Q1 (101
+trimestres). Três séries:
+\begin{itemize}[nosep]
+  \item \textbf{TPM} (juro): média trimestral da taxa diária. Convertida para fração trimestral
+        $i_q=(1+\text{TPM}/100)^{1/4}-1$.
+  \item \textbf{IPC} (inflação): variações mensais compostas em inflação trimestral.
+  \item \textbf{PIB}: o \textbf{hiato} é o ciclo do log-PIB pelo \textbf{filtro HP}
+        (\emph{Hodrick--Prescott}, $\lambda=1600$), que separa tendência de ciclo.
+\end{itemize}
+
+\fig{data_overview.png}{Dados oficiais do Chile: TPM, inflação (IPC) e hiato do produto.}
+Observe os episódios: inflação saltando em 2008 e em 2022 (até $\sim$15\% anualizado) e o tombo de
+$\sim$15\% no hiato na COVID (2020). A linha pontilhada na inflação marca a meta de 3\%.
+
+\paragraph{\emph{Demeaning} (tirar a média).} Para alimentar o modelo (cujo equilíbrio é zero), as
+séries são transformadas em \textbf{desvios da própria média}: $\pi = \text{infl}_q-\overline{\text{infl}_q}$,
+$i=i_q-\overline{i_q}$, $x=\text{hiato}-\overline{\text{hiato}}$. Importante: a média amostral da
+inflação foi \textbf{3,79\%} ao ano (acima da meta de 3\%) e a da TPM, \textbf{4,09\%}. Por isso, no
+modelo, ``inflação no equilíbrio'' corresponde a 3,79\%, e a meta de 3\% é um desvio \emph{negativo}.
+
+\subsection{Checagens econométricas}
+Além de calibrar, o projeto deixa os dados ``falarem'':
+\begin{itemize}[nosep]
+  \item \textbf{AR(1) da TPM}: estima a persistência $\rho_i$. Resultado: $\rho_i=0{,}934$ (erro-padrão
+        HAC $0{,}049$). É um número alto --- a TPM é muito persistente. (\texttt{rhoi\_estimate.csv}.)
+  \item \textbf{Regra de Taylor reduzida} (MQO e VI/2SLS): tenta recuperar $\phi_\pi,\phi_x$ dos dados.
+        As estimativas são imprecisas (de 0,83 a 3,05 conforme o método) --- a evidência é ``ampla''.
+  \item \textbf{Curva de Phillips}: estima $\kappa$ (em torno de 0,10 numa versão \emph{backward}).
+  \item \textbf{Moda posterior bayesiana (DSGE)}: estima todos os parâmetros de uma vez por máxima
+        verossimilhança penalizada por \emph{priors}. (\texttt{bayesian\_estimates.csv}.)
+\end{itemize}
+
+\begin{atencao}
+O AR(1) mede ``persistência reduzida'', que mistura gradualismo de política, mudanças de regime e
+variação do juro neutro. Ele \emph{não} isola o coeficiente estrutural de suavização. Por isso o
+projeto reporta os dois valores ($0{,}80$ e $0{,}934$) e mostra os resultados sob ambos.
+\end{atencao}
+
+% ======================================================================
+\section{Previsão: as páginas 48--55}
+% ======================================================================
+
+Esta é a parte que o trabalho enfatiza. Objetivo: usar o modelo \emph{calibrado} para
+\textbf{projetar} $\pi$, $i$ e $x$ nos próximos 8 trimestres, a partir dos dados observados. A
+ferramenta é o próprio \textbf{Dynare}.
+
+\subsection{Como a previsão é feita (fielmente ao roteiro)}
+O arquivo \texttt{dynare/nk\_chile\_forecast.mod} declara as variáveis observadas e roda:
+\begin{center}\small
+\texttt{varobs pi i x;}\\
+\texttt{estimation(datafile='chile\_observables\_dynare.csv', mode\_compute=0, forecast=8);}
+\end{center}
+O que isso faz, em português:
+\begin{itemize}[nosep]
+  \item \texttt{varobs pi i x} --- diz ao Dynare que essas três séries são \emph{observadas}.
+  \item \texttt{mode\_compute=0} --- \textbf{não estima nada}; mantém a calibração fixa.
+  \item O Dynare roda o \textbf{filtro/suavizador de Kalman} sobre o histórico (uma técnica que ``lê''
+        os choques que explicam os dados) e projeta 8 trimestres à frente.
+  \item Devolve \texttt{oo\_.forecast.Mean} (a previsão central) e \texttt{HPDinf}/\texttt{HPDsup} (as
+        bandas de incerteza).
+\end{itemize}
+
+\subsection{Previsão incondicional (o \emph{fan chart})}
+``Incondicional'' = sem impor nada; deixar o modelo seguir suas próprias leis a partir do último
+estado observado.
+
+\fig{forecast_fanchart.png}{Previsão incondicional gerada pelo Dynare (\texttt{forecast=8}), com bandas
+de credibilidade HPD, em níveis anualizados.}
+
+Leitura: a partir do último trimestre, o modelo projeta a inflação indo de \textbf{3,30\%} (horizonte
+1) a \textbf{3,76\%} (horizonte 8), convergindo para a média de 3,79\%; a TPM cai de 4,36\% para
+$\approx$4,11\%; o hiato fecha em direção a zero. A \textbf{banda azul} mostra a incerteza: dado o
+tamanho dos choques, é a faixa onde a variável provavelmente cai. Note o ``salto'' da inflação: ela
+estava em 5,7\% e a projeção começa em 3,3\%.
+
+\begin{atencao}
+Por que esse salto? Porque o modelo \textbf{não tem inércia de inflação} (a NKPC é pura) e porque o
+\textbf{único estado} que o modelo carrega é o juro passado $i_{t-1}$ --- ele ``esquece'' o último
+hiato e a última inflação. O modelo trata os 5,7\% como um choque transitório e reverte rápido para a
+média. É uma limitação real, não um erro de código. Validação: a média do Dynare bate, até o último
+dígito, com a forma reduzida analítica (a raiz estável $a_i=0{,}656$).
+\end{atencao}
+
+\subsection{Previsões condicionais (cenários de política)}
+``Condicional'' = \emph{impor} uma trajetória a alguma variável e perguntar o que acontece com as
+outras. Usa o comando \texttt{conditional\_forecast} do Dynare. O slide propõe dois tipos: fixar o
+\emph{juro} ou fixar a \emph{inflação}. Implementamos três cenários:
+
+\fig{conditional_scenarios.png}{Três cenários condicionais (manter o juro, apertar, e forçar a
+inflação à meta), ancorados no estado atual.}
+
+\begin{enumerate}[nosep]
+  \item \textbf{Manter a TPM em 4,5\% por 2 trimestres.} Como 4,5\% está acima da média (4,09\%), já é
+        levemente contracionista: a inflação cai para \textbf{3,04\%} e o hiato para $-0{,}63\%$.
+  \item \textbf{Apertar para $\approx$5,1\% por 4 trimestres.} Forte aperto: a inflação despenca para
+        \textbf{1,91\%}, mas o hiato vai a $-1{,}60\%$. (A amplificação grande de fixar o juro num
+        modelo \emph{forward-looking} é o ``\emph{forward guidance puzzle}''.)
+  \item \textbf{Forçar a inflação à meta de 3\% por 4 trimestres.} Como a meta (3\%) está \emph{abaixo}
+        da média (3,79\%), exige aperto: a TPM sobe a \textbf{4,52\%} e o hiato vai a $-0{,}67\%$.
+\end{enumerate}
+
+\paragraph{Quanto custa cada cenário? Os choques implícitos.} Para impor cada trajetória, o BC precisa
+``empurrar'' o juro com choques $\varepsilon^i$. O gráfico abaixo mostra o tamanho desses empurrões:
+
+\fig{conditional_policy_shocks.png}{Inovações de política $\varepsilon^i$ necessárias para cumprir cada
+caminho condicional.}
+O aperto a 5,1\% exige a maior inovação inicial; forçar a meta de 3\% exige um aperto pontual mais
+modesto. Esses choques tornam \emph{explícito} o esforço de política embutido em cada cenário.
+
+\begin{atencao}
+Uma nuance técnica: o \texttt{conditional\_forecast} do Dynare parte do \emph{estado estacionário}
+(onde $\pi$ já é a média de 3,79\%). Por isso o cenário de meta foi calibrado com o desvio correto
+($3\% \Rightarrow \pi_{\text{dev}}=-0{,}00192$). Os cenários da figura, porém, são reancorados no
+\emph{estado atual} pela forma reduzida exata (idêntica à solução do Dynare), para conectarem
+continuamente com o histórico. Os dois métodos concordam no sinal e no mecanismo.
+\end{atencao}
+
+% ======================================================================
+\section{Limitações, glossário e mapa do código}
+% ======================================================================
+
+\subsection{Limitações (honestas)}
+\begin{itemize}[nosep]
+  \item Modelo \textbf{fechado e pequeno}; o Chile é uma economia \textbf{aberta} (faltam câmbio,
+        cobre, termos de troca, fluxos de capital).
+  \item \textbf{Único estado} ($i_{t-1}$): não carrega independentemente o último hiato e inflação.
+  \item \textbf{Sem inércia de inflação}: reversão rápida demais (ver momentos).
+  \item $r^\ast$ fixado em cenários; na realidade varia no tempo. Os choques são calibrados, não
+        identificados historicamente.
+  \item O \emph{outlier} da COVID distorce momentos e estimação.
+  \item \textbf{Nada aqui é previsão oficial nem recomendação de política} --- é um laboratório
+        estrutural pequeno e transparente.
+\end{itemize}
+
+\subsection{Glossário rápido de símbolos}
+\begin{center}\small
+\begin{tabular}{ll@{\qquad}ll}
+\toprule
+$x_t$ & hiato do produto & $\rho_i$ & suavização de juros \\
+$\pi_t$ & inflação & $\phi_\pi,\phi_x$ & respostas da regra de Taylor \\
+$i_t$ & juro nominal (TPM) & $r^\ast$ & juro real neutro \\
+$\beta$ & fator de desconto & $\varepsilon^x,\varepsilon^\pi,\varepsilon^i$ & choques \\
+$\sigma$ & elast.\ intertemporal inv. & $\mathbb{E}_t$ & expectativa em $t$ \\
+$\kappa$ & inclinação de Phillips & IRF/FEVD & resposta a impulso / decomp.\ de variância \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Mapa do código (o que cada arquivo faz)}
+\begin{center}\small
+\begin{tabular}{ll}
+\toprule
+Arquivo & Função \\
+\midrule
+\texttt{build\_chile\_dataset.py} & baixa/monta os dados do BCCh e os observáveis \\
+\texttt{estimate\_rhoi\_chile.py} & AR(1) da TPM ($\rho_i$) \\
+\texttt{estimate\_taylor\_rule.py} & regra de Taylor por MQO e VI \\
+\texttt{estimate\_nkpc.py} & inclinação $\kappa$ \\
+\texttt{calibrate\_shocks.py} & desvios-padrão dos choques para a FEVD-alvo \\
+\texttt{generate\_dynare\_models.py} & gera o \emph{baseline} e os 18 cenários \texttt{.mod} \\
+\texttt{run\_dynare\_batch.py} & roda os \texttt{.mod} no Octave/Dynare \\
+\texttt{run\_bayesian.py} & estimação por moda posterior (DSGE) \\
+\texttt{run\_forecast.py} & \textbf{previsão nativa do Dynare} (\texttt{forecast=8} + condicional) \\
+\texttt{forecast\_model.py} & \emph{fan chart} em nível + cenários ancorados + choques \\
+\texttt{plot\_irfs.py} & figuras de IRFs e sensibilidade \\
+\texttt{build\_final\_html.py} & monta o relatório \texttt{Entrega Final.html} \\
+\texttt{nk\_chile\_forecast.mod} & modelo de previsão (\texttt{varobs}, \texttt{estimation}, \texttt{conditional\_forecast}) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{resumo}
+O projeto calibra um modelo NK mínimo para o Chile, resolve-o no Dynare, verifica determinação,
+interpreta IRFs/momentos/FEVD, testa sensibilidades, confronta com econometria e, por fim, faz a
+previsão nativa do Dynare (incondicional e condicional) das páginas 48--55. Tudo é reprodutível e
+honesto quanto aos seus limites.
+\end{resumo}
+
+\end{document}

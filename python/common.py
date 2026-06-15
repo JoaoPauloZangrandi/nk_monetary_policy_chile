@@ -23,6 +23,11 @@ DYNARE_OUTPUTS = ROOT / "outputs" / "dynare"
 # The target is a modelling choice, not an empirical decomposition published by BCCh.
 SHOCK_STD = {"e_x": 0.00500, "e_pi": 0.00277, "e_i": 0.00068}
 INITIAL_SHOCK_STD = {"e_x": 0.0050, "e_pi": 0.0025, "e_i": 0.0015}
+COURSE_BENCHMARK_SHOCK_STD_FALLBACK = {
+    "e_x": 0.00500,
+    "e_pi": 0.00331,
+    "e_i": 0.00080,
+}
 BASELINE = {
     "rstar_annual": 0.03,
     "sigma": 1.0,
@@ -60,6 +65,31 @@ def calibration_rho() -> float:
         return BASELINE["rho_i"]
     value = float(table.loc[0, "rho_i_used"])
     return value if math.isfinite(value) else BASELINE["rho_i"]
+
+
+def course_benchmark_shock_std() -> dict[str, float]:
+    """Read shock sizes fitted to the didactic FEVD benchmark.
+
+    The fitted values depend on the current rho_i calibration. The CSV is produced
+    by calibrate_shocks.py; fixed fallbacks keep model generation runnable before
+    that calibration script has been executed.
+    """
+
+    path = TABLES / "shock_sigmas_comparison.csv"
+    if not path.exists():
+        return dict(COURSE_BENCHMARK_SHOCK_STD_FALLBACK)
+    table = pd.read_csv(path)
+    selected = table[table["calibration"] == "didactic_benchmark"]
+    if selected.empty:
+        return dict(COURSE_BENCHMARK_SHOCK_STD_FALLBACK)
+    values = {
+        str(row["shock"]): float(row["sigma_calibrated"])
+        for _, row in selected.iterrows()
+    }
+    return {
+        shock: values.get(shock, fallback)
+        for shock, fallback in COURSE_BENCHMARK_SHOCK_STD_FALLBACK.items()
+    }
 
 
 def find_octave() -> Path | None:
