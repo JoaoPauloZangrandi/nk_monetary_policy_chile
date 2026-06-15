@@ -1,0 +1,4 @@
+method,rstar_quarterly,rstar_annual_pct,beta_implied,observations,is_synthetic,data_source
+ex_post_real_rate_mean_full_sample,0.0007364968474402574,0.29492435536775385,0.9992640451809639,101,False,Banco Central de Chile (BCCh)
+ex_post_real_rate_mean_last_5y,4.728870803504522e-05,0.018916824989423375,0.9999527135280812,20,False,Banco Central de Chile (BCCh)
+hp_trend_real_rate_end_of_sample,0.005822283965946262,2.3493320434604836,0.9942114187975741,101,False,Banco Central de Chile (BCCh)

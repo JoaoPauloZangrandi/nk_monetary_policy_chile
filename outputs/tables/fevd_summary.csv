@@ -1,0 +1,10 @@
+scenario,variable,shock,variance_share,source
+baseline,x,e_x,0.453868473298,dynare
+baseline,x,e_pi,0.0987486790729,dynare
+baseline,x,e_i,0.44738284763,dynare
+baseline,pi,e_x,0.0150549395732,dynare
+baseline,pi,e_pi,0.795189407125,dynare
+baseline,pi,e_i,0.189755653301,dynare
+baseline,i,e_x,0.0805855698892,dynare
+baseline,i,e_pi,0.166243763736,dynare
+baseline,i,e_i,0.7531706663750001,dynare

@@ -1,0 +1,35 @@
+{
+  "institution": "Banco Central de Chile (BCCh)",
+  "service": "Base de Datos Estadisticos - SieteRestWS REST API",
+  "url_pattern": "https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx?function=GetSeries&timeseries=<ID>&firstdate=...&lastdate=...",
+  "official_bde_url": "https://si3.bcentral.cl/Siete",
+  "policy_framework_url": "https://www.bcentral.cl/web/banco-central/areas/politica-monetaria",
+  "terms_of_use_url": "https://www.bcentral.cl/web/banco-central/condiciones-de-uso",
+  "series_ids": {
+    "tpm": "F022.TPM.TIN.D001.NO.Z.D",
+    "ipc_var": "F074.IPC.VAR.Z.Z.C.M",
+    "pib": "F032.PIB.FLU.R.CLP.EP18.Z.Z.1.T"
+  },
+  "frequency": "quarterly (built from daily TPM, monthly CPI, quarterly GDP)",
+  "period": "2001Q1 to 2026Q1",
+  "observations": 101,
+  "access_date": "2026-06-15",
+  "units": {
+    "tpm_annual_pct": "TPM, percent per year (quarterly average of daily series)",
+    "i_q": "nominal policy rate, quarterly fraction = (1+TPM/100)^(1/4)-1",
+    "infl_q": "quarterly CPI inflation, fraction (compounded monthly variations)",
+    "infl_annual_pct": "annualised quarterly inflation, percent",
+    "pib_sa": "real GDP, chained volume, seasonally adjusted, ref 2018 (CLP bn)",
+    "output_gap": "HP-filter cycle of log real GDP (lambda=1600), fraction",
+    "real_rate_q": "ex-post real quarterly rate = i_q - infl_q"
+  },
+  "transformations": "TPM: daily->quarterly mean. CPI: monthly % -> quarterly compounded fraction. GDP: log + HP filter (lambda=1600) for the output gap.",
+  "inflation_target_annual": 0.03,
+  "is_synthetic": false,
+  "note": "Real official data from BCCh; credentials are not stored in this file.",
+  "files": {
+    "policy_rate": "chile_policy_rate.csv",
+    "macro_panel": "chile_macro_quarterly.csv",
+    "observables": "chile_observables.csv (deviations: pi, i, x)"
+  }
+}

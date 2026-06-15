@@ -1,0 +1,4 @@
+method,gamma,kappa,se_kappa,r_squared,observations,first_stage_F_pi_lead,first_stage_F_x,is_synthetic,data_source,kappa_grid_nearest
+backward_OLS_HAC,0.34198870241860985,0.09787028217095006,0.039259770775825625,0.22971913817231593,100,,,False,Banco Central de Chile (BCCh),0.1
+forward_IV_2SLS_HAC,1.46393258695589,-0.05034077830181049,0.13018646832335332,-0.9392717075078068,98,2.8219186931702502,22.0349986819802,False,Banco Central de Chile (BCCh),0.07
+restricted_gamma_eq_beta(0.9926),0.9926375361451396,0.022557507197538566,0.0240943409547273,0.0030044096752936955,100,,,False,Banco Central de Chile (BCCh),0.07

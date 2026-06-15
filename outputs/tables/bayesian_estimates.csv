@@ -1,0 +1,9 @@
+parameter,type,prior_mean,posterior_mode,posterior_std,ci95_low,ci95_high,is_synthetic,data_source,estimation_scope
+stderr e_x,shock_std,0.005,0.0284325827684432,0.002182859314773,0.024154178511488,0.0327109870253984,False,Banco Central de Chile (BCCh),posterior_mode_laplace_not_mcmc
+stderr e_pi,shock_std,0.0025,0.0093418771104959,0.0006791884843406,0.0080106676811882,0.0106730865398036,False,Banco Central de Chile (BCCh),posterior_mode_laplace_not_mcmc
+stderr e_i,shock_std,0.002,0.0018044455343221,0.0001367813999361,0.0015363539904473,0.0020725370781969,False,Banco Central de Chile (BCCh),posterior_mode_laplace_not_mcmc
+sigma,param,1.0,3.4446966702386512,0.6246092420792938,2.220462555763236,4.668930784714068,False,Banco Central de Chile (BCCh),posterior_mode_laplace_not_mcmc
+kappa,param,0.1,0.0859448662075644,0.0427381190130436,0.0021781529419987,0.16971157947313,False,Banco Central de Chile (BCCh),posterior_mode_laplace_not_mcmc
+rho_i,param,0.8,0.8612938781741758,0.0228538174144372,0.8165003960418787,0.9060873603064729,False,Banco Central de Chile (BCCh),posterior_mode_laplace_not_mcmc
+phi_pi,param,1.5,1.0296008831875216,0.170680131862159,0.6950678247376899,1.3641339416373532,False,Banco Central de Chile (BCCh),posterior_mode_laplace_not_mcmc
+phi_x,param,0.5,0.2615881575653704,0.0718104925865164,0.1208395920957982,0.4023367230349427,False,Banco Central de Chile (BCCh),posterior_mode_laplace_not_mcmc

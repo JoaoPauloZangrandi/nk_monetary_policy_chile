@@ -1,0 +1,4 @@
+shock,sigma_initial,sigma_calibrated,calibration_type
+e_x,0.005,0.005,researcher_chosen_model_target
+e_pi,0.0025,0.0027693090062320307,researcher_chosen_model_target
+e_i,0.0015,0.0006789370322406709,researcher_chosen_model_target

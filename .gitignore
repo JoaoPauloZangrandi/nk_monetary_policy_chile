@@ -1,0 +1,47 @@
+# Private and copyrighted course material must never be committed.
+_private_course_pdfs/
+**/_private_course_pdfs/
+*.pdf
+*.PDF
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Dynare/Octave generated artifacts
+dynare/+*/
+dynare/*.log
+dynare/*.jnl
+dynare/*.eps
+dynare/*.fig
+dynare/*_results.mat
+dynare/*.oct
+dynare/generated/+*/
+dynare/*/checksum
+dynare/*/model/
+*.saving_in_progress
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local credentials and raw pulls (NEVER commit secrets or unlicensed raw data)
+data/raw/*
+!data/raw/.gitkeep
+data/clean/*.csv
+data/clean/*.parquet
+!data/clean/.gitkeep
+**/bcch_credentials.json
+*credentials*.json
+.env
+*.secret
+
+# Local execution logs can contain machine-specific paths.
+outputs/logs/*.txt
+outputs/logs/*.log
+!outputs/logs/.gitkeep

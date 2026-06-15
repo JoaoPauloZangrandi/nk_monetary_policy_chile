@@ -1,0 +1,2 @@
+scenario,status,n_forward,n_unstable,n_eigenvalues
+rstar_4,determinate_bk_count,2,2,3

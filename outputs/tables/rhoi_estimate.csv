@@ -1,0 +1,2 @@
+alpha,rho_i_estimate,rho_i_se_ols,rho_i_se_hac,rho_i_ci95_low,rho_i_ci95_high,half_life_quarters,long_run_mean_pct,rho_i_used,r_squared,observations,sample_start,sample_end,is_synthetic,data_source,calibration_basis,estimation_method
+0.27042396346762565,0.9340951952593648,0.036057806324308335,0.04948847622958761,0.8370977818493731,1.0310926086693566,10.166888466705016,4.103251113964521,0.9340951952593648,0.8725774254145514,100,2001Q2,2026Q1,False,BCCh:F022.TPM.TIN.D001.NO.Z.D,estimated_ar1_real_bcch_tpm,statsmodels_ols_hac
