@@ -12,6 +12,8 @@
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{array}
+\usepackage{longtable}
+\usepackage{fancyvrb}
 \usepackage{enumitem}
 \usepackage[most]{tcolorbox}
 \usepackage[colorlinks=true,linkcolor=blue!55!black,urlcolor=blue!55!black]{hyperref}
@@ -33,27 +35,58 @@
 
 \newcommand{\fig}[2]{\begin{figure}[ht]\centering
   \includegraphics[width=\linewidth]{figures/#1}\caption{#2}\end{figure}}
+\setlength{\emergencystretch}{3em}
 
 \title{\textbf{Comprehend}\\[2mm]
-\large Guia didático completo do projeto de Política Monetária:\\
+\large Manual didático autossuficiente do projeto de Política Monetária:\\
 um modelo Novo-Keynesiano mínimo calibrado para o Chile\\[3mm]
-\normalsize Teoria, código e gráficos explicados do zero --- Aula 5 (Dynare e Calibração), páginas 26--55}
+\normalsize Para público amador: teoria, variáveis, dados, código, tabelas, outputs e gráficos}
 \author{Material de estudo}
 \date{\today}
 
 \begin{document}
 \maketitle
 \begin{abstract}
-\noindent Este documento foi escrito para quem está começando. Ele explica, passo a passo e sem
-pressupor conhecimento prévio, \emph{toda} a teoria por trás do projeto: o que é um modelo
-Novo-Keynesiano (NK), o que cada equação significa, o que cada parâmetro faz, como o modelo é
-resolvido no Dynare, como se leem todos os gráficos, como os dados do Chile entram e como se faz a
-previsão das páginas 48--55. Sempre que aparece um termo técnico, ele é definido. As caixas verdes
-trazem a intuição; as laranjas, as armadilhas; as azuis, o resumo de uma frase.
+\noindent Este manual foi escrito para um público \textbf{amador}: uma pessoa interessada e capaz de
+acompanhar raciocínio econômico, mas sem formação especializada prévia em macroeconomia, econometria,
+Python, Octave ou Dynare. Ele é autossuficiente para entender o projeto e a apresentação: explica as
+equações, todos os símbolos, unidades, transformações dos dados, parâmetros, choques, cenários,
+25 gráficos, tabelas CSV, arquivos Dynare, scripts Python, previsões, análises macro aprofundadas e
+limitações. Também ensina como localizar e interpretar cada output e como reproduzir o pipeline.
+As caixas verdes trazem a intuição; as laranjas, as armadilhas; as azuis, o resumo essencial.
 \end{abstract}
 
 \tableofcontents
 \bigskip
+
+% ======================================================================
+\section{Como usar este manual e o que significa ``entender tudo''}
+% ======================================================================
+
+Este documento pode ser lido de duas formas:
+\begin{enumerate}[nosep]
+  \item \textbf{Do começo ao fim}, para aprender a teoria e acompanhar a construção do projeto.
+  \item \textbf{Como manual de consulta}, usando o sumário para procurar uma variável, gráfico,
+        tabela, arquivo ou resultado específico.
+\end{enumerate}
+
+Ao terminar, o leitor deve conseguir:
+\begin{itemize}[nosep]
+  \item explicar cada equação e cada símbolo do modelo baseline e das extensões;
+  \item distinguir dados em nível, desvios da média, frações trimestrais e percentuais anualizados;
+  \item interpretar todos os 25 gráficos e todos os slides substantivos da apresentação;
+  \item saber o que cada tabela CSV contém, para que serve e quais colunas consultar;
+  \item entender a diferença entre calibração, regressão, SVAR, filtro de Kalman, MCMC e evidência
+        marginal;
+  \item localizar o código responsável por cada output e reproduzir o projeto;
+  \item reconhecer o que é resultado do modelo, evidência dos dados, hipótese ilustrativa e limitação.
+\end{itemize}
+
+\begin{atencao}
+``Entender tudo'' não significa decorar cada número ou cada linha de código. Significa saber
+\textbf{o que cada objeto representa}, \textbf{de onde ele veio}, \textbf{como deve ser lido} e
+\textbf{o que não pode ser concluído a partir dele}. O manual fornece esse mapa completo.
+\end{atencao}
 
 % ======================================================================
 \section{Para que serve tudo isso}
@@ -118,6 +151,107 @@ próximo trimestre''.
 O modelo descreve como hiato, inflação e juros --- medidos como pequenos desvios do equilíbrio e
 influenciados pelas expectativas de futuro --- reagem a três tipos de choque.
 \end{resumo}
+
+\subsection{Unidades: fração, porcentagem, ponto percentual e ponto-base}
+Grande parte da confusão em modelos monetários vem das unidades. Neste projeto:
+\begin{itemize}[nosep]
+  \item \textbf{Fração}: $0{,}01$ significa 1\%. Nos arquivos usados pelo Dynare, inflação e juros
+        trimestrais aparecem como frações pequenas, por exemplo $0{,}005$.
+  \item \textbf{Porcentagem}: multiplicar uma fração por 100. Assim, $0{,}005=0{,}5\%$.
+  \item \textbf{Ponto percentual (p.p.)}: diferença entre duas taxas. De 3\% para 4\% é aumento de
+        1 p.p., não de 1\%.
+  \item \textbf{Ponto-base (p.b.)}: $0{,}01$ p.p. Logo, 25 p.b. = 0,25 p.p.
+  \item \textbf{Taxa trimestral}: retorno acumulado em um trimestre.
+  \item \textbf{Taxa anualizada}: taxa trimestral convertida para uma escala anual para facilitar a
+        comunicação. Não significa que o mesmo valor será observado durante quatro trimestres.
+\end{itemize}
+Para converter uma taxa anual $r_a$ em trimestral, usa-se
+$r_q=(1+r_a)^{1/4}-1$. Para anualizar uma taxa trimestral, usa-se
+$r_a=(1+r_q)^4-1$.
+
+\subsection{Dicionário completo das variáveis e símbolos}
+\small
+\begin{longtable}{@{}p{0.16\textwidth}p{0.23\textwidth}p{0.27\textwidth}p{0.26\textwidth}@{}}
+\toprule
+\textbf{Nome} & \textbf{O que representa} & \textbf{Unidade no código} & \textbf{Como interpretar} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Nome} & \textbf{O que representa} & \textbf{Unidade no código} & \textbf{Como interpretar} \\
+\midrule
+\endhead
+$x_t$ & Hiato do produto & Fração do PIB em relação à tendência & $0{,}02$ significa produto
+2\% acima da tendência; valor negativo indica ociosidade. \\
+$\pi_t$ & Inflação trimestral em desvio & Fração trimestral, retirada a média amostral & Positiva
+significa inflação acima da média usada como equilíbrio do modelo. \\
+$i_t$ & TPM trimestral em desvio & Fração trimestral, retirada a média amostral & Positiva significa
+TPM acima da média; nos gráficos volta a ser mostrada em \% a.a. \\
+$i_{t-1}$ & TPM defasada & Mesma unidade de $i_t$ & Único estado predeterminado do baseline; carrega
+memória de um trimestre para o seguinte. \\
+$q_t$ & Hiato do câmbio real na extensão aberta & Desvio logarítmico; $q>0$ representa peso mais
+fraco & Uma depreciação aumenta competitividade e inflação importada no modelo. \\
+$copper_t$ & Ciclo do preço do cobre & Desvio do log em relação à tendência HP & Positivo significa
+cobre acima de sua tendência, elevando renda e demanda na calibração. \\
+$\varepsilon^x_t$ ou \path{e_x} & Choque de demanda & Fração & Surpresa que desloca diretamente o
+hiato; positivo aquece a economia. \\
+$\varepsilon^\pi_t$ ou \path{e_pi} & Choque de custo & Fração de inflação trimestral & Positivo eleva
+inflação mesmo sem aquecimento; produz o trade-off inflação--atividade. \\
+$\varepsilon^i_t$ ou \path{e_i} & Choque monetário & Fração de juro trimestral & Positivo é aperto
+surpresa além do previsto pela regra de Taylor. \\
+\path{e_q} & Choque cambial/prêmio de risco & Desvio logarítmico & Positivo deprecia o peso na
+equação UIP ilustrativa. \\
+\path{e_copper} & Choque no preço do cobre & Desvio logarítmico & Positivo leva o cobre acima de sua
+trajetória AR(1). \\
+$r^\ast$ & Juro real neutro & Taxa trimestral no Dynare; comunicado em \% a.a. & Taxa real que não
+aquece nem esfria a economia. \\
+$\beta$ & Fator de desconto & Número entre zero e um & Peso do futuro; derivado de $r^\ast$ no
+baseline. \\
+$\sigma$ & Elasticidade intertemporal inversa & Adimensional & $1/\sigma$ mede a reação da demanda ao
+juro real. \\
+$\kappa$ & Inclinação da NKPC & Adimensional & Quanto uma unidade de hiato pressiona a inflação. \\
+$\rho_i$ & Suavização da TPM & Entre zero e um & Quanto do juro passado permanece no juro atual. \\
+$\phi_\pi$ & Reação à inflação & Adimensional & Intensidade com que o BC reage à inflação. \\
+$\phi_x$ & Reação ao hiato & Adimensional & Intensidade com que o BC reage à atividade. \\
+$\gamma_\pi$ & Indexação na NKPC híbrida & Entre zero e um & Peso da inflação passada; aumenta a
+inércia inflacionária. \\
+$\alpha_q$ & Câmbio na curva IS aberta & Adimensional & Efeito da competitividade cambial sobre a
+demanda. \\
+$\alpha_{copper}$ & Cobre na curva IS & Adimensional & Efeito do ciclo do cobre sobre demanda e
+renda. \\
+$\gamma_q$ & \emph{Pass-through} cambial & Adimensional & Repasse direto de depreciação para inflação. \\
+$\eta_i$ & Juro na UIP & Adimensional & Liga diferencial de juros à dinâmica cambial. \\
+$\phi_q$ & Câmbio na regra de Taylor & Adimensional & Reação leve da TPM à depreciação. \\
+$\rho_{copper}$ & Persistência do cobre & Entre zero e um & Velocidade com que o ciclo do cobre
+desaparece. \\
+\path{tpm_annual_pct} & TPM observada & Porcentagem ao ano & Série que aparece para o público. \\
+\path{i_q} & TPM convertida & Fração trimestral & Entrada antes de retirar a média. \\
+\path{infl_q} & Inflação IPC composta & Fração trimestral & Produto das variações mensais dentro do
+trimestre. \\
+\path{infl_annual_pct} & Inflação anualizada & Porcentagem ao ano & Escala usada em gráficos e
+previsões. \\
+\path{pib_sa} & PIB real dessazonalizado & Bilhões de pesos encadeados, referência 2018 & Série de
+nível usada para construir o hiato. \\
+\path{output_gap} & Ciclo do log do PIB & Fração & Proxy estatística do hiato pelo filtro HP. \\
+\path{real_rate_q} & Juro real ex post & Fração trimestral & \path{i_q - infl_q}; usado nas âncoras de
+$r^\ast$. \\
+\path{fx_clp_usd} & Pesos chilenos por dólar & CLP/USD & Valor maior significa peso nominal mais
+fraco. \\
+\path{copper_usd_ton} & Preço do cobre & Dólares por tonelada métrica & Nível externo antes de log e
+filtro. \\
+\path{fx_gap}, \path{copper_gap} & Ciclos externos & Desvios logarítmicos da tendência HP & Componentes
+usados para calibração aberta. \\
+\path{fx_depreciation_q} & Depreciação trimestral & Diferença do log cambial & Positiva quando o peso
+perde valor frente ao dólar. \\
+\bottomrule
+\end{longtable}
+\normalsize
+
+\begin{atencao}
+Nos arquivos \path{chile_observables.csv}, as colunas \path{pi}, \path{i} e \path{x} são
+\textbf{desvios em fração}, apropriados ao Dynare. Nos gráficos destinados ao leitor, o Python
+converte novamente para pontos percentuais ou taxas anualizadas. Comparar um número de CSV diretamente
+com um eixo em \% sem fazer essa conversão gera interpretação errada por fator 100 ou 400.
+\end{atencao}
 
 % ======================================================================
 \section{O modelo, equação por equação}
@@ -721,71 +855,860 @@ verdade absoluta.
 \end{atencao}
 
 % ======================================================================
-\section{Limitações, glossário e mapa do código}
+\section{A apresentação inteira, quadro por quadro}
 % ======================================================================
 
-\subsection{Limitações (honestas)}
-\begin{itemize}[nosep]
-  \item O \textbf{baseline} é fechado; a extensão aberta ainda é pequena, calibrada e sem demanda
-        externa, prêmio de risco estrutural ou bloco fiscal.
-  \item \textbf{Único estado} ($i_{t-1}$): não carrega independentemente o último hiato e inflação.
-  \item \textbf{Sem inércia de inflação}: reversão rápida demais (ver momentos).
-  \item $r^\ast$ fixado em cenários; na realidade varia no tempo. Os choques são calibrados, não
-        identificados historicamente.
-  \item O \emph{outlier} da COVID distorce momentos e estimação.
-  \item \textbf{Nada aqui é previsão oficial nem recomendação de política} --- é um laboratório
-        estrutural pequeno e transparente.
-\end{itemize}
+A apresentação possui \textbf{37 quadros substantivos}. O PDF tem 47 páginas porque o tema
+\emph{Metropolis} insere automaticamente dez páginas de divisão de seção. A tabela abaixo cobre todos
+os quadros com conteúdo, inclusive o apêndice.
 
-\subsection{Glossário rápido de símbolos}
-\begin{center}\small
-\begin{tabular}{ll@{\qquad}ll}
+\small
+\begin{longtable}{@{}p{0.09\textwidth}p{0.29\textwidth}p{0.54\textwidth}@{}}
 \toprule
-$x_t$ & hiato do produto & $\rho_i$ & suavização de juros \\
-$\pi_t$ & inflação & $\phi_\pi,\phi_x$ & respostas da regra de Taylor \\
-$i_t$ & juro nominal (TPM) & $r^\ast$ & juro real neutro \\
-$\beta$ & fator de desconto & $\varepsilon^x,\varepsilon^\pi,\varepsilon^i$ & choques \\
-$\sigma$ & elast.\ intertemporal inv. & $\mathbb{E}_t$ & expectativa em $t$ \\
-$\kappa$ & inclinação de Phillips & IRF/FEVD & resposta a impulso / decomp.\ de variância \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\subsection{Mapa do código (o que cada arquivo faz)}
-\begin{center}\scriptsize
-\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.39\textwidth}X@{}}
-\toprule
-Arquivo & Função \\
+\textbf{Quadro} & \textbf{Assunto} & \textbf{O que o leitor precisa entender} \\
 \midrule
-\texttt{build\_chile\_dataset.py} & baixa/monta os dados do BCCh e os observáveis \\
-\texttt{estimate\_rhoi\_chile.py} & AR(1) da TPM ($\rho_i$) \\
-\texttt{estimate\_taylor\_rule.py} & regra de Taylor por MQO e VI \\
-\texttt{estimate\_nkpc.py} & inclinação $\kappa$ \\
-\texttt{calibrate\_shocks.py} & desvios-padrão dos choques para a FEVD-alvo \\
-\texttt{generate\_dynare\_models.py} & gera o \emph{baseline} e os 18 cenários \texttt{.mod} \\
-\texttt{run\_dynare\_batch.py} & roda os \texttt{.mod} no Octave/Dynare \\
-\texttt{run\_bayesian.py} & estimação por moda posterior (DSGE) \\
-\texttt{run\_forecast.py} & \textbf{previsão nativa do Dynare} (\texttt{forecast=8} + condicional) \\
-\texttt{forecast\_model.py} & \emph{fan chart} em nível + cenários ancorados + choques \\
-\texttt{run\_history.py / plot\_history.py} & decomposição histórica e contrafactual \\
-\texttt{analyze\_svar.py} & SVAR recursivo e comparação com DSGE \\
-\texttt{estimate\_time\_varying\_rstar.py} & proxy de $r^\ast$ em espaço de estados \\
-\texttt{evaluate\_forecasts.py} & avaliação pseudo-fora-da-amostra \\
-\texttt{run\_macro\_extensions.py} & modelos aberto e Phillips híbrida no Dynare \\
-\texttt{run\_mcmc.py / plot\_mcmc.py} & posterior completa e diagnósticos das cadeias \\
-\texttt{compare\_bayesian\_models.py} & evidência marginal de Laplace entre as duas NKPCs \\
-\texttt{plot\_irfs.py} & figuras de IRFs e sensibilidade \\
-\texttt{build\_final\_html.py} & monta o relatório \texttt{Entrega Final.html} \\
-\texttt{nk\_chile\_forecast.mod} & modelo de previsão (\texttt{varobs}, \texttt{estimation}, \texttt{conditional\_forecast}) \\
+\endfirsthead
+\toprule
+\textbf{Quadro} & \textbf{Assunto} & \textbf{O que o leitor precisa entender} \\
+\midrule
+\endhead
+1 & Capa & País, método, disciplina e escopo: modelo NK calibrado, diagnosticado e usado para
+previsão. \\
+2 & Roteiro & A sequência lógica vai da pergunta econômica aos dados, solução, resultados,
+previsões e extensões. \\
+3 & Pergunta monetária & O BC usa a TPM para estabilizar inflação e atividade; existe trade-off. \\
+4 & Três equações & IS é demanda; NKPC é formação de inflação; Taylor é reação do BC. \\
+5 & Calibração & Cada parâmetro tem valor, alvo e análise de sensibilidade; não são números soltos. \\
+6 & Dados do Chile & TPM, IPC e PIB cobrem 2001Q1--2026Q1; crises influenciam fortemente a amostra. \\
+7 & Blanchard--Kahn & Duas variáveis de salto exigem duas raízes instáveis para solução única. \\
+8 & IRFs baseline & Matriz 3 por 3: cada linha é uma variável e cada coluna é um choque. \\
+9 & Leitura das IRFs & Demanda aquece; custo eleva inflação e reduz atividade; aperto reduz ambos. \\
+10 & Momentos & O modelo subestima volatilidade e persistência, sobretudo da inflação. \\
+11 & FEVD gráfica & Cada barra reparte a variância de uma variável entre os três choques. \\
+12 & FEVD interpretada & Inflação é dominada por custo; TPM por choque monetário; hiato por demanda
+e política na calibração. \\
+13 & Grade de $\kappa$ & Mostra como a inclinação de Phillips altera a resposta inflacionária. \\
+14 & Trade-offs de $\kappa$ & Separa impacto, persistência e custo real; uma métrica não resume tudo. \\
+15 & Grade de $\phi_\pi$ & Compara regras de reação à inflação de 1,3 a 2,2. \\
+16 & Trade-offs de $\phi_\pi$ & Regra mais dura contém o impacto, mas pode elevar juro, recessão e
+\emph{undershooting}. \\
+17 & Mapa de determinação & A fronteira em torno de $\phi_\pi=1$ aparece visualmente. \\
+18 & Leitura do mapa & Vermelho é indeterminação; verde é solução única; a raiz estável mede
+persistência. \\
+19 & $\rho_i$ estimado vs.\ 0,80 & Suavização maior prolonga a transmissão e muda a trajetória da
+TPM. \\
+20 & Receita de previsão & \path{varobs}, Kalman, \path{forecast=8} e calibração fixa. \\
+21 & \emph{Fan chart} & Média condicional e bandas; reversão rápida revela falta de inércia. \\
+22 & Cenários condicionais & Impor juro ou inflação permite calcular as demais trajetórias. \\
+23 & Choques implícitos & Mostra o esforço monetário necessário para cumprir cada restrição. \\
+24 & Decomposição histórica & Choques recuperados explicam a história dentro do modelo, não
+causalmente fora dele. \\
+25 & SVAR vs.\ DSGE & Compara restrições estruturais a uma identificação recursiva nos dados. \\
+26 & Economia aberta e inércia & Câmbio/cobre adicionam canais externos; NKPC híbrida adiciona
+memória. \\
+27 & MCMC & Posteriores têm incerteza; $\hat R$ e ESS avaliam as cadeias. \\
+28 & Evidência marginal & A NKPC híbrida é preferida mesmo após penalizar o parâmetro extra. \\
+29 & Econometria & AR(1), Taylor, Phillips, SVAR e Bayes não respondem exatamente à mesma pergunta. \\
+30 & Limitações & O exercício é um laboratório, não previsão oficial nem recomendação. \\
+31 & Mensagens & Regra ativa, suavização, trade-off de custos e necessidade de múltiplas evidências. \\
+32 & Choques suavizados & Série temporal de \path{e_x}, \path{e_pi} e \path{e_i} recuperados. \\
+33 & Contrafactual & História simulada sob $\phi_\pi=2{,}5$, sujeita à crítica de Lucas. \\
+34 & $r^\ast$ temporal & Proxy local mostra incerteza e grande variação da taxa neutra. \\
+35 & Previsão fora da amostra & Compara RMSE do NK a AR(1), passeio aleatório e VAR. \\
+36 & Dados externos & Peso por dólar e cobre fundamentam a extensão aberta. \\
+37 & Aberto vs.\ fechado & Mostra quanto o canal cambial altera a transmissão monetária. \\
+\bottomrule
+\end{longtable}
+\normalsize
+
+\subsection{Painel dos resultados numéricos que sustentam a apresentação}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}p{0.34\textwidth}X@{}}
+\toprule
+\textbf{Resultado} & \textbf{Leitura correta} \\
+\midrule
+$\rho_i=0{,}934$; meia-vida 10,17 trimestres & A TPM é muito persistente no AR(1), mas isso mistura
+suavização, regimes e neutro móvel. \\
+$\kappa=0{,}098$ na Phillips backward & Próximo da calibração 0,10; a versão prospectiva é mal
+identificada. \\
+$\phi_\pi=0{,}83$ no MQO e $3{,}05$ no VI & A regra reduzida é sensível ao método; não existe uma
+estimativa única robusta. \\
+BK baseline: 2 raízes instáveis para 2 variáveis forward & Solução racional única na calibração. \\
+Autocorrelação de $\pi$: dados 0,411; baseline 0,047 & O baseline não reproduz a inércia observada. \\
+FEVD da inflação: 79,5\% custo & Resultado interno da calibração, não decomposição histórica oficial. \\
+Previsão $h=8$: inflação 3,76\%; TPM 4,11\% & Convergência à média amostral, não necessariamente à
+meta ou ao cenário oficial do BCCh. \\
+SVAR: brancura $p=0{,}169$; normalidade rejeitada & Resíduos não têm autocorrelação forte, mas crises
+produzem caudas e a identificação continua frágil. \\
+Proxy final de $r^\ast=0{,}85\%$ a.a. & Medida estatística, não Laubach--Williams estrutural. \\
+MCMC: todos $\hat R<1{,}05$; ESS 92--268 & Cadeias concordam, mas ainda são autocorrelacionadas. \\
+Log evidência: híbrida 1033,17 vs.\ prospectiva 1021,15 & Diferença 12,02; forte preferência
+condicional à aproximação de Laplace e aos priors. \\
 \bottomrule
 \end{tabularx}
 \end{center}
 
+% ======================================================================
+\section{Atlas dos 25 gráficos: eixos, pergunta e interpretação}
+% ======================================================================
+
+Cada figura já apareceu no ponto relevante do texto. Este atlas serve como índice de consulta e
+explica exatamente o que procurar.
+
+\scriptsize
+\begin{longtable}{@{}p{0.25\textwidth}p{0.20\textwidth}p{0.27\textwidth}p{0.20\textwidth}@{}}
+\toprule
+\textbf{Arquivo} & \textbf{Eixos/objetos} & \textbf{Pergunta respondida} & \textbf{Cuidado} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Arquivo} & \textbf{Eixos/objetos} & \textbf{Pergunta respondida} & \textbf{Cuidado} \\
+\midrule
+\endhead
+\path{data_overview.png} & Tempo; TPM, inflação e hiato & Como evoluíram os três dados do Chile? &
+Hiato HP é estimado; inflação e TPM usam escalas diferentes. \\
+\path{irf_baseline_all_shocks.png} & Horizonte; $x,\pi,i$ por choque & Como cada choque se transmite? &
+IRF é experimento isolado, não história observada. \\
+\path{moments_model_vs_data.png} & Variável; volatilidade/persistência & O baseline imita os dados? &
+Momentos teóricos dependem dos choques calibrados. \\
+\path{fevd_calibration_comparison.png} & Variável/choque; participação em \% & A calibração atingiu os
+alvos da FEVD? & A soma por variável deve ser 100\%; não é causalidade histórica. \\
+\path{irf_kappa_comparison.png} & Horizonte; inflação por $\kappa$ & Como Phillips mais inclinada muda
+a inflação? & Mantém os demais parâmetros fixos. \\
+\path{irf_kappa_tradeoffs.png} & Métricas resumidas por $\kappa$ & Qual é o custo real e nominal de
+cada inclinação? & Impacto e resposta acumulada não são a mesma coisa. \\
+\path{irf_phi_pi_comparison.png} & Horizonte; inflação por $\phi_\pi$ & Como regras mais agressivas
+mudam as IRFs? & A grade principal já está na região determinada. \\
+\path{irf_phi_pi_tradeoffs.png} & Impacto, juro, hiato e soma absoluta & Mais ativismo sempre melhora
+tudo? & \emph{Undershooting} pode elevar a variação acumulada. \\
+\path{determinacy_map.png} & $\phi_\pi$; raízes e módulo dominante & Onde a solução passa a ser única? &
+Fronteira depende de toda a parametrização. \\
+\path{irf_rho_comparison.png} & Horizonte; $\rho_i=0{,}934$ vs.\ 0,80 & Como a suavização altera a
+persistência? & AR(1) não é coeficiente estrutural puro. \\
+\path{forecast_fanchart.png} & Data futura; média e bandas de $\pi,i,x$ & Qual a projeção
+incondicional de 8 trimestres? & É cenário do modelo, não previsão oficial. \\
+\path{conditional_scenarios.png} & Horizonte; quatro cenários em nível & O que ocorre ao impor juro ou
+meta de inflação? & Restrições podem gerar respostas grandes em modelo forward. \\
+\path{conditional_policy_shocks.png} & Horizonte; \path{e_i} implícito & Qual choque de política cumpre
+cada caminho? & Choque é residual do modelo, não decisão observada. \\
+\path{history_shock_decomposition.png} & Tempo; contribuições por choque & O que o modelo atribui a
+demanda, custo e política? & Três observáveis e três choques geram ajuste quase exato. \\
+\path{history_smoothed_shocks.png} & Tempo; \path{e_x,e_pi,e_i} & Quando o smoother exige grandes
+inovações? & Grandes valores podem refletir omissões do modelo. \\
+\path{history_counterfactual.png} & História base vs.\ regra hawkish & Como seria a trajetória com
+$\phi_\pi=2{,}5$? & Crítica de Lucas: os choques não ficariam necessariamente iguais. \\
+\path{svar_vs_dsge_irf.png} & Horizonte; SVAR, bandas e DSGE & O mecanismo DSGE aparece na evidência
+reduzida? & Ordem de Cholesky e amostra determinam a identificação. \\
+\path{rstar_time_varying.png} & Tempo; proxy, bandas e grade 2/3/4\% & $r^\ast$ parece constante? &
+Proxy estatística absorve risco, expectativas e erros de hiato. \\
+\path{forecast_oos_comparison.png} & Modelo/variável; RMSE em $h=1,4$ & O NK prevê melhor que
+benchmarks? & Usa dados revisados e hiato HP de amostra completa. \\
+\path{open_economy_data.png} & Tempo; câmbio e cobre em níveis/ciclos & Quais forças externas foram
+adicionadas? & Séries externas não tornam coeficientes estruturais estimados. \\
+\path{open_economy_irfs.png} & Horizonte; respostas a juro, câmbio e cobre & Como canais externos
+afetam $x,\pi,i,q$ e cobre? & Calibração ilustrativa. \\
+\path{open_vs_closed_monetary_irf.png} & Horizonte; modelo aberto e fechado & Quanto o câmbio modifica
+o choque monetário? & Diferença depende dos coeficientes abertos escolhidos. \\
+\path{hybrid_nkpc_irfs.png} & Horizonte; baseline vs.\ híbrida & A inflação passada cria inércia? &
+$\gamma_\pi=0{,}35$ nas IRFs é calibrado. \\
+\path{mcmc_posterior_diagnostics.png} & Parâmetros; posterior/HPD e $\hat R$ & Quais valores são
+plausíveis e as cadeias convergiram? & ESS modesto; posterior é condicional ao modelo e priors. \\
+\path{bayesian_model_comparison.png} & Modelo; log evidência relativa & A inércia compensa o parâmetro
+extra? & Laplace é aproximação local, não evidência MCMC exata. \\
+\bottomrule
+\end{longtable}
+\normalsize
+
+% ======================================================================
+\section{Dicionário dos outputs: onde estão e como ler}
+% ======================================================================
+
+\subsection{O que é um output}
+Um \textbf{output} é qualquer resultado produzido pelo pipeline: uma tabela CSV, uma figura PNG, um
+arquivo de diagnóstico, uma previsão ou um PDF. A organização principal é:
+
+\begin{Verbatim}[fontsize=\small]
+data/clean/             dados tratados e metadados
+dynare/                 modelos .mod e funções de exportação .m
+python/                 preparação, estimação, execução e gráficos
+outputs/dynare/         resultado bruto de cada cenário Dynare
+outputs/tables/         tabelas agregadas em CSV
+outputs/figures/        25 figuras públicas em PNG
+outputs/logs/           mensagens e erros das execuções
+report/                 relatório analítico em Markdown
+entrega_aula5/          Comprehend, apresentação e roteiro
+Entrega Final.html      relatório autocontido com figuras, tabelas e código
+\end{Verbatim}
+
+\begin{intuicao}
+\path{outputs/dynare/} é a ``matéria-prima'' numérica de cada modelo.
+\path{outputs/tables/} reúne essa matéria-prima em tabelas comparáveis.
+\path{outputs/figures/} transforma as tabelas em imagens. O HTML e os PDFs são a camada final de
+comunicação.
+\end{intuicao}
+
+\subsection{Os cenários e seus nomes}
+\small
+\begin{longtable}{@{}p{0.29\textwidth}p{0.20\textwidth}p{0.43\textwidth}@{}}
+\toprule
+\textbf{Pasta/cenário} & \textbf{Mudança} & \textbf{Pergunta} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Pasta/cenário} & \textbf{Mudança} & \textbf{Pergunta} \\
+\midrule
+\endhead
+\path{baseline} & Calibração central & Qual é o comportamento de referência? \\
+\path{rstar_2}, \path{rstar_3}, \path{rstar_4} & $r^\ast=2,3,4\%$ a.a. & Como neutro e $\beta$
+alteram a solução? \\
+\path{kappa_0p07}, \path{kappa_0p10}, \path{kappa_0p13} & Grade de $\kappa$ & Quanto a inclinação de
+Phillips muda as IRFs? \\
+\path{phi_pi_1p3} até \path{phi_pi_2p2} & Grade de $\phi_\pi$ em passos de 0,1 & Como o ativismo
+monetário muda resposta e convergência? \\
+\path{rho_calibrated_0p80} & $\rho_i=0{,}80$ & O que muda frente ao AR(1) estimado 0,934? \\
+\path{fevd_didactic_benchmark} & Choques do alvo didático & A FEVD pedida pode ser reproduzida? \\
+\path{ref_professor} & Referência alternativa legada & Serve apenas como comparação de
+compatibilidade; não é o baseline final. \\
+\path{forecast} & Kalman e previsão & Quais trajetórias incondicionais e condicionais surgem? \\
+\path{history} & Smoother e decomposição & Quais choques o modelo recupera na história? \\
+\path{open_economy} & $q$, cobre, UIP e \emph{pass-through} & O que o baseline fechado omite? \\
+\path{hybrid_nkpc} & $\gamma_\pi=0{,}35$ & A inflação passada melhora a persistência? \\
+\bottomrule
+\end{longtable}
+\normalsize
+
+\subsection{Arquivos típicos dentro da pasta de cada cenário Dynare}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}p{0.26\textwidth}p{0.31\textwidth}X@{}}
+\toprule
+\textbf{Arquivo} & \textbf{Conteúdo} & \textbf{Como interpretar} \\
+\midrule
+\path{stability.csv} & Status BK, número de variáveis forward e raízes instáveis & Determinado quando
+as contagens coincidem. \\
+\path{eigenvalues.csv} & Parte real, imaginária e módulo de cada autovalor & Módulo abaixo de 1 é
+raiz estável; acima de 1 é instável. \\
+\path{irfs.csv} & Horizonte e respostas \path{variavel_choque} & Valores estão em unidades internas;
+o Python converte para p.p. \\
+\path{moments.csv} & Média, desvio-padrão, variância e autocorrelação & Momentos teóricos do modelo,
+não estatísticas observadas. \\
+\path{fevd.csv} & Participações dos choques por variável & Cada linha deve somar aproximadamente
+100\%. \\
+\path{correlations.csv} & Correlação teórica entre variáveis & Sinal mostra co-movimento dentro do
+modelo. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Na pasta \path{forecast/}, aparecem ainda:
+\begin{itemize}[nosep]
+  \item \path{forecast_smoothed.csv}: estados suavizados ao longo da amostra;
+  \item \path{forecast_unconditional.csv}: média e bandas HPD por horizonte;
+  \item \path{conditional_cond_*.csv}: médias e intervalos de cada cenário condicional;
+  \item \path{structure_cond_*.txt}: nomes internos da estrutura Dynare exportada.
+\end{itemize}
+Na pasta \path{history/}:
+\begin{itemize}[nosep]
+  \item \path{smoothed_shocks.csv}: séries recuperadas de \path{e_x}, \path{e_pi} e \path{e_i};
+  \item \path{shock_decomp.csv}: contribuição de cada choque, condição inicial e total suavizado.
+\end{itemize}
+
+\subsection{Dicionário das colunas mais usadas}
+\scriptsize
+\begin{longtable}{@{}p{0.24\textwidth}p{0.68\textwidth}@{}}
+\toprule
+\textbf{Coluna} & \textbf{Significado e regra de leitura} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Coluna} & \textbf{Significado e regra de leitura} \\
+\midrule
+\endhead
+\path{scenario}, \path{scenario_type} & Identificam a calibração e a dimensão que foi alterada. \\
+\path{variable} & Variável de resposta: normalmente \path{x}, \path{pi}, \path{i}; nas extensões
+inclui \path{q} e \path{copper}. \\
+\path{shock} & Inovação que inicia a resposta: \path{e_x}, \path{e_pi}, \path{e_i}, \path{e_q} ou
+\path{e_copper}. \\
+\path{horizon}, \path{period} & Distância em trimestres a partir do choque, previsão ou início da
+amostra. Horizonte 0 é impacto contemporâneo. \\
+\path{date}, \path{origin}, \path{target_date} & Data observada, origem da previsão e data prevista. \\
+\path{source}, \path{data_source}, \path{is_synthetic} & Proveniência. Confirme sempre que
+\path{is_synthetic=False} antes de fazer afirmação empírica sobre o Chile. \\
+\path{mean}, \path{std_dev}, \path{variance} & Primeiro e segundo momentos; variância é o quadrado do
+desvio-padrão. \\
+\path{autocorrelation_1} & Correlação da variável com ela mesma defasada um trimestre; mede
+persistência. \\
+\path{response}, \path{impact_pp}, \path{response_h4_pp} & Resposta da IRF; impacto é horizonte 0,
+\path{h4} é quarto trimestre. Sufixo \path{pp} indica pontos percentuais. \\
+\path{peak_abs}, \path{peak_horizon} & Maior resposta em valor absoluto e trimestre em que ocorre. \\
+\path{cumulative_abs} & Soma das magnitudes ao longo dos horizontes; mede movimento total, não efeito
+líquido. \\
+\path{first_sign_change_horizon} & Primeiro trimestre em que a IRF cruza zero; identifica
+\emph{overshooting}. \\
+\path{variance_share} & Parcela da FEVD; em algumas tabelas entre 0 e 1, em arquivos Dynare em \%. \\
+\path{target_pct}, \path{achieved_pct}, \path{difference_pp} & Alvo de FEVD, resultado obtido e erro
+em pontos percentuais. \\
+\path{coefficient}, \path{posterior_mode}, \path{posterior_mean} & Estimativa pontual: regressão,
+moda posterior e média posterior respondem a conceitos diferentes. \\
+\path{se_*}, \path{posterior_std} & Erro-padrão ou desvio posterior; mede incerteza. \\
+\path{ci95_low/high} & Intervalo frequencista ou aproximação de Laplace a 95\%; ver a coluna de
+método. \\
+\path{hpd90_low/high} & Intervalo credível posterior de 90\%; não é intervalo de confiança
+frequencista. \\
+\path{r_squared} & Fração da variação explicada pela regressão; não prova causalidade. \\
+\path{first_stage_F_*} & Força dos instrumentos em VI/2SLS; valores baixos indicam instrumento fraco. \\
+\path{n_forward}, \path{n_unstable} & Variáveis forward e raízes instáveis; devem coincidir para BK. \\
+\path{dominant_stable_modulus} & Maior módulo entre raízes estáveis; mais próximo de 1 implica maior
+persistência. \\
+\path{convergence_half_life_quarters} & Quantos trimestres para o componente estável cair pela metade. \\
+\path{actual}, \path{forecast}, \path{error} & Realizado, previsto e diferença; o sinal do erro depende
+da convenção usada pelo script. \\
+\path{bias}, \path{mae}, \path{mse}, \path{rmse} & Viés médio, erro absoluto médio, erro quadrático
+médio e sua raiz. Menor magnitude é melhor. \\
+\path{relative_rmse_vs_random_walk} & RMSE dividido pelo passeio aleatório; abaixo de 1 significa
+ganho sobre o benchmark. \\
+\path{rhat} & Diagnóstico entre cadeias MCMC; próximo de 1 é desejável. \\
+\path{effective_sample_size} & Número de sorteios independentes equivalentes após autocorrelação. \\
+\path{laplace_log_marginal_likelihood} & Log evidência aproximada; maior é melhor entre modelos com os
+mesmos dados. \\
+\path{log_bayes_factor_vs_best} & Diferença de log evidência para o melhor; zero identifica o melhor. \\
+\path{posterior_model_probability_equal_prior} & Peso normalizado supondo probabilidades prévias
+iguais entre os modelos comparados. \\
+\bottomrule
+\end{longtable}
+\normalsize
+
+\subsection{Catálogo completo das tabelas de output}
+\scriptsize
+\begin{longtable}{@{}p{0.28\textwidth}p{0.29\textwidth}p{0.36\textwidth}@{}}
+\toprule
+\textbf{Tabela CSV} & \textbf{Para que serve} & \textbf{O que observar} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Tabela CSV} & \textbf{Para que serve} & \textbf{O que observar} \\
+\midrule
+\endhead
+\path{parameter_targets.csv} & Tabela parâmetro--alvo do trabalho & Valor calibrado, estimativa
+empírica e justificativa nunca devem ser confundidos. \\
+\path{rstar_beta_table.csv} & Conversão de $r^\ast$ 2/3/4\% e cálculo de $\beta$ & Verifique
+\path{rstar_quarterly} e \path{beta}. \\
+\path{rhoi_estimate.csv} & AR(1) da TPM & $\rho_i=0{,}934$, erro HAC, intervalo, meia-vida e
+$R^2$. \\
+\path{taylor_rule_estimates.csv} & Regra reduzida por MQO e VI & Compare $\phi_\pi$ e $\phi_x$ entre
+métodos; grande diferença sinaliza endogeneidade/fragilidade. \\
+\path{nkpc_estimates.csv} & Phillips backward, forward IV e restrita & \path{kappa}, erro-padrão e
+força dos instrumentos; forward IV é fraca. \\
+\path{rstar_estimates.csv} & Três âncoras simples para taxa neutra & Média ex post e tendência HP não
+são estimação estrutural. \\
+\path{shock_sigmas.csv} & Desvios-padrão finais dos três choques & Valores usados no baseline
+alternativo de FEVD. \\
+\path{shock_sigmas_comparison.csv} & Compara calibrações de choques & Observe como cada alvo muda
+\path{sigma_calibrated}. \\
+\path{shock_calibration.csv} & Alvos e resultados por variável/choque & Mostra participação inicial,
+alvo e resultado calibrado. \\
+\path{fevd_summary.csv} & FEVD compacta do baseline & Nove participações; três por variável. \\
+\path{fevd_all_scenarios.csv} & FEVD de todos os cenários & Permite verificar robustez da atribuição
+de variância. \\
+\path{fevd_calibration_comparison.csv} & Alvo didático vs.\ alternativa do pesquisador & Use
+\path{difference_pp} e RMSE para avaliar o ajuste. \\
+\path{moments.csv} & Momentos compactos do baseline & Média, volatilidade e persistência teóricas. \\
+\path{moments_all_scenarios.csv} & Momentos de cada cenário & Compare persistência quando parâmetros
+mudam. \\
+\path{moments_model_vs_data.csv} & Dados BCCh vs.\ Dynare & Principal tabela para diagnosticar
+subestimação de volatilidade e inércia. \\
+\path{correlations_model_vs_data.csv} & Correlações cruzadas & Mostra co-movimentos entre $x,\pi,i$
+nos dados e no modelo. \\
+\path{scenario_manifest.csv} & Receita dos modelos gerados & Confirme qual parâmetro muda em cada
+\path{scenario}. \\
+\path{scenario_determinacy.csv} & Diagnóstico BK de todos os cenários & \path{status},
+\path{n_forward}, \path{n_unstable} e meia-vida. \\
+\path{determinacy_map.csv} & Grade ampliada de $\phi_\pi$ & Base numérica de
+\path{determinacy_map.png}. \\
+\path{irfs_long.csv} & Todas as IRFs em formato longo & Uma linha por cenário, variável, choque e
+horizonte; melhor tabela para filtros. \\
+\path{irf_summary_metrics.csv} & Resumos das IRFs & Impacto, pico, resposta acumulada, cruzamento de
+zero e horizontes 4/8/19. \\
+\path{irf_sign_checks.csv} & Teste automático dos sinais de impacto & Todos os nove sinais baseline
+devem aparecer como \path{True}. \\
+\path{policy_transition_coefficients.csv} & Funções de política reduzidas & Quanto cada variável
+responde à taxa passada e a choques unitários/calibrados. \\
+\path{forecast.csv} & Todas as trajetórias de previsão e cenários & Uma linha por horizonte,
+cenário e variável. \\
+\path{forecast_summary.csv} & Recorte nos horizontes 1, 4 e 8 & Tabela apropriada para citar valores
+na apresentação. \\
+\path{forecast_oos_predictions.csv} & Cada previsão pseudo-fora-da-amostra & Contém origem, alvo,
+realizado, previsão e erro. \\
+\path{forecast_oos_metrics.csv} & Desempenho agregado dos modelos & Compare RMSE e razão contra
+passeio aleatório. \\
+\path{history_shock_decomposition.csv} & Decomposição histórica datada & Para cada variável, soma
+demanda, custo, política e condição inicial ao observado. \\
+\path{svar_diagnostics.csv} & Diagnósticos do VAR & Defasagens, estabilidade, brancura, normalidade,
+ordem de Cholesky e normalização. \\
+\path{svar_vs_dsge_irfs.csv} & IRFs e bandas do SVAR junto ao DSGE & Use as bandas 90\% para avaliar
+incerteza e diferenças. \\
+\path{rstar_time_varying.csv} & Série completa da proxy de $r^\ast$ & Juro nominal, inflação
+esperada, juro real, filtro, smoother, bandas e hiato. \\
+\path{rstar_time_varying_summary.csv} & Resumo da proxy & Último valor, média, mínimo, máximo e
+variâncias do estado. \\
+\path{open_economy_calibration.csv} & Calibração de câmbio e cobre & Persistências, volatilidades e
+coeficientes abertos; todos ilustrativos. \\
+\path{open_economy_data_summary.csv} & Estatísticas das séries externas & Amostra, média, desvio,
+mínimo e máximo. \\
+\path{macro_extension_calibration.csv} & Parâmetros dos modelos aberto e híbrido & Identifica
+\path{alpha_q}, \path{gamma_q}, \path{gamma_pi} e choques extras. \\
+\path{macro_extension_irf_metrics.csv} & Métricas de IRF das extensões & Compare baseline, híbrida e
+aberta em impacto, pico e resposta acumulada. \\
+\path{bayesian_estimates.csv} & Moda posterior e Laplace do baseline & Prior, modo, desvio local e
+intervalo 95\%; não é MCMC. \\
+\path{mcmc_posterior.csv} & Posterior completa do baseline & Média, mediana, desvio e HPD 90\%. \\
+\path{mcmc_diagnostics.csv} & Qualidade das duas cadeias & $\hat R$, ESS, cadeias e sorteios
+retidos. \\
+\path{bayesian_model_comparison.csv} & Evidência marginal dos dois modelos Phillips & Log evidência,
+fator relativo, probabilidade com odds iguais e modelo preferido. \\
+\bottomrule
+\end{longtable}
+\normalsize
+
 \begin{resumo}
-O projeto calibra um modelo NK mínimo para o Chile, resolve-o no Dynare, verifica determinação,
-interpreta IRFs/momentos/FEVD, testa sensibilidades, confronta com econometria e, por fim, faz a
-previsão nativa do Dynare das páginas 48--55. As extensões aprofundam história macro, validação,
-economia aberta, inércia e incerteza bayesiana. Tudo é reprodutível e honesto quanto aos limites.
+Para responder ``qual é o número principal?'', use tabelas \path{*_summary.csv}. Para reconstruir
+gráficos ou fazer filtros, use arquivos longos como \path{irfs_long.csv},
+\path{forecast_oos_predictions.csv} e \path{rstar_time_varying.csv}. Para avaliar se o resultado é
+confiável, abra também a tabela de diagnóstico correspondente.
+\end{resumo}
+
+% ======================================================================
+\section{Como o projeto funciona: pipeline, Python, Octave e Dynare}
+% ======================================================================
+
+\subsection{Fluxo completo}
+\[
+\begin{aligned}
+\text{fontes oficiais} &\longrightarrow \text{dados trimestrais}
+\longrightarrow \text{estimações e calibração}\\
+&\longrightarrow \text{modelos Dynare}
+\longrightarrow \text{arquivos CSV}
+\longrightarrow \text{figuras e documentos}.
+\end{aligned}
+\]
+
+Mais concretamente:
+\begin{enumerate}[nosep]
+  \item Python baixa e transforma TPM, IPC, PIB, câmbio e cobre.
+  \item Python estima parâmetros descritivos e constrói alvos.
+  \item Python gera os arquivos \path{.mod} dos cenários.
+  \item Octave carrega o Dynare; o Dynare resolve, verifica BK, simula e estima.
+  \item Funções \path{export_*.m} transformam estruturas internas \path{oo_} e \path{M_} em CSV.
+  \item Python agrega os CSVs, calcula métricas e desenha os gráficos.
+  \item LaTeX gera os PDFs; \path{build_final_html.py} gera o HTML autocontido.
+\end{enumerate}
+
+\subsection{Todos os scripts Python}
+\scriptsize
+\begin{longtable}{@{}p{0.31\textwidth}p{0.61\textwidth}@{}}
+\toprule
+\textbf{Arquivo} & \textbf{Responsabilidade, entrada e saída} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Arquivo} & \textbf{Responsabilidade, entrada e saída} \\
+\midrule
+\endhead
+\path{common.py} & Define caminhos, cria pastas e localiza Octave/Dynare; infraestrutura compartilhada. \\
+\path{build_chile_dataset.py} & Baixa BCCh ou cria fallback sintético rotulado; gera observáveis
+\path{pi,i,x} e metadados. \\
+\path{build_open_economy_dataset.py} & Baixa câmbio OECD/FRED e cobre IMF/FRED; cria logs, ciclos HP,
+persistências e tabela de calibração. \\
+\path{estimate_rhoi_chile.py} & Estima $i_t=\alpha+\rho_i i_{t-1}+u_t$ com erros OLS/HAC; gera
+\path{rhoi_estimate.csv}. \\
+\path{estimate_taylor_rule.py} & Estima regra de Taylor reduzida por MQO-HAC e VI/2SLS-HAC. \\
+\path{estimate_nkpc.py} & Estima Phillips backward, forward instrumental e versão restrita. \\
+\path{estimate_rstar.py} & Calcula âncoras simples de juro real neutro e $\beta$ implícito. \\
+\path{estimate_time_varying_rstar.py} & Ajusta modelo de tendência local/Kalman para proxy temporal de
+$r^\ast$. \\
+\path{calibrate_shocks.py} & Escolhe desvios-padrão para aproximar alvos de FEVD. \\
+\path{make_tables.py} & Monta a tabela parâmetro--alvo e a grade $r^\ast$--$\beta$. \\
+\path{generate_dynare_models.py} & Gera baseline e cenários de $r^\ast$, $\kappa$, $\phi_\pi$,
+$\rho_i$ e FEVD. \\
+\path{generate_macro_extension_models.py} & Gera/reproduz modelos aberto e Phillips híbrida e sua
+calibração. \\
+\path{run_dynare_batch.py} & Copia modelos para pasta ASCII temporária, executa Octave/Dynare com
+timeout e devolve os CSVs. \\
+\path{run_macro_extensions.py} & Executa somente os modelos aberto e híbrido. \\
+\path{run_forecast.py} & Executa o modelo de previsão nativa e copia médias, bandas e cenários. \\
+\path{run_history.py} & Executa smoother e \path{shock_decomposition}. \\
+\path{run_bayesian.py} & Encontra a moda posterior do baseline e extrai Hessiano/Laplace. \\
+\path{run_mcmc.py} & Executa duas cadeias MCMC ou recupera cadeias prontas; calcula $\hat R$ e ESS. \\
+\path{compare_bayesian_models.py} & Estima modo da híbrida e compara evidências marginais por Laplace. \\
+\path{collect_outputs.py} & Une resultados de cenários em tabelas longas de IRF, momentos, FEVD e
+determinação. \\
+\path{analyze_determinacy.py} & Amplia a grade de $\phi_\pi$ e produz o mapa de determinação. \\
+\path{analyze_model_results.py} & Compara momentos, correlações, sinais de IRF e funções de política. \\
+\path{analyze_svar.py} & Estima VAR, escolhe defasagens, aplica Cholesky, simula bandas e compara ao
+DSGE. \\
+\path{evaluate_forecasts.py} & Faz janela expansiva e calcula bias, MAE, MSE e RMSE por modelo. \\
+\path{forecast_model.py} & Converte previsão para níveis anualizados, reancora cenários e desenha
+\emph{fan chart}. \\
+\path{analyze_macro_extensions.py} & Resume e desenha IRFs dos modelos aberto e híbrido. \\
+\path{plot_history.py} & Data a decomposição, desenha choques e resolve o contrafactual hawkish. \\
+\path{plot_irfs.py} & Produz IRFs baseline, sensibilidades, trade-offs, FEVD, momentos e $\rho_i$. \\
+\path{plot_mcmc.py} & Desenha intervalos posteriores e diagnóstico $\hat R$. \\
+\path{build_final_html.py} & Incorpora figuras, tabelas, narrativa e código em
+\path{Entrega Final.html}. \\
+\bottomrule
+\end{longtable}
+\normalsize
+
+\subsection{Todos os arquivos Octave/Dynare}
+\scriptsize
+\begin{longtable}{@{}p{0.31\textwidth}p{0.61\textwidth}@{}}
+\toprule
+\textbf{Arquivo} & \textbf{Papel} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Arquivo} & \textbf{Papel} \\
+\midrule
+\endhead
+\path{nk_chile_base.mod} & Baseline com IS, NKPC, Taylor, \path{steady}, \path{check} e
+\path{stoch_simul}. \\
+\path{nk_chile_estim.mod} & Estimação da moda posterior do baseline em desvios. \\
+\path{nk_chile_mcmc.mod} & Estimação posterior completa com duas cadeias Metropolis--Hastings. \\
+\path{nk_chile_forecast.mod} & Smoother, previsão incondicional e três caminhos condicionais. \\
+\path{nk_chile_history.mod} & Smoother e decomposição histórica dos choques. \\
+\path{nk_chile_open.mod} & Extensão com $q$, cobre, UIP, \emph{pass-through} e reação cambial. \\
+\path{nk_chile_hybrid.mod} & Extensão de simulação com inflação passada e $\gamma_\pi=0{,}35$. \\
+\path{nk_chile_hybrid_estim.mod} & Estimação da NKPC híbrida para comparação marginal. \\
+\path{export_results.m} & Exporta IRFs, momentos, FEVD e correlações do modelo padrão. \\
+\path{export_stability.m} & Exporta autovalores e contagens BK, incluindo variáveis
+\emph{both}. \\
+\path{export_forecast.m} & Exporta médias e bandas da previsão incondicional. \\
+\path{export_conditional.m} & Exporta estruturas de \path{conditional_forecast}. \\
+\path{export_history.m} & Exporta choques suavizados e decomposição histórica. \\
+\path{export_extension.m} & Exportador genérico para modelos com variáveis/choques extras. \\
+\path{export_bayesian.m} & Exporta priors e moda posterior. \\
+\path{export_mcmc.m} & Exporta resumos posteriores quando o pós-processamento Dynare termina. \\
+\path{run_models.m} & Runner Octave dos cenários gerados. \\
+\path{run_all_octave.m} & Entrada simples para executar baseline e modelos disponíveis. \\
+\path{generated/*.mod} & Arquivos mecânicos das grades; não devem ser editados manualmente, pois
+são regenerados pelo Python. \\
+\bottomrule
+\end{longtable}
+\normalsize
+
+\subsection{Como ler um arquivo de modelo Dynare}
+Quase todo modelo Dynare segue a mesma sequência:
+\begin{enumerate}[nosep]
+  \item \path{var}: declara variáveis endógenas;
+  \item \path{varexo}: declara choques;
+  \item \path{parameters}: declara parâmetros;
+  \item atribuições numéricas: calibração;
+  \item \path{model(linear)}: equações econômicas;
+  \item \path{steady}: calcula/verifica o estado estacionário;
+  \item \path{check}: calcula autovalores e condições BK;
+  \item \path{shocks}: define variâncias;
+  \item \path{stoch_simul}: produz momentos, FEVD e IRFs;
+  \item \path{estimation}: usa dados, filtro de Kalman, modo, MCMC ou previsão;
+  \item \path{verbatim}: chama uma função Octave de exportação.
+\end{enumerate}
+
+\subsection{Comandos para reproduzir}
+Execute a partir da raiz do repositório. O MCMC completo é propositalmente separado porque é lento.
+
+\begin{Verbatim}[fontsize=\scriptsize]
+python -m pip install -r requirements.txt
+
+python python/build_chile_dataset.py
+python python/estimate_rhoi_chile.py
+python python/estimate_taylor_rule.py
+python python/estimate_nkpc.py
+python python/estimate_rstar.py
+python python/calibrate_shocks.py
+python python/make_tables.py
+
+python python/generate_dynare_models.py
+python python/run_dynare_batch.py --all
+python python/collect_outputs.py
+python python/analyze_determinacy.py
+python python/analyze_model_results.py
+python python/plot_irfs.py
+
+python python/run_forecast.py
+python python/forecast_model.py
+python python/run_history.py
+python python/plot_history.py
+python python/analyze_svar.py
+python python/estimate_time_varying_rstar.py
+python python/evaluate_forecasts.py
+
+python python/build_open_economy_dataset.py
+python python/generate_macro_extension_models.py
+python python/run_macro_extensions.py
+python python/analyze_macro_extensions.py
+
+python python/run_bayesian.py
+python python/run_mcmc.py
+python python/plot_mcmc.py
+python python/compare_bayesian_models.py --reuse-baseline
+
+python python/build_final_html.py
+\end{Verbatim}
+
+\begin{atencao}
+O projeto fica em caminho OneDrive com espaços e acentos. O pré-processador do Dynare pode travar
+nessa situação. Os runners Python copiam os arquivos para uma pasta temporária ASCII, executam lá e
+copiam os CSVs de volta. Não execute dois runners Dynare simultaneamente, pois eles podem disputar a
+mesma pasta temporária.
+\end{atencao}
+
+\subsection{Como diagnosticar uma execução}
+\begin{itemize}[nosep]
+  \item Se Octave não for encontrado, configure \path{OCTAVE_BIN}.
+  \item Se \path{dynare} for indefinido, configure \path{DYNARE_MATLAB}.
+  \item Se um cenário não produzir CSV, abra o arquivo correspondente em \path{outputs/logs/}.
+  \item Se houver processo antigo, procure especificamente \path{octave-cli} e o runner associado;
+        não encerre todos os processos Python indiscriminadamente.
+  \item Se um resultado for sintético, o metadata e as colunas \path{is_synthetic} devem deixar isso
+        explícito.
+  \item Se a figura parecer diferente da tabela, confira unidade, anualização, sinal e filtro usado.
+\end{itemize}
+
+% ======================================================================
+\section{Limitações, glossário e checklist final}
+% ======================================================================
+
+\subsection{Limitações que precisam acompanhar qualquer interpretação}
+
+\begin{itemize}
+  \item \textbf{Economia fechada no modelo-base.} O núcleo de três equações não contém câmbio,
+        cobre, comércio exterior nem taxa internacional. A extensão aberta reduz essa omissão,
+        mas continua sendo uma representação calibrada e simplificada do Chile.
+  \item \textbf{Hiato do produto não é observado.} Ele é construído por filtro HP. Outros métodos
+        de tendência produziriam outro hiato e poderiam alterar estimações e narrativas.
+  \item \textbf{\(r^\ast\) é muito incerto.} Os valores anuais de 2\%, 3\% e 4\% são cenários
+        transparentes, não medições exatas. A versão variável no tempo é uma proxy simplificada,
+        e não uma reprodução completa de Laubach--Williams.
+  \item \textbf{A NKPC puramente prospectiva é deliberadamente enxuta.} Ela gera pouca
+        persistência inflacionária. A NKPC híbrida acrescenta indexação e melhora a aderência,
+        mas seu parâmetro também depende da especificação e da amostra.
+  \item \textbf{Choques ``estruturais'' são estruturais dentro do modelo.} A decomposição histórica
+        reproduz os dados porque o smoother encontra os choques compatíveis com as equações. Isso
+        não prova que toda inflação observada tenha uma causa única e perfeitamente identificada.
+  \item \textbf{COVID-19 e 2021--2022 são períodos extraordinários.} Restrições de oferta,
+        transferências, reabertura, câmbio e preços globais podem aparecer comprimidos nos três
+        choques do modelo-base.
+  \item \textbf{O contrafactual não é uma máquina do tempo.} Alterar \(\phi_\pi\) mantendo os
+        mesmos choques ajuda a pensar no mecanismo da regra, mas ignora a crítica de Lucas:
+        comportamento, expectativas e até os choques poderiam mudar sob outra política.
+  \item \textbf{A identificação do SVAR depende da ordenação de Cholesky.} A resposta empírica ao
+        choque monetário depende das hipóteses contemporâneas impostas. Ela é evidência de
+        robustez, não verdade causal definitiva.
+  \item \textbf{A avaliação de previsão é pseudo fora da amostra.} Ela recria previsões passadas,
+        mas continua restrita à amostra, às revisões e aos modelos considerados. Não é previsão
+        oficial do Banco Central do Chile.
+  \item \textbf{A estimação bayesiana depende das priors e do algoritmo.} \(\widehat R\), ESS e
+        gráficos de cadeia diagnosticam a simulação MCMC, mas não garantem que a estrutura
+        econômica seja correta.
+  \item \textbf{A evidência marginal usa aproximação de Laplace.} O Bayes factor favorece a NKPC
+        híbrida na especificação estudada, porém pode variar com priors, observáveis, amostra e
+        aproximação numérica.
+  \item \textbf{Parâmetros constantes são uma aproximação.} Credibilidade, indexação, abertura e
+        transmissão monetária podem mudar ao longo de 2001--2026.
+  \item \textbf{Nada aqui é recomendação de política.} O trabalho é um laboratório estrutural,
+        empírico, pequeno e transparente.
+\end{itemize}
+
+\subsection{Glossário completo de teoria, econometria e código}
+
+\begin{longtable}{>{\bfseries\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.72\textwidth}}
+\toprule
+Termo ou sigla & Explicação em linguagem direta \\
+\midrule
+\endfirsthead
+\toprule
+Termo ou sigla & Explicação em linguagem direta \\
+\midrule
+\endhead
+Novo-Keynesiano (NK) & Família de modelos em que famílias e empresas otimizam, expectativas
+importam e alguns preços ou salários não se ajustam instantaneamente. \\
+DSGE & \textit{Dynamic Stochastic General Equilibrium}: modelo dinâmico, sujeito a choques e
+baseado em decisões consistentes de agentes e mercados. \\
+Equação IS & Relação entre demanda, hiato, juro real e expectativas. No modelo, juros reais mais
+altos reduzem o hiato do produto. \\
+NKPC & Curva de Phillips Novo-Keynesiana: inflação depende da inflação esperada e da pressão de
+demanda, representada pelo hiato. \\
+Calvo & Mecanismo em que apenas uma fração das firmas consegue reajustar preços em cada período,
+criando rigidez nominal. \\
+Regra de Taylor & Regra que descreve como o banco central ajusta a taxa de juros em resposta à
+inflação e à atividade. \\
+TPM & Taxa de Política Monetária definida pelo Banco Central do Chile; é o instrumento de política
+usado como série de juros. \\
+BCCh & Banco Central de Chile, fonte central de dados e instituição responsável pela política
+monetária chilena. \\
+IPC & Índice de Preços ao Consumidor. Sua variação mede inflação ao consumidor. \\
+PIB & Produto Interno Bruto, medida do valor da produção final da economia. \\
+Hiato do produto & Diferença entre produção observada e uma estimativa de produção potencial.
+Positivo indica atividade acima do potencial. \\
+Filtro HP & Filtro Hodrick--Prescott, técnica que separa uma série em tendência e ciclo usando uma
+penalização de suavidade. \\
+\(r^\ast\) & Taxa real neutra: juro real compatível, em conceito, com inflação estável e produto no
+potencial. Não é diretamente observável. \\
+Estado estacionário & Situação de referência em que variáveis permanecem constantes na ausência
+de novos choques. \\
+Linearização & Aproximação do modelo ao redor do estado estacionário; transforma relações não
+lineares em equações locais mais simples. \\
+Expectativa racional & Hipótese de que agentes usam o modelo e as informações disponíveis de
+maneira internamente consistente, sem erros sistemáticos previsíveis. \\
+Condição de Blanchard--Kahn (BK) & Teste que compara raízes instáveis e variáveis prospectivas.
+Quando contagem e posto são adequados, existe solução local única e estável. \\
+Determinácia & Existência de uma trajetória única dadas condições iniciais e choques.
+Indeterminância permite múltiplas trajetórias autorrealizáveis. \\
+Princípio de Taylor & Ideia de que o juro nominal deve reagir mais do que proporcionalmente à
+inflação para elevar o juro real e estabilizar preços. \\
+IRF & \textit{Impulse Response Function}: caminho previsto das variáveis após um choque isolado,
+mantendo os demais choques em zero. \\
+Horizonte & Número de trimestres após o choque mostrado em uma IRF ou previsão. Horizonte zero é
+o impacto contemporâneo. \\
+Pico & Maior resposta, em valor absoluto ou no sentido analisado, ao longo do horizonte. \\
+Meia-vida & Tempo necessário para a resposta cair aproximadamente à metade do pico; medida
+intuitiva de persistência. \\
+Momento & Estatística resumida de uma série, como média, desvio-padrão, correlação ou
+autocorrelação. \\
+FEVD & \textit{Forecast Error Variance Decomposition}: parcela da incerteza de previsão de uma
+variável atribuída a cada choque em determinado horizonte. \\
+AR(1) & Processo em que a variável atual depende de constante, próprio valor defasado e erro. \\
+MQO/OLS & Mínimos Quadrados Ordinários: estima coeficientes minimizando a soma dos resíduos ao
+quadrado. \\
+HAC/Newey--West & Erro-padrão robusto a heterocedasticidade e autocorrelação dos resíduos. \\
+VI/IV & Variáveis instrumentais: usa instrumentos correlacionados com o regressor endógeno e não
+correlacionados com o erro estrutural. \\
+2SLS/MQ2E & Mínimos Quadrados em Dois Estágios, implementação comum de variáveis instrumentais. \\
+Endogeneidade & Situação em que um regressor se correlaciona com o erro, impedindo interpretação
+causal simples do MQO. \\
+VAR & Vetor autorregressivo: sistema em que cada variável depende das próprias defasagens e das
+defasagens das demais. \\
+SVAR & VAR estrutural: acrescenta restrições para interpretar inovações estatísticas como choques
+econômicos. \\
+Cholesky & Decomposição triangular usada para ortogonalizar inovações do VAR; sua interpretação
+depende da ordem das variáveis. \\
+Espaço de estados & Representação com variáveis observadas e estados latentes que evoluem ao
+longo do tempo. \\
+Filtro de Kalman & Algoritmo recursivo que estima o estado em \(t\) usando dados disponíveis até
+\(t\). \\
+Smoother de Kalman & Usa a amostra completa, inclusive observações futuras em relação a \(t\),
+para estimar estados e choques históricos. \\
+Decomposição histórica & Separa a trajetória suavizada de cada variável nas contribuições
+acumuladas de cada choque e da condição inicial. \\
+Contrafactual & Simulação de uma história alternativa sob outra regra ou parâmetro; depende das
+hipóteses mantidas constantes. \\
+Pseudo fora da amostra & Avaliação que recria previsões passadas usando apenas a informação que
+estaria disponível em cada data de origem. \\
+Random walk & Passeio aleatório; benchmark em que a melhor previsão do próximo valor é o valor
+atual. \\
+RMSE & Raiz do erro quadrático médio; penaliza erros grandes com intensidade. Menor é melhor. \\
+MAE & Erro absoluto médio; mede o tamanho médio do erro em unidades da variável. Menor é melhor. \\
+MSE & Erro quadrático médio antes da raiz; também dá peso maior a erros grandes. \\
+Fan chart & Gráfico em leque com previsão central e bandas que se ampliam conforme cresce a
+incerteza. \\
+Previsão condicional & Impõe um caminho futuro para uma variável e calcula os choques necessários
+para torná-lo compatível com o modelo. \\
+Economia aberta & Modelo que inclui relações com o exterior, como câmbio, juros internacionais,
+termos de troca e preços de importação. \\
+UIP & Paridade descoberta de juros: relaciona diferencial de juros à depreciação esperada do
+câmbio, admitindo ou não prêmio de risco. \\
+Pass-through & Intensidade com que uma variação cambial é transmitida aos preços domésticos. \\
+Termos de troca & Razão entre preços de exportação e importação. Para o Chile, cobre é referência
+importante para condições externas. \\
+NKPC híbrida & Curva de Phillips com componente prospectivo e componente defasado, permitindo
+persistência ou indexação da inflação. \\
+Overshooting & Resposta que inicialmente ultrapassa seu nível de longo prazo antes de retornar. \\
+Undershooting & Resposta inicial menor ou em sentido oposto ao ajuste posterior, conforme a
+variável e o mecanismo. \\
+Prior & Distribuição que representa informação sobre um parâmetro antes de observar a amostra
+usada na estimação. \\
+Verossimilhança & Medida de quão compatíveis os dados são com os parâmetros e o modelo. \\
+Posterior & Distribuição dos parâmetros depois de combinar prior e verossimilhança pelo teorema
+de Bayes. \\
+MAP/moda posterior & Valor do parâmetro que maximiza a densidade posterior. \\
+MCMC & Métodos de Monte Carlo via cadeias de Markov para gerar amostras aproximadas da posterior. \\
+Burn-in & Parte inicial da cadeia MCMC descartada para reduzir influência do ponto de partida. \\
+\(\widehat R\) & Diagnóstico que compara variação entre e dentro de cadeias. Valores próximos de 1
+sugerem convergência. \\
+ESS & Tamanho efetivo da amostra: quantidade de observações independentes equivalente após
+considerar autocorrelação da cadeia. \\
+HPD & Intervalo de maior densidade posterior; contém os valores mais prováveis segundo a posterior
+para determinada massa de probabilidade. \\
+Verossimilhança marginal & Evidência integrada do modelo, ponderando a verossimilhança por toda a
+distribuição prior. \\
+Bayes factor & Razão entre verossimilhanças marginais de dois modelos; quantifica evidência
+relativa sob as priors escolhidas. \\
+Aproximação de Laplace & Aproxima a integral da evidência ao redor da moda posterior usando
+curvatura local. \\
+Crítica de Lucas & Alerta de que relações estimadas podem mudar quando a regra de política muda,
+pois agentes alteram comportamento e expectativas. \\
+Dynare & Software para resolver, simular e estimar modelos macroeconômicos, usado aqui sobre GNU
+Octave. \\
+Octave & Ambiente numérico livre, semelhante ao MATLAB, usado para executar o Dynare sem pressupor
+MATLAB. \\
+Python & Linguagem usada para dados, econometria, automação, gráficos, tabelas, validações e
+montagem dos produtos finais. \\
+CSV & Arquivo textual tabular, usado como formato simples de intercâmbio entre Python, Dynare e
+documentos. \\
+\bottomrule
+\end{longtable}
+
+\subsection{Checklist final de compreensão}
+
+Uma pessoa que estudou este manual deve conseguir responder, sem apenas decorar:
+\begin{enumerate}
+  \item O que representam \(x\), \(\pi\) e \(i\), em quais unidades aparecem e por que o código usa
+        frações enquanto os gráficos usam porcentagens.
+  \item Como a IS, a NKPC e a regra de Taylor se conectam, incluindo expectativas e juro real.
+  \item A diferença entre parâmetro calibrado, estimado por regressão, por VI e por Bayes.
+  \item Como transformar \(r^\ast\) anual em trimestral e por que isso determina \(\beta\).
+  \item Por que o teste de Blanchard--Kahn é necessário e como ler uma região de determinácia.
+  \item Como interpretar sinal, magnitude, pico, persistência e retorno ao equilíbrio em uma IRF.
+  \item O que momentos e FEVD acrescentam e por que FEVD não é causalidade histórica.
+  \item Como ler fan chart, previsão condicional, choque implícito e avaliação fora da amostra.
+  \item Por que o smoother reproduz a história sem garantir identificação causal perfeita.
+  \item Qual restrição identifica o choque no SVAR e como comparar sua IRF com a do DSGE.
+  \item O que economia aberta, pass-through, UIP, cobre e NKPC híbrida mudam no baseline.
+  \item Como prior, verossimilhança, posterior, MCMC, \(\widehat R\), ESS, evidência marginal e
+        Bayes factor se relacionam.
+  \item Onde encontrar cada gráfico, tabela, CSV, log, arquivo \texttt{.mod}, script Python,
+        apresentação e relatório.
+  \item Como reproduzir dados, estimações, cenários, Dynare, figuras, tabelas e documentos.
+  \item Quais conclusões são sustentadas e quais exigiriam dados, identificação ou modelos mais
+        ricos.
+\end{enumerate}
+
+\section{Resumo do projeto em linguagem amadora}
+
+O projeto constrói uma representação disciplinada de como a política monetária chilena pode afetar
+atividade e inflação. O modelo-base contém três peças: famílias e empresas reduzem demanda quando o
+juro real sobe; empresas ajustam inflação conforme expectativas e pressão de demanda; e o Banco
+Central responde à inflação e ao hiato, suavizando a TPM. Dynare verifica se essas peças formam um
+sistema com solução única e calcula como choques se propagam. Python prepara dados, estima
+parâmetros, executa comparações, lê resultados e transforma tudo em tabelas e gráficos.
+
+As sensibilidades mostram que conclusões dependem dos parâmetros: \(\kappa\) governa a transmissão
+do hiato para a inflação; \(\phi_\pi\) governa a força da reação anti-inflacionária; \(\rho_i\)
+governa a suavização da taxa; e \(r^\ast\) altera o fator de desconto e a referência de juros. IRFs
+explicam dinâmica após choques; momentos e FEVD resumem volatilidade e fontes de incerteza;
+previsões avaliam caminhos futuros; o smoother reconstrói choques compatíveis com a história; e o
+SVAR oferece uma comparação empírica de forma reduzida.
+
+O pacote avançado pergunta onde o modelo simples falha e como melhorá-lo. A economia aberta
+adiciona câmbio e cobre; a NKPC híbrida adiciona inércia; \(r^\ast\) variável permite mudanças na
+taxa neutra; a avaliação fora da amostra compara o modelo com benchmarks; e a estimação bayesiana
+mede incerteza paramétrica e compara modelos. Esses recursos enriquecem o trabalho, mas não eliminam
+suas hipóteses. O resultado correto é uma análise quantitativa transparente, reproduzível e
+consciente de seus limites, não uma alegação de que um modelo pequeno descreve toda a economia.
+
+\begin{resumo}
+\textbf{Mensagem final para a apresentação:} a utilidade do modelo está em organizar mecanismos,
+quantificar respostas e tornar hipóteses verificáveis. A leitura responsável combina teoria,
+evidência, diagnósticos numéricos e cautela. Cada número apresentado pode ser rastreado até um dado,
+parâmetro, equação, script ou arquivo de output documentado neste manual.
 \end{resumo}
 
 \end{document}

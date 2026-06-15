@@ -74,7 +74,9 @@ Pacote completo de análise macro (Tier 1+2+3) **em cima** do trabalho da Aula 5
 
 ## Entregas integradas
 - `Entrega Final.html`: 25 figuras públicas, tabelas, narrativa e código completo.
-- `entrega_aula5/Comprehend.pdf`: 26 páginas, incluindo toda a teoria das extensões.
+- `entrega_aula5/Comprehend.pdf`: 39 páginas, em linguagem didática para público amador, cobrindo
+  os 37 quadros substantivos da apresentação, 25 gráficos, 40 tabelas, variáveis, outputs, código,
+  reprodução, glossário e limitações.
 - `entrega_aula5/Apresentacao.pdf`: rota principal de 20 minutos e apêndice com
   todas as 25 figuras (47 slides no total).
 - `entrega_aula5/Roteiro.pdf`: 5 páginas, com tempos e fala para a rota principal.
