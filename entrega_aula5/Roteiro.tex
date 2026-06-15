@@ -27,8 +27,9 @@
 
 \noindent\textit{Como usar este roteiro: o texto em corpo normal é o que se fala; os marcadores em
 azul indicam o slide e o tempo sugerido. A rota principal termina no slide 31 e dura
-$\approx$20 minutos, incluindo transições. Os slides posteriores são apêndice para perguntas: todos
-os gráficos estão na apresentação, mas não precisam ser expostos oralmente.}
+aproximadamente 18,5 minutos de fala marcada, reservando cerca de 1,5 minuto para transições, pausas e
+encerramento: total de 20 minutos. Os slides posteriores são apêndice para perguntas: todos os
+gráficos estão na apresentação, mas não precisam ser expostos oralmente.}
 
 \bigskip
 
@@ -212,24 +213,28 @@ depende da identificação e de variáveis omitidas; não devemos chamar qualque
 Terceiro, adiciono os canais que mais importam para uma economia pequena e aberta: câmbio, UIP,
 \emph{pass-through} e cobre. Uma depreciação pressiona a inflação; cobre mais caro expande a demanda.
 Em paralelo, a Phillips híbrida adiciona inflação passada e eleva a persistência modelada de 0,05
-para 0,38, corrigindo parte do salto da previsão.
+para 0,38, corrigindo parte do salto da previsão. Nessas IRFs, uso
+\(\gamma_\pi=0{,}35\) como calibração transparente.
 
 Por fim, o MCMC deixa explícita a incerteza. As duas cadeias convergem segundo o R-hat, mas o tamanho
 efetivo ainda é modesto. A média posterior de phi-pi é 1,17 e seu intervalo de 90\% encosta abaixo de
 1. Ou seja, até a distância da economia à fronteira de determinação é incerta.
 
 No slide seguinte, a evidência marginal compara formalmente a Phillips prospectiva e a híbrida sobre
-os mesmos dados. A híbrida vence por 12 log-pontos, um fator de Bayes aproximado de 166 mil, mesmo
-pagando pelo parâmetro extra. A mensagem não é que o número seja absoluto: ele usa aproximação local
-de Laplace e depende dos priors. A mensagem robusta é que a inércia passada recebe forte apoio.
+os mesmos dados. Aqui \(\gamma_\pi\) deixa de ser fixado: sua moda posterior estimada é 0,341, muito
+próxima da calibração de 0,35 usada nas IRFs. A híbrida obtém log evidência 1033,17 contra 1021,15,
+uma vantagem de 12,02 log-pontos e fator de Bayes aproximado de 166 mil, mesmo pagando pelo parâmetro
+extra. A mensagem não é que o número seja absoluto: ele usa aproximação local de Laplace, depende
+dos priors e não substitui uma segunda MCMC completa para a híbrida. A mensagem robusta é que a
+inércia passada recebe forte apoio nesta especificação.
 
 \slide{29--31}{Econometria, limitações e mensagens}{1,25 min}
 Além de calibrar, deixamos os dados falarem: AR(1), regra de Taylor, Phillips, SVAR, previsão fora da
 amostra e Bayes. Os métodos não entregam a mesma resposta, e isso é informação econômica, não falha.
 
 As limitações permanecem: a extensão aberta ainda é pequena e calibrada; a proxy de r-estrela não é
-uma estimativa estrutural; a pandemia pesa muito; e nenhum resultado é previsão oficial ou
-recomendação.
+uma estimativa estrutural; a pandemia pesa muito; a comparação entre Phillips usa Laplace local; e
+nenhum resultado é previsão oficial ou recomendação.
 
 As mensagens finais são quatro: uma regra ativa ancora expectativas; a suavização estica a
 transmissão; choques de custo impõem trade-off; e a combinação de modelo, dados e testes de robustez

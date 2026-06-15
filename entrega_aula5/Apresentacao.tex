@@ -311,7 +311,8 @@
   \centering\includegraphics[width=\linewidth,height=0.68\textheight,keepaspectratio]{figures/bayesian_model_comparison.png}
   \vspace{1mm}
   {\footnotesize Mesmos dados e priors comuns. A NKPC híbrida vence por 12,02 log-pontos
-  (fator de Bayes aproximado $\sim$166 mil), mesmo após penalizar $\gamma_\pi$. Laplace local.}
+  (1033,17 vs.\ 1021,15; fator de Bayes $\sim$166 mil). A moda estimada é
+  $\gamma_\pi=0{,}341$. Evidência de Laplace local.}
 \end{frame}
 
 \section{Síntese}
@@ -332,7 +333,8 @@
   \begin{itemize}
     \item O baseline é fechado; a extensão aberta ainda é pequena e calibrada.
     \item \textbf{Único estado} ($i_{t-1}$): ``esquece'' o último hiato e inflação.
-    \item A NKPC híbrida melhora a inércia, mas $\gamma_\pi$ não foi estimado.
+    \item Nas IRFs, $\gamma_\pi=0{,}35$ é calibrado; na comparação formal, a moda é 0,341.
+    \item A evidência marginal é Laplace local; não houve MCMC completo da híbrida.
     \item $r^\ast$, SVAR e decomposição histórica têm incertezas de identificação.
     \item Não é previsão oficial nem recomendação --- é um laboratório transparente.
   \end{itemize}

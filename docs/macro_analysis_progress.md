@@ -74,7 +74,7 @@ Pacote completo de análise macro (Tier 1+2+3) **em cima** do trabalho da Aula 5
 
 ## Entregas integradas
 - `Entrega Final.html`: 25 figuras públicas, tabelas, narrativa e código completo.
-- `entrega_aula5/Comprehend.pdf`: 39 páginas, em linguagem didática para público amador, cobrindo
+- `entrega_aula5/Comprehend.pdf`: 41 páginas, em linguagem didática para público amador, cobrindo
   os 37 quadros substantivos da apresentação, 25 gráficos, 40 tabelas, variáveis, outputs, código,
   reprodução, glossário e limitações.
 - `entrega_aula5/Apresentacao.pdf`: rota principal de 20 minutos e apêndice com
