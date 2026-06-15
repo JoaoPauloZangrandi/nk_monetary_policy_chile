@@ -120,6 +120,7 @@ def read_metadata() -> dict:
 
 def build() -> None:
     metadata = read_metadata()
+    figure_count = len(list(FIGURES.glob("*.png")))
     scenario_manifest = pd.read_csv(TABLES / "scenario_manifest.csv")
     determinacy = pd.read_csv(TABLES / "scenario_determinacy.csv")
     sign_checks = pd.read_csv(TABLES / "irf_sign_checks.csv")
@@ -144,6 +145,7 @@ def build() -> None:
         ("rho", "Persistência ρi"),
         ("econometria", "Econometria"),
         ("previsoes", "Previsões"),
+        ("macro", "Análise macro aprofundada"),
         ("politica", "Análise monetária"),
         ("limitacoes", "Limitações"),
         ("reproducao", "Reprodução"),
@@ -681,6 +683,83 @@ def build() -> None:
 
     parts.append(
         section(
+            "macro",
+            "Extensões e validação",
+            "História macro, evidência empírica e mecanismos ausentes no baseline",
+            f"""
+            <p class="lead">Este bloco amplia o trabalho obrigatório em três direções: usa o
+            suavizador para organizar a história macro; confronta o DSGE com benchmarks empíricos;
+            e reespecifica o modelo para inércia inflacionária e economia pequena e aberta.</p>
+
+            <h3>1. Decomposição histórica e contrafactual</h3>
+            {image("history_shock_decomposition.png", "Decomposição histórica dos observáveis",
+                "Figura 14 — Contribuições históricas dos três choques",
+                "Como há três observáveis, três choques e nenhum erro de medida, a reconstrução é "
+                "quase exata. Isso valida o código, mas não identifica causalmente a história.")}
+            {image("history_smoothed_shocks.png", "Choques recuperados pelo suavizador",
+                "Figura 15 — Inovações estruturais suavizadas",
+                "Crises exigem inovações muito maiores que os desvios-padrão ilustrativos do "
+                "baseline, pois poucos choques absorvem toda a volatilidade observada.")}
+            {image("history_counterfactual.png", "Contrafactual com reação mais agressiva",
+                "Figura 16 — Mesmos choques sob phi_pi = 2,5",
+                "A regra hawkish muda inflação, atividade e juros. É um exercício condicional "
+                "sujeito à crítica de Lucas, não uma avaliação causal do BCCh.")}
+
+            <h3>2. SVAR, r* e desempenho preditivo</h3>
+            {image("svar_vs_dsge_irf.png", "IRFs monetárias do SVAR e DSGE",
+                "Figura 17 — Evidência reduzida versus restrições estruturais",
+                "O SVAR passa o teste de brancura, mas rejeita normalidade e apresenta activity "
+                "puzzle inicial. A divergência informa sobre identificação e especificação.")}
+            {csv_table("svar_diagnostics.csv")}
+            {image("rstar_time_varying.png", "Proxy estatística de r-star",
+                "Figura 18 — Componente local do juro real ex ante",
+                "A estimativa termina perto de 0,85% a.a. A amplitude da série revela incerteza e "
+                "contaminação cíclica; não é uma estimação Laubach-Williams estrutural.")}
+            {csv_table("rstar_time_varying_summary.csv")}
+            {image("forecast_oos_comparison.png", "Erros de previsão fora da amostra",
+                "Figura 19 — NK versus AR(1), passeio aleatório e VAR",
+                "O NK é fraco a um trimestre, mas ganha do passeio aleatório para inflação, hiato "
+                "e marginalmente juros em quatro trimestres. O teste usa dados revisados.")}
+            {csv_table("forecast_oos_metrics.csv", columns=[
+                "horizon", "variable", "model", "rmse", "relative_rmse_vs_random_walk"
+            ])}
+
+            <h3>3. Economia aberta e inércia inflacionária</h3>
+            {image("open_economy_data.png", "Câmbio e cobre usados na extensão",
+                "Figura 20 — Canais externos relevantes para o Chile",
+                "Depreciação do peso e ciclo do cobre ancoram persistências e volatilidades. Os "
+                "demais coeficientes estruturais continuam sendo calibrações ilustrativas.")}
+            {image("open_economy_irfs.png", "IRFs do modelo de economia aberta",
+                "Figura 21 — Depreciação, cobre e transmissão monetária",
+                "Depreciação eleva inflação por pass-through; cobre positivo expande demanda e "
+                "pressiona preços e juros. O modelo satisfaz Blanchard-Kahn.")}
+            {image("open_vs_closed_monetary_irf.png", "Modelo aberto versus fechado",
+                "Figura 22 — O setor externo altera a transmissão",
+                "O câmbio cria uma margem adicional mesmo para choques monetários, mostrando o "
+                "custo analítico de tratar o Chile como economia fechada.")}
+            {image("hybrid_nkpc_irfs.png", "IRFs com Phillips híbrida",
+                "Figura 23 — Indexação e persistência inflacionária",
+                "Com gamma_pi=0,35, a autocorrelação modelada da inflação sobe de cerca de 0,05 "
+                "para 0,38. O ajuste melhora, mas a indexação é calibrada.")}
+
+            <h3>4. Posterior completa por MCMC</h3>
+            {image("mcmc_posterior_diagnostics.png", "Posteriores e R-hat do MCMC",
+                "Figura 24 — Incerteza paramétrica e convergência",
+                "Duas cadeias de 10.000 propostas, com 30% descartado. R-hat fica abaixo de 1,05, "
+                "mas ESS modesto e aceitação alta recomendam cautela.")}
+            {csv_table("mcmc_posterior.csv")}
+            {csv_table("mcmc_diagnostics.csv")}
+
+            {callout("warning", "Hierarquia das conclusões",
+                "IRFs do DSGE são mecanismos condicionais; SVAR depende da identificação; r* é "
+                "proxy estatística; a decomposição histórica é exata por construção; modelo aberto "
+                "e NKPC híbrida são calibrações; MCMC é posterior condicionada ao modelo e priors.")}
+            """,
+        )
+    )
+
+    parts.append(
+        section(
             "politica",
             "Síntese econômica",
             "Revisão aprofundada da análise monetária",
@@ -779,7 +858,7 @@ def build() -> None:
             "reproducao",
             "Projeto reproduzível",
             "Arquitetura, comandos e verificações",
-            """
+            f"""
             <div class="pipeline">
               <span>BCCh API</span><b>→</b><span>dados trimestrais</span><b>→</b>
               <span>estimações</span><b>→</b><span>calibração</span><b>→</b>
@@ -804,6 +883,16 @@ python python/analyze_model_results.py
 python python/run_forecast.py
 python python/forecast_model.py
 python python/plot_irfs.py
+python python/run_history.py
+python python/plot_history.py
+python python/analyze_svar.py
+python python/estimate_time_varying_rstar.py
+python python/evaluate_forecasts.py
+python python/build_open_economy_dataset.py
+python python/generate_macro_extension_models.py
+python python/run_macro_extensions.py
+python python/analyze_macro_extensions.py
+python python/plot_mcmc.py
 python python/build_final_html.py</code></pre>
             <h3>Tratamento do Windows e OneDrive</h3>
             <p>O runner copia os modelos para uma pasta temporária com caminho ASCII antes de
@@ -814,7 +903,7 @@ python python/build_final_html.py</code></pre>
             <ul class="checklist">
               <li>Dados marcados como reais em <code>dataset_metadata.json</code>.</li>
               <li>19 modelos com saídas Dynare e diagnóstico BK.</li>
-              <li>13 figuras públicas incorporadas neste arquivo.</li>
+              <li>{figure_count} figuras públicas incorporadas neste arquivo.</li>
               <li>Tabelas carregadas diretamente dos CSVs produzidos pelo pipeline.</li>
               <li>Código integral incorporado abaixo.</li>
               <li>PDF privado e credenciais fora do versionamento.</li>
@@ -987,6 +1076,7 @@ python python/build_final_html.py</code></pre>
 <script>{script}</script>
 </body>
 </html>"""
+    document = "\n".join(line.rstrip() for line in document.splitlines()) + "\n"
     OUTPUT.write_text(document, encoding="utf-8")
     print(f"Wrote {OUTPUT} ({OUTPUT.stat().st_size / 1024 / 1024:.2f} MiB)")
     print(f"Embedded {len(list(FIGURES.glob('*.png')))} PNG figures")

@@ -21,7 +21,7 @@ Pacote completo de análise macro (Tier 1+2+3) **em cima** do trabalho da Aula 5
 | 3b | Modelo de economia aberta (UIP + pass-through + choque de cobre) | **feito** |
 | 3c | NKPC híbrida com indexação e inércia inflacionária | **feito** |
 | 3d | Bayesiano completo: duas cadeias MCMC + R-hat/ESS | **feito** |
-| 4 | Integrar nas entregas (PDF/seções, apresentação, Comprehend) + commit | pendente |
+| 4 | Integrar nas entregas (PDF/seções, apresentação, Comprehend) + commit | **feito** |
 
 ## Arquivos da Fase 1 (já criados)
 - `dynare/nk_chile_history.mod` — estimation(smoother) + `shock_decomposition`.
@@ -67,6 +67,12 @@ Pacote completo de análise macro (Tier 1+2+3) **em cima** do trabalho da Aula 5
   proposta conservadora. A posterior de `phi_pi` inclui valores abaixo de 1,
   reforçando a incerteza sobre a força da reação monetária.
 
+## Entregas integradas
+- `Entrega Final.html`: 24 figuras públicas, tabelas, narrativa e código completo.
+- `entrega_aula5/Comprehend.pdf`: 24 páginas, incluindo toda a teoria das extensões.
+- `entrega_aula5/Apresentacao.pdf`: rota principal de 20 minutos e apêndice com
+  todas as 24 figuras.
+- `entrega_aula5/Roteiro.pdf`: 5 páginas, com tempos e fala para a rota principal.
+
 ## Próximo passo imediato
-Integrar os novos resultados no relatório, HTML, `Comprehend`, apresentação e
-roteiro; reconstruir os artefatos e validar os arquivos finais.
+Nenhuma fase técnica pendente. Apenas versionar e publicar o commit final.

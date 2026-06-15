@@ -26,12 +26,13 @@
 \maketitle
 
 \noindent\textit{Como usar este roteiro: o texto em corpo normal é o que se fala; os marcadores em
-azul indicam o slide e o tempo sugerido. Total $\approx$ 20 minutos. Fale com calma; os números-chave
-estão em \textbf{negrito}.}
+azul indicam o slide e o tempo sugerido. A rota principal termina no slide 27 e dura
+$\approx$20 minutos, incluindo transições. Os slides posteriores são apêndice para perguntas: todos
+os gráficos estão na apresentação, mas não precisam ser expostos oralmente.}
 
 \bigskip
 
-\slide{1--2}{Título e roteiro}{1 min}
+\slide{1--2}{Título e roteiro}{0,5 min}
 Boa tarde. Hoje eu vou mostrar como construir e usar um \textbf{modelo de política monetária} para o
 Chile. A ideia central é simples: bancos centrais têm basicamente \emph{um} instrumento, a taxa de
 juros, e precisam decidir como mexê-la para controlar a inflação sem desestabilizar a economia. Para
@@ -40,7 +41,7 @@ Novo-Keynesiano. Eu vou: primeiro apresentar o modelo e a intuição; depois cal
 Chile; mostrar o que ele prevê em termos de resposta a choques; e, no final --- que é a parte central
 do trabalho ---, gerar \textbf{previsões} com ele, usando o próprio Dynare.
 
-\slide{3}{A pergunta da política monetária}{1,5 min}
+\slide{3}{A pergunta da política monetária}{1 min}
 Vamos começar pela pergunta. O Banco Central do Chile move a TPM, a taxa de política monetária --- o
 equivalente à nossa Selic. Quando ele sobe o juro, encarece o crédito, esfria o consumo e o
 investimento, e isso tende a derrubar a inflação. Quando baixa, faz o contrário. O objetivo dele é
@@ -52,7 +53,7 @@ produto}, que mede se a economia está acima ou abaixo do seu potencial; a \text
 equilíbrio, então elas ficam todas em torno de zero. Isso é um truque matemático que transforma
 equações complicadas em equações de linha reta, fáceis de resolver.
 
-\slide{4}{O modelo em três equações}{2,5 min}
+\slide{4}{O modelo em três equações}{2 min}
 Aqui está o coração de tudo: três equações.
 
 A primeira é a \textbf{curva IS}, que representa a \emph{demanda}. Ela diz que a demanda hoje depende
@@ -77,7 +78,7 @@ o fato de que bancos centrais movem o juro em passos pequenos e graduais, não e
 Então, resumindo as três: demanda reage ao juro real; inflação reage ao aquecimento e ao futuro; e o
 banco central reage à inflação e ao hiato, devagar.
 
-\slide{5}{Calibração e a tabela parâmetro--alvo}{1,5 min}
+\slide{5}{Calibração e a tabela parâmetro--alvo}{1 min}
 ``Calibrar'' é escolher os números do modelo. A tarefa do trabalho pede exatamente isto, para o Chile.
 Fixamos o juro neutro em \textbf{3\% ao ano} --- testando também 2\% e 4\% --- e disso derivamos o
 fator de desconto beta, que dá \textbf{0,9926}. A relação é direta: beta é um sobre um mais o juro
@@ -87,7 +88,7 @@ e dá \textbf{0,934} --- bem alto, indicando que a TPM é muito persistente. O p
 phi-x em 0,5. Por fim, os tamanhos dos choques são calibrados para que a decomposição de variância
 fique realista. Tudo isso vira uma tabela ``parâmetro contra alvo'', que é um dos produtos pedidos.
 
-\slide{6}{Os dados do Chile}{1,5 min}
+\slide{6}{Os dados do Chile}{1 min}
 Estes são os dados, oficiais do Banco Central do Chile, trimestrais, de 2001 a 2026 --- 101
 trimestres. No painel de cima, a TPM, que variou de menos de 1\% até quase 11\%. No meio, a inflação,
 com a linha pontilhada marcando a meta de 3\%: dá para ver os picos de 2008 e de 2022, quando passou de
@@ -97,7 +98,7 @@ tendência de longo prazo do ciclo. Um detalhe técnico que importa: para alimen
 tira a média de cada série. E a média da inflação no período foi \textbf{3,79\%}, acima da meta de 3\%
 --- isso vai ser relevante na hora da previsão.
 
-\slide{7}{Solução e determinação}{1,5 min}
+\slide{7}{Solução e determinação}{1 min}
 Resolver o modelo significa encontrar uma trajetória única e estável, apesar de as variáveis dependerem
 do futuro. A ferramenta para garantir isso é a \textbf{condição de Blanchard-Kahn}. A regra é: cada
 variável que ``salta'' --- aqui, a inflação e o hiato, que não têm passado --- precisa de exatamente
@@ -108,7 +109,7 @@ reagir à inflação \emph{mais que proporcionalmente}, ou seja, phi-pi maior qu
 menos, surgiriam profecias auto-realizáveis de inflação --- a chamada indeterminação. Vamos ver isso
 desenhado daqui a pouco.
 
-\slide{8--9}{IRFs do baseline}{2 min}
+\slide{8--9}{IRFs do baseline}{1,5 min}
 Este é o gráfico mais importante do modelo: as \textbf{funções de resposta a impulso}, ou IRFs. Elas
 respondem: se eu der um único choque hoje, o que acontece com cada variável nos próximos trimestres? As
 linhas são hiato, inflação e juro; as colunas são os três choques.
@@ -124,7 +125,7 @@ Na terceira, um \textbf{choque de política monetária}, um aperto-surpresa: tan
 inflação caem. E a resposta é gradual, por causa da suavização do juro. Os sinais batem exatamente com
 a teoria, e tudo converge rápido --- sinal de que o modelo é estável.
 
-\slide{10}{Momentos: modelo versus dados}{1 min}
+\slide{10}{Momentos: modelo versus dados}{0,75 min}
 Aqui comparamos as estatísticas do modelo com as dos dados. Duas lições. Primeira: o modelo
 \emph{subestima} a volatilidade real --- as barras do modelo são bem menores. Faz sentido, porque a
 economia teve choques gigantes, como a COVID, que um modelo mínimo não reproduz. Segunda, e mais
@@ -132,7 +133,7 @@ importante: a \textbf{persistência da inflação} nos dados é cerca de 0,4, ma
 é a confirmação numérica daquilo que eu falei: como a curva de Phillips só olha para frente, o modelo
 não tem inércia de inflação. Esse é um limite conhecido e honesto do modelo.
 
-\slide{11--12}{FEVD}{1,5 min}
+\slide{11--12}{FEVD}{1 min}
 A decomposição da variância, ou FEVD, responde: de toda a oscilação de uma variável, quanto por cento
 vem de cada choque? É como repartir a culpa. O resultado é bem intuitivo: o \textbf{hiato} é explicado
 por demanda e política, meio a meio; a \textbf{inflação} é dominada por choques de \textbf{custo}, com
@@ -141,7 +142,7 @@ exatamente o que se esperaria de um modelo Novo-Keynesiano e ``parecido com um r
 central'', que era o alvo da tarefa. E o gráfico mostra que a calibração dos choques de fato
 \emph{atinge} esses alvos --- as barras de alvo e de resultado ficam quase idênticas.
 
-\slide{13--16}{Sensibilidades (kappa, phi-pi, determinação, rho-i)}{2,5 min}
+\slide{13--16}{Sensibilidades (kappa, phi-pi, determinação, rho-i)}{2 min}
 Agora a parte de sensibilidade, que a tarefa pede explicitamente. Primeiro, variando \textbf{kappa}
 entre 0,07 e 0,13: quanto maior, mais forte o repasse do aquecimento para a inflação, e mais o banco
 central precisa reagir.
@@ -159,7 +160,7 @@ quanto mais ativo o banco central, mais rápida a convergência. É o princípio
 Por fim, comparando rho-i estimado, 0,934, com o calibrado, 0,80: com a suavização mais alta, o juro
 se move mais devagar e os efeitos duram mais.
 
-\slide{17}{Como a previsão é feita}{1,5 min}
+\slide{17}{Como a previsão é feita}{1 min}
 Chegamos à parte central do trabalho: a \textbf{previsão}, que segue as páginas 48 a 55. E aqui eu
 quero enfatizar: a previsão é feita \emph{nativamente no Dynare}, exatamente como o roteiro pede. A
 receita é declarar as variáveis observadas com \texttt{varobs}, e rodar o comando \texttt{estimation}
@@ -169,7 +170,7 @@ rodar o \textbf{filtro de Kalman} sobre o histórico --- uma técnica que ``lê'
 os dados observados --- e, a partir do último estado, projetar oito trimestres à frente. Ele devolve a
 previsão central e as bandas de incerteza.
 
-\slide{18}{Previsão incondicional --- fan chart}{1,5 min}
+\slide{18}{Previsão incondicional --- fan chart}{1 min}
 Esta é a previsão incondicional: ``incondicional'' quer dizer que a gente não impõe nada, apenas deixa
 o modelo seguir suas próprias leis a partir de hoje. A linha azul é a projeção central, e a faixa é a
 banda de incerteza do Dynare. A inflação sai de \textbf{3,30\%} e converge para \textbf{3,76\%}, perto
@@ -180,7 +181,7 @@ carrega é o juro passado --- ele literalmente ``esquece'' a última inflação 
 choque transitório. Eu poderia esconder isso, mas prefiro ser honesto: é uma característica real do
 modelo mínimo. E como validação, a média do Dynare bate, até o último dígito, com a solução analítica.
 
-\slide{19}{Previsões condicionais --- cenários}{1,5 min}
+\slide{19}{Previsões condicionais --- cenários}{1 min}
 Agora a previsão \textbf{condicional}: aqui a gente \emph{impõe} uma trajetória a uma variável e
 pergunta o que acontece com as outras, usando o comando \texttt{conditional\_forecast}. O roteiro
 sugere dois tipos: fixar o juro ou fixar a inflação. Eu fiz três cenários. Primeiro, \textbf{manter a
@@ -190,26 +191,48 @@ despenca para 1,91\%, mas o hiato vai a menos 1,6\% --- um custo alto. Terceiro,
 inflação à meta de 3\%}: como a meta está abaixo da média de 3,79\%, isso exige aperto, e o juro sobe
 para 4,52\%.
 
-\slide{20}{Choques implícitos}{1 min}
+\slide{20}{Choques implícitos}{0,5 min}
 E como saber o ``custo'' de cada cenário? Para impor cada trajetória, o banco central precisa empurrar
 o juro com choques de política. Este gráfico mostra o tamanho desses empurrões. O aperto mais forte
 exige a maior inovação inicial; forçar a meta de inflação exige um aperto pontual mais modesto. A graça
 disso é tornar \emph{explícito} o esforço de política embutido em cada cenário --- é assim que um banco
 central comunica trajetórias alternativas.
 
-\slide{21--23}{Econometria, limitações e mensagens}{1,5 min}
-Rapidamente: além de calibrar, eu deixei os dados falarem. O AR(1) confirmou a alta persistência do
-juro; a regra de Taylor estimada deu valores de phi-pi imprecisos, entre 0,83 e 3,05, dependendo do
-método; e fiz também uma estimação bayesiana como checagem. Sempre que havia uma escolha, rodei as duas
-versões e mostrei o que é robusto.
+\slide{21--24}{Análise macro aprofundada}{2 min}
+Agora eu amplio o exercício para perguntar se a narrativa resiste a outras evidências. Primeiro, a
+\textbf{decomposição histórica}: o suavizador recupera choques de demanda, custo e política que
+reproduzem os dados. Isso ajuda a organizar a história, mas há uma cautela: três observáveis são
+explicados por exatamente três choques, sem erro de medida. Portanto, a reconstrução quase perfeita
+é também consequência da estrutura; não é identificação causal independente.
 
-Sobre limitações, sendo honesto: o modelo é \textbf{fechado e pequeno}, mas o Chile é uma economia
-aberta --- faltam câmbio e o preço do cobre. O modelo tem um único estado, não tem inércia de inflação,
-e o juro neutro é fixo. Nada aqui é previsão oficial; é um laboratório transparente.
+Segundo, comparo o DSGE a um \textbf{SVAR}. O SVAR mostra que a inflação cai após o choque monetário,
+mas a atividade inicialmente sobe, o chamado \emph{activity puzzle}. Isso alerta que o resultado
+depende da identificação e de variáveis omitidas; não devemos chamar qualquer IRF de fato causal.
 
-E as mensagens finais são quatro: uma regra de juros \emph{ativa} é o que garante a estabilidade; a
-suavização estimada para o Chile é alta e estica os efeitos da política; choques de custo sempre impõem
-um trade-off entre inflação e produto; e a previsão nativa do Dynare é o que conecta esse modelo
-calibrado à prática de comunicação de cenários de um banco central. Muito obrigado.
+Terceiro, adiciono os canais que mais importam para uma economia pequena e aberta: câmbio, UIP,
+\emph{pass-through} e cobre. Uma depreciação pressiona a inflação; cobre mais caro expande a demanda.
+Em paralelo, a Phillips híbrida adiciona inflação passada e eleva a persistência modelada de 0,05
+para 0,38, corrigindo parte do salto da previsão.
+
+Por fim, o MCMC deixa explícita a incerteza. As duas cadeias convergem segundo o R-hat, mas o tamanho
+efetivo ainda é modesto. A média posterior de phi-pi é 1,17 e seu intervalo de 90\% encosta abaixo de
+1. Ou seja, até a distância da economia à fronteira de determinação é incerta.
+
+\slide{25--27}{Econometria, limitações e mensagens}{1,25 min}
+Além de calibrar, deixamos os dados falarem: AR(1), regra de Taylor, Phillips, SVAR, previsão fora da
+amostra e Bayes. Os métodos não entregam a mesma resposta, e isso é informação econômica, não falha.
+
+As limitações permanecem: a extensão aberta ainda é pequena e calibrada; a proxy de r-estrela não é
+uma estimativa estrutural; a pandemia pesa muito; e nenhum resultado é previsão oficial ou
+recomendação.
+
+As mensagens finais são quatro: uma regra ativa ancora expectativas; a suavização estica a
+transmissão; choques de custo impõem trade-off; e a combinação de modelo, dados e testes de robustez
+é mais informativa do que qualquer número isolado. Muito obrigado.
+
+\section*{Apêndice para perguntas (fora dos 20 minutos)}
+Os slides restantes mostram, sem necessidade de exposição corrida, os choques suavizados, o
+contrafactual histórico, a proxy temporal de $r^\ast$, a avaliação fora da amostra, os dados de
+câmbio e cobre e a comparação aberto versus fechado. Use-os apenas se houver pergunta específica.
 
 \end{document}

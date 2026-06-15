@@ -102,8 +102,27 @@ python python/analyze_model_results.py    # moments, correlations, signs and tra
 python python/run_forecast.py             # NATIVE Dynare forecast=8 + conditional_forecast (pages 48-55)
 python python/forecast_model.py           # level fan chart + current-state-anchored scenario figures
 python python/plot_irfs.py                # figures
+
+# Deep macro extensions (optional, but included in the final deliverables)
+python python/run_history.py               # smoother + historical decomposition
+python python/plot_history.py              # narrative + policy counterfactual
+python python/analyze_svar.py              # recursive SVAR versus DSGE
+python python/estimate_time_varying_rstar.py
+python python/evaluate_forecasts.py        # pseudo-out-of-sample comparison
+python python/build_open_economy_dataset.py
+python python/generate_macro_extension_models.py
+python python/run_macro_extensions.py      # open economy + hybrid NKPC
+python python/analyze_macro_extensions.py
+python python/run_mcmc.py                  # slow: two full Dynare chains
+python python/plot_mcmc.py
+
 python python/build_final_html.py         # self-contained Entrega Final.html
 ```
+
+The full MCMC is intentionally not part of the routine fast pipeline. The
+published tables use two completed 10,000-draw Dynare chains with a 30% burn-in.
+`run_mcmc.py --recover-dir <dynare-work-directory>` can post-process completed
+chain files without rerunning Dynare.
 
 ## How the Dynare runner avoids OneDrive problems
 
@@ -136,12 +155,33 @@ the baseline before the full batch. Increase `--timeout` only after checking the
 **No BCCh credentials are available.** The dataset builder creates an explicitly labelled synthetic
 panel for pipeline testing. Synthetic results must not be described as empirical evidence for Chile.
 
-## Posterior-mode extension
+## Bayesian extensions
 
 `dynare/nk_chile_estim.mod` writes the model in deviation form and estimates a
 posterior mode (MAP). Reported uncertainty uses a local Laplace approximation
 from the mode Hessian. This is an exploratory extension, not a full MCMC
 posterior exercise and not the source of the baseline calibration.
+
+`dynare/nk_chile_mcmc.mod` is the full posterior extension. Its final
+diagnostics have R-hat below 1.05 for all eight estimated objects, but effective
+sample sizes remain modest; inference is reported with explicit convergence and
+model-conditioning caveats.
+
+## Deep macro analysis
+
+The project also contains a historical shock decomposition, a conditional
+hawkish-rule counterfactual, a recursive SVAR, a statistical time-varying
+`rstar` proxy, pseudo-out-of-sample forecast evaluation, a small-open-economy
+extension with exchange-rate pass-through and copper, and a hybrid Phillips
+curve with inflation indexation. These are enrichment exercises:
+
+- the historical decomposition is exact because three observables are matched
+  by three shocks without measurement error;
+- the SVAR depends on Cholesky ordering and displays an initial activity puzzle;
+- time-varying `rstar` is a local-level proxy, not a structural
+  Laubach-Williams estimate;
+- forecast evaluation uses revised data and a full-sample HP output gap;
+- open-economy and indexation coefficients are illustrative calibrations.
 
 ## Outputs
 
@@ -157,7 +197,9 @@ posterior exercise and not the source of the baseline calibration.
 `irf_kappa_tradeoffs`, `irf_phi_pi_comparison`, `irf_phi_pi_tradeoffs`,
 `irf_rho_comparison`, `determinacy_map`, `moments_model_vs_data`,
 `fevd_calibration_comparison`, `forecast_fanchart`, `conditional_scenarios`,
-`conditional_policy_shocks`.
+`conditional_policy_shocks`, plus the historical, SVAR, time-varying-rstar,
+forecast-evaluation, open-economy, hybrid-NKPC, and MCMC figures documented in
+`docs/macro_analysis_progress.md`.
 
 `outputs/dynare/<scenario>/`: per-scenario `irfs.csv`, `moments.csv`, `fevd.csv`, `stability.csv`,
 `eigenvalues.csv` for the 19 models (baseline, rstar/kappa/phi_pi grids, rho_i comparison and
@@ -182,7 +224,7 @@ scenarios, not forecasts from the BCCh or investment advice.
 - [ ] `data/clean/dataset_metadata.json` reports `is_synthetic=false` with series codes and access date.
 - [ ] `requirements.txt` installs in a clean environment.
 - [ ] All 19 `.mod` models regenerated before the Dynare batch; `steady`/`check`/`stoch_simul` complete.
-- [ ] Required tables and all 13 figures exist in `outputs/`.
+- [ ] Required tables and all public figures exist in `outputs/`.
 - [ ] `python python/build_final_html.py` regenerates `Entrega Final.html`.
 - [ ] `git status` shows no PDFs, credentials, `__pycache__`, or compiled `+model` folders.
 

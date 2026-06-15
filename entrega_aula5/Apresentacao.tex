@@ -44,7 +44,20 @@
 
 \begin{document}
 
-\maketitle
+\begin{frame}[plain]
+  \centering
+  \vfill
+  {\LARGE\bfseries\color{azul} Política monetária no Chile\par}
+  \vspace{5mm}
+  {\large Um modelo Novo-Keynesiano mínimo: calibração, diagnósticos e previsão (Dynare)\par}
+  \vspace{7mm}
+  {\normalsize Daniel Colli e João Zangrandi\par}
+  \vspace{2mm}
+  {\small FGV EESP --- Teoria e Prática da Política Monetária\par}
+  \vspace{5mm}
+  {\small Aula 5 --- Dynare e Calibração (pp.\ 26--55)\par}
+  \vfill
+\end{frame}
 
 \begin{frame}{Roteiro}
   \begin{columns}[T]
@@ -258,6 +271,42 @@
   cada caminho.}
 \end{frame}
 
+\section{Análise macro aprofundada}
+
+\begin{frame}{Decomposição histórica --- o modelo lê a história}
+  \centering\includegraphics[width=\linewidth,height=0.68\textheight,keepaspectratio]{figures/history_shock_decomposition.png}
+  \vspace{1mm}
+  {\footnotesize O smoother atribui os dados a demanda, custo e política. Com 3 observáveis e 3
+  choques, a reconstrução é exata por construção: narrativa condicional, não identificação causal.}
+\end{frame}
+
+\begin{frame}{SVAR versus DSGE --- teste empírico das IRFs}
+  \figw{svar_vs_dsge_irf.png}
+  \vspace{1mm}
+  {\footnotesize O SVAR recursivo exibe \emph{activity puzzle}; o DSGE impõe contração imediata.
+  A divergência revela sensibilidade à identificação e às restrições estruturais.}
+\end{frame}
+
+\begin{frame}{Economia aberta e inércia --- o que faltava}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \includegraphics[width=\linewidth,height=0.59\textheight,keepaspectratio]{figures/open_economy_irfs.png}
+      {\scriptsize Câmbio, \emph{pass-through}, UIP e cobre.}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \includegraphics[width=\linewidth,height=0.59\textheight,keepaspectratio]{figures/hybrid_nkpc_irfs.png}
+      {\scriptsize Indexação eleva a persistência da inflação de 0,05 para 0,38.}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{MCMC --- parâmetros são incertos}
+  \centering\includegraphics[width=\linewidth,height=0.68\textheight,keepaspectratio]{figures/mcmc_posterior_diagnostics.png}
+  \vspace{1mm}
+  {\footnotesize Duas cadeias de 10 mil propostas; todos os $\hat R<1{,}05$, mas ESS modesto.
+  O intervalo de $\phi_\pi$ encosta em valores abaixo de 1.}
+\end{frame}
+
 \section{Síntese}
 
 \begin{frame}{Econometria --- deixar os dados falarem}
@@ -274,10 +323,10 @@
 
 \begin{frame}{Limitações (honestas)}
   \begin{itemize}
-    \item Modelo \textbf{fechado e pequeno}; Chile é economia \textbf{aberta} (câmbio, cobre).
+    \item O baseline é fechado; a extensão aberta ainda é pequena e calibrada.
     \item \textbf{Único estado} ($i_{t-1}$): ``esquece'' o último hiato e inflação.
-    \item \textbf{Sem inércia de inflação}: reversão rápida demais.
-    \item $r^\ast$ fixo; choques calibrados, não identificados historicamente.
+    \item A NKPC híbrida melhora a inércia, mas $\gamma_\pi$ não foi estimado.
+    \item $r^\ast$, SVAR e decomposição histórica têm incertezas de identificação.
     \item Não é previsão oficial nem recomendação --- é um laboratório transparente.
   \end{itemize}
 \end{frame}
@@ -287,9 +336,36 @@
     \item Uma regra \textbf{ativa} ($\phi_\pi>1$) é o que garante a \textbf{determinação}.
     \item A \textbf{suavização} estimada é alta e estica os efeitos monetários.
     \item Choques de custo impõem um \textbf{trade-off} inflação\,$\times$\,produto.
-    \item A previsão nativa do Dynare conecta o modelo calibrado à \textbf{comunicação de cenários}.
+    \item Dados e extensões mostram onde o modelo funciona e onde suas conclusões são condicionais.
   \end{enumerate}
   \begin{center}\large\color{azul}\textbf{Obrigado!}\end{center}
+\end{frame}
+
+\appendix
+\section{Apêndice --- todos os resultados adicionais}
+
+\begin{frame}{Choques recuperados pelo suavizador}
+  \fig{history_smoothed_shocks.png}
+\end{frame}
+
+\begin{frame}{Contrafactual histórico com $\phi_\pi=2{,}5$}
+  \fig{history_counterfactual.png}
+\end{frame}
+
+\begin{frame}{Proxy de $r^\ast$ variável no tempo}
+  \fig{rstar_time_varying.png}
+\end{frame}
+
+\begin{frame}{Previsão pseudo-fora-da-amostra}
+  \fig{forecast_oos_comparison.png}
+\end{frame}
+
+\begin{frame}{Dados externos: peso chileno e cobre}
+  \fig{open_economy_data.png}
+\end{frame}
+
+\begin{frame}{Modelo aberto versus fechado}
+  \fig{open_vs_closed_monetary_irf.png}
 \end{frame}
 
 \end{document}

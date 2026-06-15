@@ -359,9 +359,9 @@ Leituras: \(\kappa\approx0{,}09\) é próximo da calibração; \(\rho_i\approx0{
 \(\phi_\pi\approx1{,}03\) fica próximo do limiar de determinação e seu intervalo de Laplace inclui
 valores abaixo de um. O desvio do choque de demanda \(\sigma_{e_x}\) é elevado, possivelmente pelo
 *outlier* da Covid-19 (hiato de −14% em 2020Q2), que o filtro de Kalman atribui a um grande choque de
-demanda. Como `mh_replic=0`, esse exercício não produz amostras MCMC nem intervalos credíveis
-posteriores integrais; os intervalos são aproximações locais de Laplace e devem ser tratados como
-exploratórios. Extensões naturais incluem erros de medida, tratamento explícito da Covid e MCMC.
+demanda. Como `mh_replic=0`, esse exercício isolado não produz amostras MCMC nem intervalos
+credíveis posteriores integrais; os intervalos são aproximações locais de Laplace. A Seção 17.7
+complementa esta checagem com duas cadeias MCMC completas, sem transformar a posterior no baseline.
 
 ## 16. Previsões incondicional e condicionais
 
@@ -408,7 +408,104 @@ antecipados antes de cada período: **não** é previsão perfeita. E como o ún
 \(i_{t-1}\), o algoritmo não carrega de forma independente o último hiato e a última inflação. As
 trajetórias são testes de mecanismo, não recomendação de política nem previsão oficial.
 
-## 17. Implicações de política monetária
+## 17. Análise macroeconômica aprofundada
+
+### 17.1 Decomposição histórica: narrativa condicionada ao modelo
+
+O suavizador de Kalman recupera, trimestre a trimestre, os choques de demanda, custo e política que
+fazem o modelo reproduzir os observáveis. A decomposição organiza episódios como a crise global, a
+Covid-19 e a inflação de 2021–2023.
+
+![Decomposição histórica](../outputs/figures/history_shock_decomposition.png)
+
+Como existem três observáveis, três choques e nenhum erro de medida, a reconstrução é praticamente
+exata (RMSE \(3{,}2\times10^{-7}\)). Isso valida o código, mas **não** oferece identificação histórica
+independente: todo desvio precisa ser atribuído a um dos três choques disponíveis.
+
+![Choques suavizados](../outputs/figures/history_smoothed_shocks.png)
+
+### 17.2 Contrafactual de uma regra mais agressiva
+
+Reaplicaram-se os mesmos choques recuperados sob \(\phi_\pi=2{,}5\). O exercício pergunta quanto as
+trajetórias teriam mudado com resposta mais forte à inflação. Ele ilustra o trade-off entre
+desinflação e atividade, mas não é avaliação causal do BCCh: expectativas e choques poderiam mudar
+sob outro regime (crítica de Lucas).
+
+![Contrafactual hawkish](../outputs/figures/history_counterfactual.png)
+
+### 17.3 SVAR: evidência reduzida versus DSGE
+
+Estimou-se um VAR recursivo em \([x,\pi,i]\), com quatro defasagens — a menor ordem que não rejeita
+brancura dos resíduos (\(p=0{,}169\)). O choque monetário é a terceira inovação de Cholesky,
+normalizada para elevar a taxa em 0,25 p.p. anualizado no impacto.
+
+![SVAR versus DSGE](../outputs/figures/svar_vs_dsge_irf.png)
+
+O SVAR produz um *activity puzzle* inicial: a atividade sobe antes de cair, enquanto o DSGE impõe
+contração imediata. No quarto trimestre, \(x=+0{,}24\) p.p. no SVAR contra \(-0{,}07\) no DSGE; a
+inflação cai mais no SVAR (\(-0{,}26\) contra \(-0{,}09\)). Os resíduos rejeitam normalidade.
+Portanto, a comparação revela fragilidade de identificação e possível má especificação; não valida
+automaticamente nenhum dos dois modelos.
+
+### 17.4 \(r^*\) variável no tempo
+
+Construiu-se uma proxy em espaço de estados: juro real ex ante menos componente cíclico associado ao
+hiato, com tendência local filtrada por Kalman. A estimativa suavizada termina em **0,85% a.a.**, bem
+abaixo do baseline fixo de 3%, e varia de −4,72% a 3,05% na amostra.
+
+![Proxy temporal de r-star](../outputs/figures/rstar_time_varying.png)
+
+Essa amplitude mostra por que a série deve ser lida como **proxy estatística**, não como
+Laubach–Williams estrutural. Expectativas inflacionárias por AR, filtro HP, crises e prêmio de risco
+contaminam a medida. A conclusão robusta é a incerteza de \(r^*\), não um valor verdadeiro de 0,85%.
+
+### 17.5 Avaliação pseudo-fora-da-amostra
+
+Com janela expansiva, compararam-se NK, AR(1), passeio aleatório e VAR nos horizontes de 1 e 4
+trimestres. Em \(h=1\), o NK perde para benchmarks simples nas três variáveis. Em \(h=4\), supera o
+passeio aleatório para inflação (RMSE 3,38 contra 4,03), hiato (2,90 contra 4,26) e marginalmente para
+TPM (2,45 contra 2,53).
+
+![Avaliação de previsões](../outputs/figures/forecast_oos_comparison.png)
+
+Restrições estruturais ajudam no médio prazo, mas prejudicam o *nowcasting*. O exercício é “pseudo”
+fora da amostra porque usa dados revisados e hiato HP da amostra completa.
+
+### 17.6 Economia pequena e aberta e NKPC híbrida
+
+Foram incorporados câmbio real \(q\), paridade descoberta de juros (UIP), *pass-through* para a
+inflação e um choque persistente de cobre. Câmbio CLP/USD (OECD) e preço global do cobre (IMF), via
+FRED, ancoram persistências e volatilidades; os demais coeficientes estruturais são ilustrativos.
+
+![Dados de economia aberta](../outputs/figures/open_economy_data.png)
+
+![IRFs de economia aberta](../outputs/figures/open_economy_irfs.png)
+
+Uma depreciação aumenta a inflação no impacto, e um choque positivo de cobre expande demanda e
+pressiona inflação e juros. O modelo satisfaz Blanchard–Kahn, mas não é um modelo estimado do Chile.
+
+![Aberto versus fechado](../outputs/figures/open_vs_closed_monetary_irf.png)
+
+A NKPC híbrida adiciona \(\gamma_\pi\pi_{t-1}\), com \(\gamma_\pi=0{,}35\). A autocorrelação da
+inflação sobe de aproximadamente 0,05 para **0,38**, próxima do padrão observado, e a desinflação se
+torna mais prolongada. Esse ganho de ajuste vem de calibração, não de prova de indexação causal.
+
+![NKPC híbrida](../outputs/figures/hybrid_nkpc_irfs.png)
+
+### 17.7 Posterior completa por MCMC
+
+O Dynare gerou duas cadeias Metropolis–Hastings de 10.000 propostas, descartando-se 30%. Todos os
+\(\hat R\) ficaram abaixo de 1,05. O tamanho efetivo ficou entre aproximadamente 92 e 268, indicando
+autocorrelação relevante; a aceitação próxima de 63% também sugere passos conservadores.
+
+![Posterior MCMC](../outputs/figures/mcmc_posterior_diagnostics.png)
+
+A média posterior é \(\kappa=0{,}095\), \(\rho_i=0{,}873\), \(\sigma=3{,}61\),
+\(\phi_\pi=1{,}168\) e \(\phi_x=0{,}295\). O intervalo credível de 90% de \(\phi_\pi\),
+\([0{,}986;1{,}453]\), encosta em valores abaixo de um. A intensidade da reação monetária e a
+distância até a fronteira de determinação permanecem empiricamente incertas.
+
+## 18. Implicações de política monetária
 
 O modelo sintetiza quatro mensagens. Primeiro, uma resposta ativa à inflação é central para a
 determinação; na parametrização usada, a fronteira está em torno de \(\phi_\pi=1\), mas a evidência
@@ -419,25 +516,24 @@ impacto inflacionário, porém aumenta o deslocamento de produto e juros e pode 
 *undershooting*. Quarto, FEVD e cenários condicionais mostram quais choques seriam necessários
 **dentro do modelo**, não o que ocorreu historicamente nem o que o BCCh deveria fazer.
 
-## 18. Limitações
+## 19. Limitações
 
-O modelo é **fechado e pequeno**, enquanto o Chile é uma economia **aberta**. Estão ausentes: a taxa
-de **câmbio** e o *pass-through* cambial; o preço do **cobre** e os termos de troca; a demanda externa
-e o prêmio de risco; fluxos de capital; indexação; fricções financeiras; heterogeneidade; o limite
+O **baseline** é fechado e pequeno, enquanto o Chile é uma economia aberta. A extensão da Seção 17
+adiciona câmbio, cobre e *pass-through*, mas ainda de forma calibrada e parcial. Permanecem ausentes:
+demanda externa e prêmio de risco; fluxos de capital; fricções financeiras; heterogeneidade; o limite
 inferior dos juros; e questões de credibilidade e comunicação. A taxa neutra é fixada em cenários e os
 choques são calibrados; \(r^*\) provavelmente varia no tempo. Além disso, o *outlier* da Covid-19
 distorce momentos e a estimação (Seção 15), e a NKPC *forward-looking* é mal identificada (Seção 14).
 Os momentos e a FEVD do modelo **não** são automaticamente os observados no Chile.
 
-## 19. Extensões
+## 20. Extensões adicionais
 
-Naturais: (i) um **NK de economia aberta** com curva IS com câmbio, paridade descoberta de juros (UIP)
-e Phillips com componente importada; (ii) uma regra de Taylor que reaja ao câmbio; (iii) **estimação
-bayesiana completa** com MCMC, *priors* alternativos e *dummies*/erros de medida para a Covid;
-(iv) \(r^*\) variável no tempo (Laubach–Williams/HLW); (v) um filtro estrutural para o hiato; e
-(vi) comparação sistemática de momentos e IRFs do modelo com SVARs estimados para o Chile.
+Próximos passos: (i) estimar conjuntamente o modelo aberto; (ii) incorporar demanda externa, prêmio
+de risco e termos de troca; (iii) usar *priors* alternativos, erros de medida e tratamento explícito
+da Covid no MCMC; (iv) estimar \(r^*\) e produto potencial em sistema estrutural; (v) identificar o
+SVAR com instrumento externo ou restrições de sinal; e (vi) avaliar previsões com vintages de dados.
 
-## 20. Conclusão
+## 21. Conclusão
 
 Recalibrou-se o NK mínimo para o Chile com **dados reais do BCCh**, usando
 \(\rho_i=0{,}934\) do AR(1) como alvo descritivo e comparando-o com 0,80. Foram calibradas tanto a
@@ -448,9 +544,10 @@ persistência dos juros, uma Phillips backward próxima de 0,10 e grande incerte
 prospectiva e na regra de Taylor. O confronto com os dados revela que o modelo subestima
 volatilidades e persistências. As sensibilidades e previsões condicionais dos dois tipos organizam
 os mecanismos centrais sem transformar o modelo em descrição completa, previsão oficial ou
-recomendação para a economia chilena.
+recomendação para a economia chilena. As extensões mostram que câmbio, cobre, inércia inflacionária,
+incerteza paramétrica e identificação empírica mudam a dinâmica e delimitam as conclusões seguras.
 
-## 21. Fontes e reprodutibilidade
+## 22. Fontes e reprodutibilidade
 
 - **Dados:** [Banco Central de Chile, Base de Datos Estadísticos](https://si3.bcentral.cl/Siete/ES/Siete/Cuadro/CAP_TASA_INTERES/MN_TASA_INTERES_09/TPM_C1),
   séries `F022.TPM…`, `F074.IPC.VAR…`, `F032.PIB…EP18…`; acesso em 15/06/2026
@@ -458,6 +555,8 @@ recomendação para a economia chilena.
 - **Marco monetário:** [Política Monetaria do BCCh](https://www.bcentral.cl/web/banco-central/areas/politica-monetaria),
   meta de inflação projetada de 3% no horizonte de dois anos.
 - **Uso dos dados:** [condições de uso do BCCh](https://www.bcentral.cl/web/banco-central/condiciones-de-uso).
+- **Economia aberta:** câmbio CLP/USD da OECD e preço do cobre do IMF, distribuídos via FRED
+  (metadados em `data/clean/open_economy_metadata.json`).
 - **Software:** GNU Octave 11.1.0 + Dynare 7.1; Python (numpy, pandas, statsmodels, scipy, matplotlib).
 - **Pipeline e arquivos de saída:** ver `README.md`. Todas as tabelas estão em `outputs/tables/` e os
   resultados do Dynare em `outputs/dynare/`.

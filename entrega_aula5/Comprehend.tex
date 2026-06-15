@@ -553,13 +553,136 @@ continuamente com o histórico. Os dois métodos concordam no sinal e no mecanis
 \end{atencao}
 
 % ======================================================================
+\section{Análise macro aprofundada: do modelo mínimo ao mundo real}
+% ======================================================================
+
+Esta seção responde a uma pergunta diferente: \emph{o que aprendemos quando confrontamos o modelo
+com a história, com métodos econométricos alternativos e com canais que o baseline omite?} Cada
+ferramenta tem um tipo de resposta e um limite próprio.
+
+\subsection{Suavizador de Kalman e decomposição histórica}
+O \textbf{filtro de Kalman} atualiza a estimativa do estado à medida que cada observação chega. O
+\textbf{suavizador} usa a amostra inteira para revisar a estimativa de cada trimestre. Dado o modelo,
+ele pergunta: quais sequências de $\varepsilon^x$, $\varepsilon^\pi$ e $\varepsilon^i$ seriam
+necessárias para reproduzir $x$, $\pi$ e $i$?
+
+\fig{history_shock_decomposition.png}{Decomposição histórica: contribuição de demanda, custo e
+política para cada variável observada.}
+\fig{history_smoothed_shocks.png}{Choques estruturais recuperados pelo suavizador de Kalman.}
+
+\begin{atencao}
+Temos três observáveis, três choques e nenhum erro de medida. Por isso, o modelo consegue reproduzir
+os dados quase exatamente. Isso é uma ótima validação computacional, mas não é identificação causal:
+se a inflação sobe, o modelo é obrigado a distribuir essa alta entre os poucos choques disponíveis.
+\end{atencao}
+
+\subsection{Contrafactual de política e crítica de Lucas}
+Depois de recuperar os choques, alimentamos a mesma história em uma regra mais agressiva,
+$\phi_\pi=2{,}5$. Isso responde: \emph{mantendo todo o resto igual, qual seria a trajetória?}
+
+\fig{history_counterfactual.png}{Contrafactual com reação mais forte à inflação.}
+
+O resultado é \textbf{condicional}, não uma prova do que ``teria acontecido''. Pela \textbf{crítica de
+Lucas}, famílias, firmas, expectativas e até os choques mudam quando a regra muda. O contrafactual é
+útil para entender mecanismos, não para julgar retrospectivamente o BCCh.
+
+\subsection{SVAR, Cholesky e comparação com o DSGE}
+Um \textbf{VAR} explica cada variável por defasagens de todas as variáveis. Para chamar uma inovação
+de ``choque monetário'', precisamos de identificação. No \textbf{SVAR recursivo}, a decomposição de
+\textbf{Cholesky} impõe a ordem $[x,\pi,i]$: dentro do trimestre, o juro pode reagir a atividade e
+inflação, mas estas não reagem contemporaneamente ao choque de juros.
+
+\fig{svar_vs_dsge_irf.png}{IRFs de um choque monetário no SVAR e no DSGE.}
+
+O VAR(4) não rejeita resíduos brancos ($p=0{,}169$), mas rejeita normalidade e mostra um
+\emph{activity puzzle}: a atividade sobe inicialmente após o aperto identificado. Isso pode refletir
+antecipação do BC, variáveis omitidas, a ordem recursiva ou instabilidade da amostra. A comparação
+não escolhe um vencedor; ela mostra quais restrições do DSGE não são reproduzidas automaticamente
+pelos dados.
+
+\subsection{$r^\ast$ variável no tempo e modelos de espaço de estados}
+Em um \textbf{modelo de espaço de estados}, uma variável não observada evolui ao longo do tempo e
+gera observações com ruído. Aqui, uma tendência local do juro real ex ante, controlada pelo hiato,
+serve de proxy para $r^\ast$.
+
+\fig{rstar_time_varying.png}{Proxy estatística de $r^\ast$ comparada à grade fixa de 2/3/4\%.}
+
+A estimativa final é 0,85\% a.a., mas a série vai de $-4{,}72\%$ a 3,05\%. Esse intervalo não deve ser
+tratado como trajetória estrutural verdadeira: inflação esperada por AR, prêmio de risco, filtro HP e
+crises entram na medida. Ela ensina que $r^\ast$ é incerto e móvel.
+
+\subsection{Previsão pseudo-fora-da-amostra}
+Uma boa previsão deve enfrentar dados que não participaram da estimação. Usamos janela
+\textbf{expansiva}: estimamos até uma data, prevemos 1 ou 4 trimestres e avançamos. Comparamos NK,
+AR(1), passeio aleatório e VAR pelo \textbf{RMSE}, a raiz do erro quadrático médio.
+
+\fig{forecast_oos_comparison.png}{RMSE do NK e dos benchmarks nos horizontes de 1 e 4 trimestres.}
+
+O NK é pior no horizonte de um trimestre, mas supera o passeio aleatório para inflação e hiato em
+quatro trimestres. A estrutura econômica ajuda no médio prazo; a rigidez do modelo atrapalha no
+curto. Chamamos o teste de \emph{pseudo} porque os dados foram revisados e o hiato HP usa a amostra
+completa.
+
+\subsection{Economia pequena e aberta: câmbio, UIP e cobre}
+Para o Chile, o câmbio e o cobre são canais centrais:
+\begin{itemize}[nosep]
+  \item \textbf{UIP} (paridade descoberta de juros): a diferença de juros se relaciona à depreciação
+        esperada, sujeita a prêmio de risco.
+  \item \textbf{\emph{Pass-through}}: uma depreciação encarece importados e pode elevar o IPC.
+  \item \textbf{Cobre}: preço maior melhora renda externa e demanda, mas seu efeito fiscal e cambial
+        pode operar em direções adicionais.
+\end{itemize}
+
+\fig{open_economy_data.png}{Câmbio CLP/USD e preço internacional do cobre usados na calibração.}
+\fig{open_economy_irfs.png}{IRFs do modelo ampliado com câmbio e cobre.}
+\fig{open_vs_closed_monetary_irf.png}{Transmissão monetária no modelo aberto e no fechado.}
+
+Uma depreciação aumenta a inflação no impacto; cobre positivo expande atividade e pressiona juros.
+O modelo satisfaz Blanchard--Kahn, mas seus coeficientes estruturais são ilustrativos. O objetivo é
+mostrar por que o baseline fechado é incompleto, não alegar estimação definitiva do setor externo.
+
+\subsection{NKPC híbrida e inércia da inflação}
+A Phillips pura ``esquece'' $\pi_{t-1}$. A versão híbrida adiciona indexação:
+\[
+ \pi_t=\gamma_\pi\pi_{t-1}+(1-\gamma_\pi)
+ \left(\beta E_t\pi_{t+1}+\kappa x_t\right)+\varepsilon^\pi_t .
+\]
+Com $\gamma_\pi=0{,}35$, parte das firmas reajusta olhando a inflação passada. Isso eleva a
+autocorrelação modelada de aproximadamente 0,05 para 0,38.
+
+\fig{hybrid_nkpc_irfs.png}{A Phillips híbrida prolonga a resposta da inflação.}
+
+O ajuste melhora, mas $\gamma_\pi$ foi calibrado. Melhor ajuste estatístico não prova, sozinho, que
+indexação seja o mecanismo causal correto.
+
+\subsection{Bayes completo: MCMC, R-hat e ESS}
+Bayes combina \textbf{prior} e \textbf{verossimilhança} para gerar a posterior. O
+\textbf{Metropolis--Hastings} propõe valores, aceita ou rejeita cada passo e constrói uma cadeia cuja
+distribuição limite é a posterior.
+\begin{itemize}[nosep]
+  \item \textbf{Burn-in}: sorteios iniciais descartados; aqui, 30\%.
+  \item $\hat R$: compara variação entre e dentro das cadeias; próximo de 1 é desejável.
+  \item \textbf{ESS}: tamanho efetivo após descontar autocorrelação; menor que o número bruto.
+  \item \textbf{intervalo credível}: região que contém determinada massa posterior, condicional ao
+        modelo, dados e priors.
+\end{itemize}
+
+\fig{mcmc_posterior_diagnostics.png}{Posteriores de duas cadeias de 10.000 propostas e diagnóstico
+$\hat R$.}
+
+Todos os $\hat R$ ficaram abaixo de 1,05, mas o ESS ficou entre cerca de 92 e 268. A posterior média
+é $\kappa=0{,}095$, $\rho_i=0{,}873$, $\phi_\pi=1{,}168$ e $\phi_x=0{,}295$. O intervalo de 90\% de
+$\phi_\pi$, $[0{,}986;1{,}453]$, encosta na região abaixo de um: a força da regra e a distância até a
+fronteira de determinação continuam incertas.
+
+% ======================================================================
 \section{Limitações, glossário e mapa do código}
 % ======================================================================
 
 \subsection{Limitações (honestas)}
 \begin{itemize}[nosep]
-  \item Modelo \textbf{fechado e pequeno}; o Chile é uma economia \textbf{aberta} (faltam câmbio,
-        cobre, termos de troca, fluxos de capital).
+  \item O \textbf{baseline} é fechado; a extensão aberta ainda é pequena, calibrada e sem demanda
+        externa, prêmio de risco estrutural ou bloco fiscal.
   \item \textbf{Único estado} ($i_{t-1}$): não carrega independentemente o último hiato e inflação.
   \item \textbf{Sem inércia de inflação}: reversão rápida demais (ver momentos).
   \item $r^\ast$ fixado em cenários; na realidade varia no tempo. Os choques são calibrados, não
@@ -599,6 +722,12 @@ Arquivo & Função \\
 \texttt{run\_bayesian.py} & estimação por moda posterior (DSGE) \\
 \texttt{run\_forecast.py} & \textbf{previsão nativa do Dynare} (\texttt{forecast=8} + condicional) \\
 \texttt{forecast\_model.py} & \emph{fan chart} em nível + cenários ancorados + choques \\
+\texttt{run\_history.py / plot\_history.py} & decomposição histórica e contrafactual \\
+\texttt{analyze\_svar.py} & SVAR recursivo e comparação com DSGE \\
+\texttt{estimate\_time\_varying\_rstar.py} & proxy de $r^\ast$ em espaço de estados \\
+\texttt{evaluate\_forecasts.py} & avaliação pseudo-fora-da-amostra \\
+\texttt{run\_macro\_extensions.py} & modelos aberto e Phillips híbrida no Dynare \\
+\texttt{run\_mcmc.py / plot\_mcmc.py} & posterior completa e diagnósticos das cadeias \\
 \texttt{plot\_irfs.py} & figuras de IRFs e sensibilidade \\
 \texttt{build\_final\_html.py} & monta o relatório \texttt{Entrega Final.html} \\
 \texttt{nk\_chile\_forecast.mod} & modelo de previsão (\texttt{varobs}, \texttt{estimation}, \texttt{conditional\_forecast}) \\
@@ -609,8 +738,8 @@ Arquivo & Função \\
 \begin{resumo}
 O projeto calibra um modelo NK mínimo para o Chile, resolve-o no Dynare, verifica determinação,
 interpreta IRFs/momentos/FEVD, testa sensibilidades, confronta com econometria e, por fim, faz a
-previsão nativa do Dynare (incondicional e condicional) das páginas 48--55. Tudo é reprodutível e
-honesto quanto aos seus limites.
+previsão nativa do Dynare das páginas 48--55. As extensões aprofundam história macro, validação,
+economia aberta, inércia e incerteza bayesiana. Tudo é reprodutível e honesto quanto aos limites.
 \end{resumo}
 
 \end{document}
