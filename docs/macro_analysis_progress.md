@@ -21,6 +21,7 @@ Pacote completo de análise macro (Tier 1+2+3) **em cima** do trabalho da Aula 5
 | 3b | Modelo de economia aberta (UIP + pass-through + choque de cobre) | **feito** |
 | 3c | NKPC híbrida com indexação e inércia inflacionária | **feito** |
 | 3d | Bayesiano completo: duas cadeias MCMC + R-hat/ESS | **feito** |
+| 3e | Comparação baseline vs NKPC híbrida por evidência marginal (Laplace) | **feito** |
 | 4 | Integrar nas entregas (PDF/seções, apresentação, Comprehend) + commit | **feito** |
 
 ## Arquivos da Fase 1 (já criados)
@@ -66,12 +67,16 @@ Pacote completo de análise macro (Tier 1+2+3) **em cima** do trabalho da Aula 5
   indica autocorrelação relevante. A aceitação próxima de 63% também sugere
   proposta conservadora. A posterior de `phi_pi` inclui valores abaixo de 1,
   reforçando a incerteza sobre a força da reação monetária.
+- A comparação marginal usa os mesmos 101 trimestres e observáveis nos dois
+  modelos. A NKPC híbrida vence por 12,02 log-pontos (fator de Bayes aproximado
+  166 mil), com `gamma_pi=0,341` no modo. A evidência é de Laplace no modo,
+  portanto local e condicionada aos priors.
 
 ## Entregas integradas
-- `Entrega Final.html`: 24 figuras públicas, tabelas, narrativa e código completo.
-- `entrega_aula5/Comprehend.pdf`: 24 páginas, incluindo toda a teoria das extensões.
+- `Entrega Final.html`: 25 figuras públicas, tabelas, narrativa e código completo.
+- `entrega_aula5/Comprehend.pdf`: 26 páginas, incluindo toda a teoria das extensões.
 - `entrega_aula5/Apresentacao.pdf`: rota principal de 20 minutos e apêndice com
-  todas as 24 figuras.
+  todas as 25 figuras (47 slides no total).
 - `entrega_aula5/Roteiro.pdf`: 5 páginas, com tempos e fala para a rota principal.
 
 ## Próximo passo imediato

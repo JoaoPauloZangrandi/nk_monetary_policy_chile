@@ -750,6 +750,18 @@ def build() -> None:
             {csv_table("mcmc_posterior.csv")}
             {csv_table("mcmc_diagnostics.csv")}
 
+            <h3>5. Comparação por evidência marginal</h3>
+            {image("bayesian_model_comparison.png", "Evidência marginal dos modelos de Phillips",
+                "Figura 25 — NKPC prospectiva versus NKPC híbrida",
+                "Com os mesmos 101 trimestres, observáveis e priors comuns, a aproximação de "
+                "Laplace favorece a NKPC híbrida por 12,02 log-pontos. O fator de Bayes aproximado "
+                "é cerca de 166 mil, mesmo após a penalização do parâmetro gamma_pi.")}
+            {csv_table("bayesian_model_comparison.csv")}
+            {callout("info", "Como ler a comparação",
+                "A evidência marginal integra ajuste e complexidade. O resultado é formal, mas "
+                "local ao modo posterior e condicionado aos priors. Não é bridge sampling nem "
+                "uma estimativa de evidência baseada em cadeias completas para os dois modelos.")}
+
             {callout("warning", "Hierarquia das conclusões",
                 "IRFs do DSGE são mecanismos condicionais; SVAR depende da identificação; r* é "
                 "proxy estatística; a decomposição histórica é exata por construção; modelo aberto "
@@ -893,6 +905,7 @@ python python/generate_macro_extension_models.py
 python python/run_macro_extensions.py
 python python/analyze_macro_extensions.py
 python python/plot_mcmc.py
+python python/compare_bayesian_models.py --reuse-baseline
 python python/build_final_html.py</code></pre>
             <h3>Tratamento do Windows e OneDrive</h3>
             <p>O runner copia os modelos para uma pasta temporária com caminho ASCII antes de

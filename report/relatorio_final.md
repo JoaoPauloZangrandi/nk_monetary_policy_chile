@@ -505,6 +505,28 @@ A média posterior é \(\kappa=0{,}095\), \(\rho_i=0{,}873\), \(\sigma=3{,}61\),
 \([0{,}986;1{,}453]\), encosta em valores abaixo de um. A intensidade da reação monetária e a
 distância até a fronteira de determinação permanecem empiricamente incertas.
 
+### 17.8 Comparação de modelos por verossimilhança marginal
+
+Para testar formalmente se a inércia adicional compensa a maior complexidade, compararam-se o modelo
+com NKPC prospectiva e a NKPC híbrida sobre os **mesmos 101 trimestres**, observáveis
+\((\pi,i,x)\) e priors comuns. A evidência marginal foi aproximada por Laplace no modo posterior:
+
+\[
+\log p(y\mid M)\approx \log p(y,\hat\theta\mid M)
+ +\frac{k}{2}\log(2\pi)-\frac{1}{2}\log|H(\hat\theta)|.
+\]
+
+![Comparação bayesiana](../outputs/figures/bayesian_model_comparison.png)
+
+A log evidência é **1021,15** para a Phillips prospectiva e **1033,17** para a híbrida. A diferença
+de **12,02** log-pontos implica fator de Bayes aproximado de **166 mil** a favor da híbrida, sob odds
+prévias iguais. O modo de \(\gamma_\pi\) é 0,341, próximo da calibração de 0,35 usada nas IRFs.
+
+O resultado é forte dentro desta especificação: os dados valorizam inflação passada mesmo após a
+penalização pelo parâmetro extra. Contudo, é uma aproximação gaussiana **local** ao modo, sensível a
+priors, amostra, tratamento da Covid e forma da posterior. Não é uma evidência marginal calculada por
+*bridge sampling* ou pelas cadeias MCMC dos dois modelos.
+
 ## 18. Implicações de política monetária
 
 O modelo sintetiza quatro mensagens. Primeiro, uma resposta ativa à inflação é central para a

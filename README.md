@@ -115,6 +115,7 @@ python python/run_macro_extensions.py      # open economy + hybrid NKPC
 python python/analyze_macro_extensions.py
 python python/run_mcmc.py                  # slow: two full Dynare chains
 python python/plot_mcmc.py
+python python/compare_bayesian_models.py --reuse-baseline
 
 python python/build_final_html.py         # self-contained Entrega Final.html
 ```
@@ -167,6 +168,12 @@ diagnostics have R-hat below 1.05 for all eight estimated objects, but effective
 sample sizes remain modest; inference is reported with explicit convergence and
 model-conditioning caveats.
 
+`python/compare_bayesian_models.py` compares the forward-looking and hybrid
+Phillips specifications on the same 101 observations and observables. It uses
+the Laplace approximation to each model's marginal data density at the Dynare
+posterior mode. The hybrid specification is preferred by 12.02 log-evidence
+points, conditional on the priors and local Gaussian approximation.
+
 ## Deep macro analysis
 
 The project also contains a historical shock decomposition, a conditional
@@ -182,6 +189,8 @@ curve with inflation indexation. These are enrichment exercises:
   Laubach-Williams estimate;
 - forecast evaluation uses revised data and a full-sample HP output gap;
 - open-economy and indexation coefficients are illustrative calibrations.
+- marginal-likelihood comparison is a local Laplace approximation, not a
+  bridge-sampling or modified-harmonic-mean estimate from both models' chains.
 
 ## Outputs
 

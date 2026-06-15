@@ -26,7 +26,7 @@
 \maketitle
 
 \noindent\textit{Como usar este roteiro: o texto em corpo normal é o que se fala; os marcadores em
-azul indicam o slide e o tempo sugerido. A rota principal termina no slide 27 e dura
+azul indicam o slide e o tempo sugerido. A rota principal termina no slide 31 e dura
 $\approx$20 minutos, incluindo transições. Os slides posteriores são apêndice para perguntas: todos
 os gráficos estão na apresentação, mas não precisam ser expostos oralmente.}
 
@@ -142,7 +142,7 @@ exatamente o que se esperaria de um modelo Novo-Keynesiano e ``parecido com um r
 central'', que era o alvo da tarefa. E o gráfico mostra que a calibração dos choques de fato
 \emph{atinge} esses alvos --- as barras de alvo e de resultado ficam quase idênticas.
 
-\slide{13--16}{Sensibilidades (kappa, phi-pi, determinação, rho-i)}{2 min}
+\slide{13--19}{Sensibilidades (kappa, phi-pi, determinação, rho-i)}{2 min}
 Agora a parte de sensibilidade, que a tarefa pede explicitamente. Primeiro, variando \textbf{kappa}
 entre 0,07 e 0,13: quanto maior, mais forte o repasse do aquecimento para a inflação, e mais o banco
 central precisa reagir.
@@ -160,7 +160,7 @@ quanto mais ativo o banco central, mais rápida a convergência. É o princípio
 Por fim, comparando rho-i estimado, 0,934, com o calibrado, 0,80: com a suavização mais alta, o juro
 se move mais devagar e os efeitos duram mais.
 
-\slide{17}{Como a previsão é feita}{1 min}
+\slide{20}{Como a previsão é feita}{1 min}
 Chegamos à parte central do trabalho: a \textbf{previsão}, que segue as páginas 48 a 55. E aqui eu
 quero enfatizar: a previsão é feita \emph{nativamente no Dynare}, exatamente como o roteiro pede. A
 receita é declarar as variáveis observadas com \texttt{varobs}, e rodar o comando \texttt{estimation}
@@ -170,7 +170,7 @@ rodar o \textbf{filtro de Kalman} sobre o histórico --- uma técnica que ``lê'
 os dados observados --- e, a partir do último estado, projetar oito trimestres à frente. Ele devolve a
 previsão central e as bandas de incerteza.
 
-\slide{18}{Previsão incondicional --- fan chart}{1 min}
+\slide{21}{Previsão incondicional --- fan chart}{1 min}
 Esta é a previsão incondicional: ``incondicional'' quer dizer que a gente não impõe nada, apenas deixa
 o modelo seguir suas próprias leis a partir de hoje. A linha azul é a projeção central, e a faixa é a
 banda de incerteza do Dynare. A inflação sai de \textbf{3,30\%} e converge para \textbf{3,76\%}, perto
@@ -181,7 +181,7 @@ carrega é o juro passado --- ele literalmente ``esquece'' a última inflação 
 choque transitório. Eu poderia esconder isso, mas prefiro ser honesto: é uma característica real do
 modelo mínimo. E como validação, a média do Dynare bate, até o último dígito, com a solução analítica.
 
-\slide{19}{Previsões condicionais --- cenários}{1 min}
+\slide{22}{Previsões condicionais --- cenários}{1 min}
 Agora a previsão \textbf{condicional}: aqui a gente \emph{impõe} uma trajetória a uma variável e
 pergunta o que acontece com as outras, usando o comando \texttt{conditional\_forecast}. O roteiro
 sugere dois tipos: fixar o juro ou fixar a inflação. Eu fiz três cenários. Primeiro, \textbf{manter a
@@ -191,14 +191,14 @@ despenca para 1,91\%, mas o hiato vai a menos 1,6\% --- um custo alto. Terceiro,
 inflação à meta de 3\%}: como a meta está abaixo da média de 3,79\%, isso exige aperto, e o juro sobe
 para 4,52\%.
 
-\slide{20}{Choques implícitos}{0,5 min}
+\slide{23}{Choques implícitos}{0,5 min}
 E como saber o ``custo'' de cada cenário? Para impor cada trajetória, o banco central precisa empurrar
 o juro com choques de política. Este gráfico mostra o tamanho desses empurrões. O aperto mais forte
 exige a maior inovação inicial; forçar a meta de inflação exige um aperto pontual mais modesto. A graça
 disso é tornar \emph{explícito} o esforço de política embutido em cada cenário --- é assim que um banco
 central comunica trajetórias alternativas.
 
-\slide{21--24}{Análise macro aprofundada}{2 min}
+\slide{24--28}{Análise macro aprofundada}{2 min}
 Agora eu amplio o exercício para perguntar se a narrativa resiste a outras evidências. Primeiro, a
 \textbf{decomposição histórica}: o suavizador recupera choques de demanda, custo e política que
 reproduzem os dados. Isso ajuda a organizar a história, mas há uma cautela: três observáveis são
@@ -218,7 +218,12 @@ Por fim, o MCMC deixa explícita a incerteza. As duas cadeias convergem segundo 
 efetivo ainda é modesto. A média posterior de phi-pi é 1,17 e seu intervalo de 90\% encosta abaixo de
 1. Ou seja, até a distância da economia à fronteira de determinação é incerta.
 
-\slide{25--27}{Econometria, limitações e mensagens}{1,25 min}
+No slide seguinte, a evidência marginal compara formalmente a Phillips prospectiva e a híbrida sobre
+os mesmos dados. A híbrida vence por 12 log-pontos, um fator de Bayes aproximado de 166 mil, mesmo
+pagando pelo parâmetro extra. A mensagem não é que o número seja absoluto: ele usa aproximação local
+de Laplace e depende dos priors. A mensagem robusta é que a inércia passada recebe forte apoio.
+
+\slide{29--31}{Econometria, limitações e mensagens}{1,25 min}
 Além de calibrar, deixamos os dados falarem: AR(1), regra de Taylor, Phillips, SVAR, previsão fora da
 amostra e Bayes. Os métodos não entregam a mesma resposta, e isso é informação econômica, não falha.
 

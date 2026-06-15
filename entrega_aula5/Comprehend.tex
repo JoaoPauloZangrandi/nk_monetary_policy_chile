@@ -10,6 +10,8 @@
 \usepackage[a4paper,margin=2.3cm]{geometry}
 \usepackage{xcolor}
 \usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
 \usepackage{enumitem}
 \usepackage[most]{tcolorbox}
 \usepackage[colorlinks=true,linkcolor=blue!55!black,urlcolor=blue!55!black]{hyperref}
@@ -340,7 +342,8 @@ isso no mapa de determinação (Figura~\ref{fig:det}).
 \end{enumerate}
 As funções de política são a ``solução'' do modelo: por exemplo, um choque de custo
 ($\varepsilon^\pi>0$) eleva a inflação ($+0{,}86$), eleva o juro ($+0{,}23$) e reduz o hiato
-($-0{,}67$). (Arquivos em \texttt{outputs/dynare/baseline/}.)
+($-0{,}67$). Os arquivos ficam em \texttt{outputs/dynare/}\allowbreak
+\texttt{baseline/}.
 
 % ======================================================================
 \section{Lendo os resultados: todos os gráficos}
@@ -685,6 +688,38 @@ Todos os $\hat R$ ficaram abaixo de 1,05, mas o ESS ficou entre cerca de 92 e 26
 $\phi_\pi$, $[0{,}986;1{,}453]$, encosta na região abaixo de um: a força da regra e a distância até a
 fronteira de determinação continuam incertas.
 
+\subsection{Comparação por verossimilhança marginal}
+A posterior diz quais parâmetros são plausíveis \emph{dentro} de um modelo. Para comparar modelos,
+precisamos da \textbf{verossimilhança marginal} ou \textbf{evidência}:
+\[
+ p(y\mid M)=\int p(y\mid\theta,M)\,p(\theta\mid M)\,d\theta .
+\]
+Ela calcula quão bem o modelo prevê os dados antes de conhecer os parâmetros, fazendo uma média sobre
+o prior. Por isso penaliza modelos que só ajustam bem em uma região muito estreita: adicionar um
+parâmetro não garante evidência maior.
+
+Usamos os mesmos 101 trimestres, os mesmos observáveis $(\pi,i,x)$ e os mesmos priors comuns. A
+\textbf{aproximação de Laplace} substitui a posterior perto do modo por uma normal e usa o Hessiano
+$H$ para medir a curvatura:
+\[
+ \log p(y\mid M)\approx \log p(y,\hat\theta\mid M)
+ +\frac{k}{2}\log(2\pi)-\frac12\log|H(\hat\theta)|.
+\]
+
+\fig{bayesian_model_comparison.png}{Evidência marginal relativa: NKPC prospectiva versus híbrida.}
+
+A log evidência foi 1021,15 para a prospectiva e 1033,17 para a híbrida. A diferença de 12,02
+log-pontos corresponde a um \textbf{fator de Bayes aproximado de 166 mil} a favor da híbrida, com
+$\gamma_\pi=0{,}341$ no modo. Em palavras: mesmo pagando a penalização do parâmetro extra, a inflação
+passada melhora muito o ajuste probabilístico.
+
+\begin{atencao}
+É evidência de Laplace, local e condicionada aos priors. Ela pode exagerar a precisão se a posterior
+for assimétrica ou multimodal. Não rodamos uma segunda MCMC completa para a híbrida nem usamos
+\emph{bridge sampling}; portanto, o número deve ser lido como comparação formal aproximada, não como
+verdade absoluta.
+\end{atencao}
+
 % ======================================================================
 \section{Limitações, glossário e mapa do código}
 % ======================================================================
@@ -717,8 +752,8 @@ $\kappa$ & inclinação de Phillips & IRF/FEVD & resposta a impulso / decomp.\ d
 \end{center}
 
 \subsection{Mapa do código (o que cada arquivo faz)}
-\begin{center}\small
-\begin{tabular}{ll}
+\begin{center}\scriptsize
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.39\textwidth}X@{}}
 \toprule
 Arquivo & Função \\
 \midrule
@@ -738,11 +773,12 @@ Arquivo & Função \\
 \texttt{evaluate\_forecasts.py} & avaliação pseudo-fora-da-amostra \\
 \texttt{run\_macro\_extensions.py} & modelos aberto e Phillips híbrida no Dynare \\
 \texttt{run\_mcmc.py / plot\_mcmc.py} & posterior completa e diagnósticos das cadeias \\
+\texttt{compare\_bayesian\_models.py} & evidência marginal de Laplace entre as duas NKPCs \\
 \texttt{plot\_irfs.py} & figuras de IRFs e sensibilidade \\
 \texttt{build\_final\_html.py} & monta o relatório \texttt{Entrega Final.html} \\
 \texttt{nk\_chile\_forecast.mod} & modelo de previsão (\texttt{varobs}, \texttt{estimation}, \texttt{conditional\_forecast}) \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{center}
 
 \begin{resumo}
