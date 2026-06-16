@@ -40,7 +40,9 @@ chart estilo FED Atlanta; **DSGE convergir à meta por construção** (hoje reve
   atividade (32º). Okun no texto. 2 slides (dashboard + spider). Sem vagas/admissões (FRED não tem p/
   Chile). **Também:** câmbio/cobre agora por Kalman (build_open_economy_dataset.py), cadeia aberta
   re-rodada (ainda determinada). Figuras: labor_activity_dashboard.png, labor_spider.png.
-- [ ] WP5 — conclusões de política (1–2 slides)
+- [x] WP5 — conclusões de política: 2 slides (diagnóstico + implicações) antes do "Obrigado".
+  Síntese: energia puxou o surto; inflação com memória; economia no potencial; convergência à meta;
+  gradualismo domina; φπ~1 é o risco. Apresentação agora 45 quadros.
 - [ ] WP6 — atualizar Comprehend/relatório/HTML/Roteiro + push final
 
 ## Numeração atual da apresentação (39 quadros, antes da v2)
