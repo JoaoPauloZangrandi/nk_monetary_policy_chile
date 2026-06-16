@@ -75,8 +75,8 @@
         \item IRFs, momentos e FEVD
         \item Sensibilidades ($\kappa$, $\phi_\pi$, $\rho_i$)
         \item \textbf{Previsão: incondicional e condicional}
-        \item Econometria e limitações
-        \item Mensagens
+        \item Resposta final e robustez
+        \item Obrigado
       \end{enumerate}
     \end{column}
   \end{columns}
@@ -334,39 +334,11 @@
   para o próximo trimestre, a híbrida é a melhor ferramenta.\par}
 \end{frame}
 
-\section{Síntese}
-
-\begin{frame}{Econometria --- deixar os dados falarem}
-  \begin{itemize}
-    \item \textbf{AR(1)} da TPM: $\rho_i=0{,}934$ (muito persistente).
-    \item \textbf{Regra de Taylor} (MQO/VI): $\phi_\pi$ entre 0,83 e 3,05 --- evidência imprecisa.
-    \item \textbf{Curva de Phillips}: $\kappa\approx 0{,}10$.
-    \item \textbf{Moda posterior bayesiana}: estima tudo de uma vez (checagem).
-  \end{itemize}
-  \begin{alertblock}{Calibração \emph{e} estimação}
-    Na dúvida, o projeto roda as duas versões e mostra o que é robusto.
-  \end{alertblock}
-\end{frame}
-
-\begin{frame}{Limitações (honestas)}
-  \begin{itemize}
-    \item O baseline é fechado; a extensão aberta ainda é pequena e calibrada.
-    \item \textbf{Único estado} ($i_{t-1}$): ``esquece'' o último hiato e inflação.
-    \item Nas IRFs, $\gamma_\pi=0{,}35$ é calibrado; na comparação formal, a moda é 0,341.
-    \item A evidência marginal é Laplace local; não houve MCMC completo da híbrida.
-    \item $r^\ast$, SVAR e decomposição histórica têm incertezas de identificação.
-    \item Não é previsão oficial nem recomendação --- é um laboratório transparente.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Mensagens}
-  \begin{enumerate}
-    \item Uma regra \textbf{ativa} ($\phi_\pi>1$) é o que garante a \textbf{determinação}.
-    \item A \textbf{suavização} estimada é alta e estica os efeitos monetários.
-    \item Choques de custo impõem um \textbf{trade-off} inflação\,$\times$\,produto.
-    \item Dados e extensões mostram onde o modelo funciona e onde suas conclusões são condicionais.
-  \end{enumerate}
-  \begin{center}\large\color{azul}\textbf{Obrigado!}\end{center}
+\begin{frame}[plain]
+  \centering
+  \vfill
+  {\Huge\bfseries\color{azul} Obrigado!}
+  \vfill
 \end{frame}
 
 \appendix
@@ -385,7 +357,7 @@
 \end{frame}
 
 \begin{frame}{Previsão pseudo-fora-da-amostra (baseline vs híbrida vs benchmarks)}
-  \figw{forecast_oos_comparison.png}
+  \centering\includegraphics[width=\linewidth,height=0.62\textheight,keepaspectratio]{figures/forecast_oos_comparison.png}
   \vspace{1mm}
   {\footnotesize A \textbf{NKPC híbrida} (vermelho) reduz o RMSE da inflação de 1 trimestre em
   $\approx$19\% vs o baseline (laranja) --- a inércia cura a fraqueza de curto prazo. Em 1 ano os dois
