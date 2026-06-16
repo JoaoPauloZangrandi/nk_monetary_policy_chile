@@ -316,17 +316,38 @@
 \end{frame}
 
 \begin{frame}{Resposta direta: para onde vai a economia chilena?}
-  \centering\includegraphics[width=\linewidth,height=0.56\textheight,keepaspectratio]{figures/forecast_outlook.png}
+  \centering\includegraphics[width=\linewidth,height=0.70\textheight,keepaspectratio]{figures/forecast_outlook.png}
   \vspace{1mm}
   {\footnotesize\raggedright
-  \textbf{Melhor previsão} (incondicional; ancorada no \textbf{1 ano}, onde o fora-da-amostra mostra
-  skill real): inflação \textbf{5,7 $\to$ 3,7\%}, TPM \textbf{4,5 $\to$ 4,2\%}, hiato
-  \textbf{$-1{,}1 \to 0$} --- a economia \textbf{normaliza em $\approx$1 ano} (em 2 anos: inflação
-  $\approx$3,8\%, a média histórica acima da meta de 3\%).\\
-  \textbf{Robustez:} testamos a NKPC híbrida (preferida pelos dados) no mesmo OOS --- ela melhora a
-  inflação de 1 trimestre em \textbf{19\%} (cura a fraqueza do baseline), mas \emph{converge para a
-  mesma previsão de 1 ano} (tracejado vermelho). A resposta é robusta à escolha do modelo. \emph{Não é
-  previsão oficial.}\par}
+  \textbf{Melhor previsão} (incondicional, ancorada no horizonte de \textbf{1 ano}): a economia
+  \textbf{normaliza em $\approx$1 ano} --- inflação \textbf{5,7 $\to$ 3,7\%}, TPM \textbf{4,5 $\to$
+  4,2\%}, hiato \textbf{$-1{,}1 \to 0$}. (Em 2 anos: inflação $\approx$3,8\%, TPM $\approx$4,1\%.)\par}
+\end{frame}
+
+\begin{frame}{A previsão é robusta? O teste da NKPC híbrida}
+  \begin{itemize}
+    \item Testamos também a \textbf{NKPC híbrida} (a que os dados preferem, com inércia de inflação)
+          no \textbf{mesmo} teste fora-da-amostra.
+    \item \textbf{Curto prazo (1 trimestre):} a híbrida corta o erro de previsão da inflação em
+          \textbf{$\approx$19\%} --- a inércia cura a fraqueza do baseline.
+    \item \textbf{Horizonte de 1 ano:} \textbf{empate} --- os dois modelos convergem.
+  \end{itemize}
+  \vspace{1mm}
+  \begin{center}\footnotesize
+  \begin{tabular}{lcc}
+    \toprule
+    Inflação prevista & Baseline & Híbrida \\
+    \midrule
+    1 trimestre & 3,3\% & 4,2\% \\
+    \textbf{1 ano} & \textbf{3,7\%} & \textbf{3,5\%} \\
+    2 anos & 3,8\% & 3,8\% \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \begin{exampleblock}{Conclusão}
+    A previsão de \textbf{1 ano é robusta} à escolha do modelo. Para o próximo trimestre, a híbrida
+    (com inércia) é a ferramenta melhor.
+  \end{exampleblock}
 \end{frame}
 
 \section{Síntese}
