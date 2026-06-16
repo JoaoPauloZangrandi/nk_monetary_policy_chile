@@ -29,7 +29,7 @@ chart estilo FED Atlanta; **DSGE convergir à meta por construção** (hoje reve
   cache. Level-mapping mean→target em forecast_model/outlook/history/ipc. Slides 6,21,25,31 atualizados.
   **Notas:** φπ posterior caiu p/ 0,97 com novo hiato/centragem (re-rodar MCMC+comparação no WP6);
   HP→Kalman de fx/copper em build_open_economy_dataset.py **adiado p/ WP4**.
-- [ ] WP2 — esclarecer SVAR (slide)
+- [x] WP2 — esclarecer SVAR (slide 27): nota de que é SVAR recursivo (Cholesky), não só VAR.
 - [ ] WP3 — núcleos da inflação (FRED)
 - [ ] WP4 — atividade + trabalho + spider (FRED)
 - [ ] WP5 — conclusões de política (1–2 slides)

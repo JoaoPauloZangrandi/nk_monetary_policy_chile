@@ -302,8 +302,12 @@
 \begin{frame}{SVAR versus DSGE --- teste empírico das IRFs}
   \figw{svar_vs_dsge_irf.png}
   \vspace{1mm}
-  {\footnotesize O SVAR recursivo exibe \emph{activity puzzle}; o DSGE impõe contração imediata.
-  A divergência revela sensibilidade à identificação e às restrições estruturais.}
+  {\footnotesize\raggedright
+  \textbf{É um SVAR (não só um VAR):} a forma reduzida é um VAR(4), mas a ordenação contemporânea de
+  \textbf{Cholesky} $[x,\pi,i]$ o torna \emph{estrutural} --- o choque monetário é a inovação
+  ortogonal de $i$ (juro reage a tudo no trimestre; $x,\pi$ só com defasagem). É a identificação
+  recursiva, a mais simples (sem restrições de sinal/longo prazo). Resultado: o SVAR exibe
+  \emph{activity puzzle}; o DSGE impõe contração imediata.\par}
 \end{frame}
 
 \begin{frame}{Economia aberta e inércia --- o que faltava}
