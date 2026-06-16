@@ -29,6 +29,7 @@ def main() -> None:
 
     mean_infl_q = float(macro["infl_q"].mean())
     mean_i_q = float(macro["i_q"].mean())
+    target_q = (1.03) ** 0.25 - 1.0  # inflation observable is centred on the 3% target
     mean_infl_annual = ((1.0 + mean_infl_q) ** 4 - 1.0) * 100.0
     mean_tpm_annual = ((1.0 + mean_i_q) ** 4 - 1.0) * 100.0
 
@@ -37,7 +38,7 @@ def main() -> None:
         if var == "x":
             return 100.0 * dev
         if var == "pi":
-            return ((1.0 + mean_infl_q + dev) ** 4 - 1.0) * 100.0
+            return ((1.0 + target_q + dev) ** 4 - 1.0) * 100.0
         return ((1.0 + mean_i_q + dev) ** 4 - 1.0) * 100.0
 
     last_period = pd.Period(str(macro.iloc[-1]["date"]), freq="Q")
@@ -47,7 +48,7 @@ def main() -> None:
     # Hybrid (data-preferred) forecast from the current state, for robustness.
     hybrid_sol = solve_hybrid(hybrid_params(0.35))
     i_dev0 = float(macro["i_q"].iloc[-1] - mean_i_q)
-    pi_dev0 = float(macro["infl_q"].iloc[-1] - mean_infl_q)
+    pi_dev0 = float(macro["infl_q"].iloc[-1] - target_q)
     hybrid_dev = np.array(
         [hybrid_forecast(hybrid_sol, i_dev0, pi_dev0, h) for h in range(1, horizon + 1)]
     )  # (horizon, 3) deviations of [x, pi, i]

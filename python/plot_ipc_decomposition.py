@@ -41,6 +41,7 @@ def main() -> None:
     dates = macro["date"].tolist()
     n = len(dates)
     mean_infl_annual = ((1.0 + macro["infl_q"].mean()) ** 4 - 1.0) * 100.0
+    target_annual = 3.0  # observable is centred on the target; bars stack from 3%
     ipc = macro["infl_annual_pct"].to_numpy()
 
     decomp = pd.read_csv(HIST / "shock_decomp.csv")
@@ -58,8 +59,8 @@ def main() -> None:
     # ------------------------------------------------------------------ #
     fig, ax = plt.subplots(figsize=(12.5, 6.2))
     xs = np.arange(n)
-    pos = np.full(n, mean_infl_annual)
-    neg = np.full(n, mean_infl_annual)
+    pos = np.full(n, target_annual)
+    neg = np.full(n, target_annual)
     for comp in ("e_x", "e_pi", "e_i", "initial"):
         vals = pi[comp].to_numpy() * ANN
         p = np.where(vals > 0, vals, 0.0)

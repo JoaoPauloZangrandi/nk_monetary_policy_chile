@@ -30,7 +30,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from common import DATA_CLEAN, DATA_RAW, ensure_directories
+from common import DATA_CLEAN, DATA_RAW, ensure_directories, kalman_gap
 
 BCCH_BASE = "https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx"
 SERIES = {
@@ -145,11 +145,9 @@ def build_real_panel(user: str, password: str) -> tuple[pd.DataFrame, dict]:
             f"Only {len(panel)} overlapping quarters; expected a long sample."
         )
 
-    from statsmodels.tsa.filters.hp_filter import hpfilter
-
     panel["log_pib"] = np.log(panel["pib_sa"])
-    cycle, trend = hpfilter(panel["log_pib"], lamb=HP_LAMBDA)
-    panel["pib_trend_hp"] = trend
+    cycle, trend = kalman_gap(panel["log_pib"].to_numpy())  # Kalman UC, not HP
+    panel["pib_trend_kalman"] = trend
     panel["output_gap"] = cycle
 
     # Quarterly nominal rate as a fraction (model unit), Fisher-consistent.
@@ -279,7 +277,7 @@ def main() -> None:
     observables = pd.DataFrame(
         {
             "date": panel.index,
-            "pi": (panel["infl_q"] - panel["infl_q"].mean()).to_numpy(),
+            "pi": (panel["infl_q"] - ((1.0 + INFLATION_TARGET_ANNUAL) ** 0.25 - 1.0)).to_numpy(),
             "i": (panel["i_q"] - panel["i_q"].mean()).to_numpy(),
             "x": (panel["output_gap"] - panel["output_gap"].mean()).to_numpy(),
         }

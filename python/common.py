@@ -47,6 +47,44 @@ def quarterly_rstar(annual_rate: float) -> float:
     return (1.0 + annual_rate) ** 0.25 - 1.0
 
 
+def kalman_gap(log_level) -> tuple[np.ndarray, np.ndarray]:
+    """Trend-cycle decomposition by an Unobserved-Components (Kalman) model.
+
+    Replaces the HP filter everywhere in the project. The series (a log level) is
+    split into a smooth stochastic trend and a stochastic, damped cycle; the cycle
+    is the output-gap analogue. A smooth (integrated random-walk) trend keeps sharp
+    shocks such as COVID-2020 in the CYCLE rather than the trend. Returns
+    (cycle, trend) as numpy arrays of the same length as the input.
+    """
+    from statsmodels.tsa.statespace.structural import UnobservedComponents
+
+    raw = np.asarray(log_level, dtype=float)
+    y = raw * 100.0  # log points: far better-conditioned for the optimiser
+    # An AR(2) cycle on a smooth (I(2)) trend is the classic Clark/Watson gap; the
+    # cycle is constrained enough to capture the business cycle instead of letting
+    # a flexible trend absorb it (which collapses the gap to ~0).
+    attempts = (
+        ("autoregressive", dict(level="smooth trend", autoregressive=2)),
+        ("cycle", dict(level="smooth trend", cycle=True, stochastic_cycle=True,
+                       damped_cycle=True, cycle_period_bounds=(6, 40))),
+        ("autoregressive", dict(level="local linear trend", autoregressive=2)),
+    )
+    last_error: Exception | None = None
+    for component, spec in attempts:
+        try:
+            result = UnobservedComponents(y, **spec).fit(disp=False, maxiter=3000)
+            cycle = np.asarray(getattr(result, component).smoothed, dtype=float) / 100.0
+            try:
+                trend = np.asarray(result.level.smoothed, dtype=float) / 100.0
+            except Exception:  # noqa: BLE001
+                trend = raw - cycle
+            if cycle.shape == raw.shape and np.all(np.isfinite(cycle)) and np.nanstd(cycle) > 1e-3:
+                return cycle, trend
+        except Exception as exc:  # noqa: BLE001
+            last_error = exc
+    raise RuntimeError(f"kalman_gap: no UnobservedComponents spec converged ({last_error}).")
+
+
 def complete_parameters(overrides: dict | None = None) -> dict:
     params = dict(BASELINE)
     if overrides:

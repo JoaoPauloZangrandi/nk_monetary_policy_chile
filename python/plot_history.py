@@ -81,6 +81,7 @@ def main() -> None:
 
     mean_infl_q = float(macro["infl_q"].mean())
     mean_i_q = float(macro["i_q"].mean())
+    target_q = (1.03) ** 0.25 - 1.0  # inflation observable centred on the 3% target
 
     # Annualised percentage-point scaling (linear, keeps the decomposition additive).
     scale = {"pi": 400.0, "i": 400.0, "x": 100.0}
@@ -157,7 +158,7 @@ def main() -> None:
     rmse = float(np.sqrt(np.mean((base[15:] - obs[15:]) ** 2)))
 
     def to_annual_infl(dev):
-        return ((1.0 + mean_infl_q + dev) ** 4 - 1.0) * 100.0
+        return ((1.0 + target_q + dev) ** 4 - 1.0) * 100.0
 
     def to_annual_tpm(dev):
         return ((1.0 + mean_i_q + dev) ** 4 - 1.0) * 100.0

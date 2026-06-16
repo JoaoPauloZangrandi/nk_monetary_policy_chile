@@ -1,11 +1,11 @@
 source,variable,other_variable,correlation
 BCCh data,x,x,1.0
-BCCh data,x,pi,0.34237735051508
-BCCh data,x,i,0.3484367224011974
-BCCh data,pi,x,0.34237735051508
+BCCh data,x,pi,0.33207259333113
+BCCh data,x,i,0.4160622700530253
+BCCh data,pi,x,0.33207259333113
 BCCh data,pi,pi,1.0
 BCCh data,pi,i,0.27679435387552415
-BCCh data,i,x,0.3484367224011974
+BCCh data,i,x,0.4160622700530253
 BCCh data,i,pi,0.27679435387552415
 BCCh data,i,i,1.0
 Dynare baseline,x,x,1.0

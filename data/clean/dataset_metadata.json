@@ -31,5 +31,7 @@
     "policy_rate": "chile_policy_rate.csv",
     "macro_panel": "chile_macro_quarterly.csv",
     "observables": "chile_observables.csv (deviations: pi, i, x)"
-  }
+  },
+  "output_gap_method": "Unobserved-Components Kalman smoother (smooth I(2) trend + AR(2) cycle), replacing the HP filter; COVID stays in the cycle",
+  "inflation_centering": "observable pi = quarterly inflation minus the 3% annual target (steady state = target; model forecasts converge to 3% by construction)"
 }

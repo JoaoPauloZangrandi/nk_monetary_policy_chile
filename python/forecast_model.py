@@ -112,19 +112,19 @@ def main() -> None:
     metadata = json.loads((DATA_CLEAN / "dataset_metadata.json").read_text(encoding="utf-8"))
     data_source = str(metadata.get("institution", metadata.get("source", "unknown")))
 
-    # Level mapping: add back the sample means removed when building observables.
+    # Level mapping: inflation is now centred on the TARGET, the rate on its mean.
     mean_infl_q = float(macro["infl_q"].mean())
     mean_i_q = float(macro["i_q"].mean())
     mean_tpm_annual = annual_pct(mean_i_q)
     mean_infl_annual = annual_pct(mean_infl_q)
     target_q = (1.0 + INFLATION_TARGET_ANNUAL) ** 0.25 - 1.0
-    pi_target_dev = target_q - mean_infl_q  # 3% target as a demeaned inflation gap
+    pi_target_dev = 0.0  # the target IS the steady state now (pi deviation = 0)
 
     def to_level(variable: str, deviation):
         if variable == "x":
             return 100.0 * np.asarray(deviation)
         if variable == "pi":
-            return annual_pct(mean_infl_q + np.asarray(deviation))
+            return annual_pct(target_q + np.asarray(deviation))
         return annual_pct(mean_i_q + np.asarray(deviation))
 
     last_i_gap = float(observables.iloc[-1]["i"])

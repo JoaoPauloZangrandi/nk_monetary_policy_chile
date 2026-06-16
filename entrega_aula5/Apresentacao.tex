@@ -139,8 +139,8 @@
 \begin{frame}{Dados oficiais do Banco Central do Chile (2001--2026)}
   \figw{data_overview.png}
   \vspace{1mm}
-  {\footnotesize Picos de inflação em 2008 e 2022; tombo do hiato de $-15\%$ na COVID. Meta de 3\%
-  (linha pontilhada). 101 trimestres.}
+  {\footnotesize Picos de inflação em 2008 e 2022; queda do hiato de $\approx-10\%$ na COVID. Meta de
+  3\% (linha pontilhada). Hiato por \textbf{filtro de Kalman} (componentes não observados). 101 trimestres.}
 \end{frame}
 
 \section{Solução e determinação}
@@ -254,8 +254,8 @@
 \begin{frame}{Previsão incondicional --- \emph{fan chart}}
   \figw{forecast_fanchart.png}
   \vspace{1mm}
-  {\footnotesize Inflação 3,30\%\,$\to$\,3,76\% (volta à média); TPM 4,36\%\,$\to$\,4,11\%. Sem inércia
-  $\Rightarrow$ reversão rápida.}
+  {\footnotesize Inflação converge para a \textbf{meta de 3\%} (2,5\,$\to$\,3,0\% em 8 trim.); TPM
+  4,4\,$\to$\,4,1\%. O modelo é centrado na meta $\Rightarrow$ converge a 3\% por construção.}
 \end{frame}
 
 \begin{frame}{Previsões condicionais --- cenários de política}
@@ -286,7 +286,7 @@
   {\footnotesize\raggedright
   O IPC (linha preta) decomposto pelo modelo: os surtos de \textbf{2008 e 2022} (faixas amarelas) são
   dominados por choques de \textbf{custo} (laranja), com apoio de \textbf{demanda} (azul); a política
-  (verde) tende a puxar a inflação para baixo. As barras medem o desvio da média de 3,8\%.\par}
+  (verde) tende a puxar a inflação para baixo. As barras medem o desvio da \textbf{meta de 3\%}.\par}
 \end{frame}
 
 \begin{frame}{A mesma inflação do IPC, dois modelos}
@@ -339,8 +339,9 @@
   \vspace{1mm}
   {\footnotesize\raggedright
   \textbf{Melhor previsão} (incondicional, ancorada no horizonte de \textbf{1 ano}): a economia
-  \textbf{normaliza em $\approx$1 ano} --- inflação \textbf{5,7 $\to$ 3,7\%}, TPM \textbf{4,5 $\to$
-  4,2\%}, hiato \textbf{$-1{,}1 \to 0$}. (Em 2 anos: inflação $\approx$3,8\%, TPM $\approx$4,1\%.)\par}
+  \textbf{normaliza em $\approx$1 ano} --- inflação \textbf{5,7 $\to \approx$2,9\%} (rumo à meta de
+  3\%), TPM \textbf{4,5 $\to$ 4,2\%}, hiato (Kalman) $\approx 0$. (Em 2 anos: inflação $\approx$3,0\%,
+  a meta; TPM $\approx$4,1\%.)\par}
 \end{frame}
 
 \begin{frame}{A previsão é robusta? O teste da NKPC híbrida}
