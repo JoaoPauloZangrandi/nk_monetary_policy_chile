@@ -101,6 +101,7 @@ python python/analyze_determinacy.py      # determinacy map vs phi_pi
 python python/analyze_model_results.py    # moments, correlations, signs and transition coefficients
 python python/run_forecast.py             # NATIVE Dynare forecast=8 + conditional_forecast (pages 48-55)
 python python/forecast_model.py           # level fan chart + current-state-anchored scenario figures
+python python/plot_forecast_outlook.py    # direct-answer 1-year outlook dashboard
 python python/plot_irfs.py                # figures
 
 # Deep macro extensions (optional, but included in the final deliverables)
