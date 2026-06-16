@@ -34,7 +34,12 @@ chart estilo FED Atlanta; **DSGE convergir à meta por construção** (hoje reve
   YoY, até 2023). Achado: **energia liderou o surto 2021-23 (pico 24%)**; núcleo/serviços persistentes
   (~11%). 2 slides novos (painel por núcleo vs banda 2-4%; ranking de impacto + mapa ao modelo
   custo/inércia). Figuras: ipc_cores_panel.png, ipc_cores_drivers.png. (README: add no WP6.)
-- [ ] WP4 — atividade + trabalho + spider (FRED)
+- [x] WP4 — atividade + trabalho + spider (FRED). `build_labor_activity.py`: desemprego/jovem,
+  emprego, participação, prod. industrial + hiato Kalman. **Spider estilo FED Atlanta** (percentis,
+  atual vs pré-pandemia): forte em emprego (92º)/participação (76º), fraco em desemprego (34º, 8,7%) e
+  atividade (32º). Okun no texto. 2 slides (dashboard + spider). Sem vagas/admissões (FRED não tem p/
+  Chile). **Também:** câmbio/cobre agora por Kalman (build_open_economy_dataset.py), cadeia aberta
+  re-rodada (ainda determinada). Figuras: labor_activity_dashboard.png, labor_spider.png.
 - [ ] WP5 — conclusões de política (1–2 slides)
 - [ ] WP6 — atualizar Comprehend/relatório/HTML/Roteiro + push final
 

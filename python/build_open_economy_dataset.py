@@ -73,8 +73,9 @@ def main() -> None:
 
     open_panel["log_fx"] = np.log(open_panel["fx_clp_usd"])
     open_panel["log_copper"] = np.log(open_panel["copper_usd_ton"])
-    fx_cycle, fx_trend = hpfilter(open_panel["log_fx"], lamb=1600)
-    copper_cycle, copper_trend = hpfilter(open_panel["log_copper"], lamb=1600)
+    from common import kalman_gap  # Kalman UC cycle, not HP
+    fx_cycle, fx_trend = kalman_gap(open_panel["log_fx"].to_numpy())
+    copper_cycle, copper_trend = kalman_gap(open_panel["log_copper"].to_numpy())
     open_panel["fx_gap"] = fx_cycle
     open_panel["fx_trend"] = fx_trend
     open_panel["copper_gap"] = copper_cycle

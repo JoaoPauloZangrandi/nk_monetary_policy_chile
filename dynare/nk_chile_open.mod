@@ -15,7 +15,7 @@ alpha_copper = 0.03;
 gamma_q = 0.03;
 eta_i = 1;
 phi_q = 0.05;
-rho_copper = 0.751738277033;
+rho_copper = 0.941182126643;
 
 model(linear);
   // Domestic demand: real rate, competitiveness and copper-income channel.
@@ -40,8 +40,8 @@ shocks;
   var e_x; stderr 0.005;
   var e_pi; stderr 0.00277;
   var e_i; stderr 0.00068;
-  var e_q; stderr 0.044948060401;
-  var e_copper; stderr 0.112581559119;
+  var e_q; stderr 0.0460980810142;
+  var e_copper; stderr 0.12;
 end;
 
 stoch_simul(order=1, irf=20, nograph);
