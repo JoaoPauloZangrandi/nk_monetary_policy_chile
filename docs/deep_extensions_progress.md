@@ -30,7 +30,10 @@ chart estilo FED Atlanta; **DSGE convergir à meta por construção** (hoje reve
   **Notas:** φπ posterior caiu p/ 0,97 com novo hiato/centragem (re-rodar MCMC+comparação no WP6);
   HP→Kalman de fx/copper em build_open_economy_dataset.py **adiado p/ WP4**.
 - [x] WP2 — esclarecer SVAR (slide 27): nota de que é SVAR recursivo (Cholesky), não só VAR.
-- [ ] WP3 — núcleos da inflação (FRED)
+- [x] WP3 — núcleos da inflação (FRED). `build_inflation_cores.py` (headline/núcleo/energia/serviços,
+  YoY, até 2023). Achado: **energia liderou o surto 2021-23 (pico 24%)**; núcleo/serviços persistentes
+  (~11%). 2 slides novos (painel por núcleo vs banda 2-4%; ranking de impacto + mapa ao modelo
+  custo/inércia). Figuras: ipc_cores_panel.png, ipc_cores_drivers.png. (README: add no WP6.)
 - [ ] WP4 — atividade + trabalho + spider (FRED)
 - [ ] WP5 — conclusões de política (1–2 slides)
 - [ ] WP6 — atualizar Comprehend/relatório/HTML/Roteiro + push final
