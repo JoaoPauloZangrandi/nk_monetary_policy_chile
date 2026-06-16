@@ -105,8 +105,10 @@ python python/plot_forecast_outlook.py    # direct-answer 1-year outlook dashboa
 python python/plot_irfs.py                # figures
 
 # Deep macro extensions (optional, but included in the final deliverables)
-python python/run_history.py               # smoother + historical decomposition
+python python/run_history.py               # smoother + historical decomposition (baseline)
+python python/run_history.py --mod nk_chile_history_hybrid.mod  # hybrid decomposition
 python python/plot_history.py              # narrative + policy counterfactual
+python python/plot_ipc_decomposition.py    # IPC inflation decomposition (baseline + hybrid)
 python python/analyze_svar.py              # recursive SVAR versus DSGE
 python python/estimate_time_varying_rstar.py
 python python/evaluate_forecasts.py        # pseudo-out-of-sample comparison (baseline + hybrid)

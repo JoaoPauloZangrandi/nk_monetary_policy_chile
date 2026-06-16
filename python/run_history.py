@@ -43,6 +43,7 @@ def kill_tree(proc: subprocess.Popen) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--timeout", type=int, default=420)
+    parser.add_argument("--mod", default="nk_chile_history.mod")
     args = parser.parse_args()
     ensure_directories()
 
@@ -60,11 +61,11 @@ def main() -> int:
     work = Path(tempfile.gettempdir()) / "nk_history_work"
     if work.exists():
         shutil.rmtree(work, ignore_errors=True)
-    (work / "outputs" / "dynare" / "history").mkdir(parents=True, exist_ok=True)
+    (work / "outputs" / "dynare").mkdir(parents=True, exist_ok=True)
     (work / "outputs" / "logs").mkdir(parents=True, exist_ok=True)
 
     dynare_dir = ROOT / "dynare"
-    for helper in ("nk_chile_history.mod", "export_history.m"):
+    for helper in (args.mod, "export_history.m"):
         shutil.copy(dynare_dir / helper, work / helper)
     pd.read_csv(observables)[["pi", "i", "x"]].to_csv(
         work / "chile_observables_dynare.csv", index=False
@@ -72,7 +73,7 @@ def main() -> int:
 
     expression = (
         f"addpath('{octave_literal(dynare_matlab)}'); "
-        "dynare('nk_chile_history.mod','noclearall','nolog');"
+        f"dynare('{args.mod}','noclearall','nolog');"
     )
     command = [str(octave), "--quiet", "--eval", expression]
     environment = os.environ.copy()
@@ -89,14 +90,17 @@ def main() -> int:
         stdout, stderr = proc.communicate()
         timed_out = True
 
-    staged = work / "outputs" / "dynare" / "history"
-    dest = DYNARE_OUTPUTS / "history"
-    dest.mkdir(parents=True, exist_ok=True)
+    staged_root = work / "outputs" / "dynare"
     copied = []
-    if staged.exists():
-        for csv in sorted(staged.glob("*.csv")):
-            shutil.copy(csv, dest / csv.name)
-            copied.append(csv.name)
+    if staged_root.exists():
+        for sub in sorted(staged_root.iterdir()):
+            if not sub.is_dir():
+                continue
+            dest = DYNARE_OUTPUTS / sub.name
+            dest.mkdir(parents=True, exist_ok=True)
+            for csv in sorted(sub.glob("*.csv")):
+                shutil.copy(csv, dest / csv.name)
+                copied.append(f"{sub.name}/{csv.name}")
 
     (LOGS / "history_run.log").write_text(
         f"TIMEOUT: {timed_out}\nRC: {proc.returncode}\nCOPIED: {copied}\n\n"

@@ -8,7 +8,7 @@ function export_history(scenario_id)
     script_dir = fileparts(mfilename('fullpath'));
     repo_root = fileparts(script_dir);
   end
-  out_dir = fullfile(repo_root, 'outputs', 'dynare', 'history');
+  out_dir = fullfile(repo_root, 'outputs', 'dynare', scenario_id);
   if ~exist(out_dir, 'dir'); mkdir(out_dir); end
 
   % --- Smoothed structural shocks ---------------------------------------
