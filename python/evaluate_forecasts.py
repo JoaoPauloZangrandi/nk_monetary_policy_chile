@@ -26,13 +26,17 @@ from common import (
     complete_parameters,
     ensure_directories,
 )
+from hybrid_solution import hybrid_params, solve_hybrid, hybrid_forecast
 
 
 VARIABLES = ["x", "pi", "i"]
-MODELS = ["NK", "AR1", "Random walk", "VAR"]
+MODELS = ["NK", "NK híbrido", "AR1", "Random walk", "VAR"]
 HORIZONS = [1, 4]
 MIN_TRAIN = 40
 SCALES = {"x": 100.0, "pi": 400.0, "i": 400.0}
+# The hybrid reduced form is calibration-fixed, so solve it once (gamma_pi=0.35,
+# validated to reproduce Dynare's hybrid IRFs to machine precision).
+HYBRID_SOLUTION = solve_hybrid(hybrid_params(0.35))
 
 
 def ar1_forecast(series: np.ndarray, horizon: int) -> float:
@@ -54,6 +58,14 @@ def nk_forecast(train: pd.DataFrame, horizon: int) -> np.ndarray:
     for _ in range(horizon):
         forecast = np.array([a_x, a_pi, a_i]) * lagged_rate_gap
         lagged_rate_gap = float(forecast[2])
+    return forecast + means[VARIABLES].to_numpy()
+
+
+def nk_hybrid_forecast(train: pd.DataFrame, horizon: int) -> np.ndarray:
+    means = train.mean()
+    i_dev = float(train["i"].iloc[-1] - means["i"])
+    pi_dev = float(train["pi"].iloc[-1] - means["pi"])
+    forecast = hybrid_forecast(HYBRID_SOLUTION, i_dev, pi_dev, horizon)
     return forecast + means[VARIABLES].to_numpy()
 
 
@@ -83,6 +95,7 @@ def main() -> None:
             target = data.iloc[origin + horizon]
             predictions = {
                 "NK": nk_forecast(train[VARIABLES], horizon),
+                "NK híbrido": nk_hybrid_forecast(train[VARIABLES], horizon),
                 "AR1": np.array(
                     [ar1_forecast(train[v].to_numpy(), horizon) for v in VARIABLES]
                 ),
@@ -137,6 +150,7 @@ def main() -> None:
     fig, axes = plt.subplots(2, 3, figsize=(14, 8), sharey=False)
     colors = {
         "NK": "#B45309",
+        "NK híbrido": "#B91C1C",
         "AR1": "#1E4E79",
         "Random walk": "#6B7280",
         "VAR": "#16A34A",

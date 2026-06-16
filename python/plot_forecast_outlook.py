@@ -17,6 +17,7 @@ import numpy as np
 import pandas as pd
 
 from common import DATA_CLEAN, DYNARE_OUTPUTS, FIGURES, ensure_directories
+from hybrid_solution import hybrid_forecast, hybrid_params, solve_hybrid
 
 FORECAST = DYNARE_OUTPUTS / "forecast" / "forecast_unconditional.csv"
 
@@ -42,6 +43,15 @@ def main() -> None:
     last_period = pd.Period(str(macro.iloc[-1]["date"]), freq="Q")
     horizon = int(fc["horizon"].max())
     future = [str(last_period + h) for h in range(1, horizon + 1)]
+
+    # Hybrid (data-preferred) forecast from the current state, for robustness.
+    hybrid_sol = solve_hybrid(hybrid_params(0.35))
+    i_dev0 = float(macro["i_q"].iloc[-1] - mean_i_q)
+    pi_dev0 = float(macro["infl_q"].iloc[-1] - mean_infl_q)
+    hybrid_dev = np.array(
+        [hybrid_forecast(hybrid_sol, i_dev0, pi_dev0, h) for h in range(1, horizon + 1)]
+    )  # (horizon, 3) deviations of [x, pi, i]
+    var_col = {"x": 0, "pi": 1, "i": 2}
 
     hist = macro.tail(8).copy()
     hist_dates = hist["date"].tolist()
@@ -71,6 +81,10 @@ def main() -> None:
         ax.fill_between(x_fc, np.concatenate([[last_obs], inf_lv]),
                         np.concatenate([[last_obs], sup_lv]),
                         color="#1E4E79", alpha=0.15, label="Banda 90%")
+        # Hybrid forecast (data-preferred model) for robustness.
+        hyb_lv = to_level(var, hybrid_dev[:, var_col[var]])
+        ax.plot(x_fc, np.concatenate([[last_obs], hyb_lv]), color="#B91C1C",
+                linewidth=1.7, linestyle="--", label="Híbrida (preferida pelos dados)")
         # Highlight the 1-year-ahead (horizon 4) point.
         h1y = 4
         x1y = n_hist - 1 + h1y
@@ -95,9 +109,10 @@ def main() -> None:
     fig.suptitle("Previsão do modelo para o Chile — próximos 8 trimestres (incondicional, Dynare)",
                  fontsize=13)
     fig.text(0.01, 0.005,
-             "Linha vertical = último dado (2026Q1). O ponto vermelho marca o horizonte de 1 ano, "
-             "onde o teste fora-da-amostra mostra o modelo superando benchmarks ingênuos. "
-             "Não é previsão oficial do BCCh.", fontsize=7.5)
+             "Linha vertical = último dado (2026Q1). Ponto vermelho = horizonte de 1 ano. A linha "
+             "tracejada é a NKPC híbrida (preferida pelos dados): segura mais a inflação no curto "
+             "prazo, mas converge para a mesma previsão de 1 ano. Não é previsão oficial do BCCh.",
+             fontsize=7.5)
     fig.tight_layout(rect=(0, 0.04, 1, 0.95))
     fig.savefig(FIGURES / "forecast_outlook.png", dpi=180)
     plt.close(fig)

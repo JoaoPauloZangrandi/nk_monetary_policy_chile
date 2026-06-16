@@ -54,9 +54,16 @@ Pacote completo de análise macro (Tier 1+2+3) **em cima** do trabalho da Aula 5
   vendido como validação causal definitiva.
 - A proxy de `r*` variável no tempo termina em 0,85% a.a. É um componente local
   estatístico, não uma estimação estrutural Laubach–Williams.
-- No pseudo-out-of-sample, o NK perde em horizonte de um trimestre, mas tem
-  ganho relativo para inflação e hiato em quatro trimestres. O exercício usa
+- No pseudo-out-of-sample, o NK baseline perde em horizonte de um trimestre, mas
+  tem ganho relativo para inflação e hiato em quatro trimestres. O exercício usa
   dados revisados e hiato HP da amostra completa.
+- **Disputa baseline vs híbrida (hybrid_solution.py):** a forma reduzida da NKPC
+  híbrida (2 estados) foi resolvida por iteração contrativa e validada contra as
+  IRFs do Dynare a ~1e-14. No mesmo OOS, a híbrida reduz o RMSE da inflação em
+  h=1 em ~19% (4,74→3,83), empata em h=1 ano, e sua previsão de nível converge
+  com o baseline em 1 ano (~3,5%). Conclusão: o curto prazo melhora com inércia,
+  mas a resposta-headline de 1 ano é robusta à escolha do modelo. Reportado nos
+  slides "Resposta direta" e OOS (apêndice) e na Seção 17.5 do relatório.
 - O modelo aberto é determinado e acrescenta câmbio real, pass-through e cobre.
   Seus coeficientes são ilustrativos; persistências/volatilidades de câmbio e
   cobre são ancoradas em dados públicos.

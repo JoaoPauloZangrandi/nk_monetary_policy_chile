@@ -461,15 +461,25 @@ contaminam a medida. A conclusão robusta é a incerteza de \(r^*\), não um val
 
 ### 17.5 Avaliação pseudo-fora-da-amostra
 
-Com janela expansiva, compararam-se NK, AR(1), passeio aleatório e VAR nos horizontes de 1 e 4
-trimestres. Em \(h=1\), o NK perde para benchmarks simples nas três variáveis. Em \(h=4\), supera o
-passeio aleatório para inflação (RMSE 3,38 contra 4,03), hiato (2,90 contra 4,26) e marginalmente para
-TPM (2,45 contra 2,53).
+Com janela expansiva, compararam-se NK *baseline*, **NK híbrido**, AR(1), passeio aleatório e VAR nos
+horizontes de 1 e 4 trimestres. Em \(h=1\), o NK baseline perde para benchmarks simples nas três
+variáveis. Em \(h=4\), supera o passeio aleatório para inflação (RMSE 3,38 contra 4,03), hiato (2,90
+contra 4,26) e marginalmente para TPM (2,45 contra 2,53).
+
+A forma reduzida da **NKPC híbrida** (dois estados, \(i_{t-1}\) e \(\pi_{t-1}\)) foi resolvida por
+iteração contrativa e **validada contra as IRFs do Dynare até a precisão de máquina** (diferença
+\(\sim 10^{-14}\)). Posta no mesmo exercício, ela **reduz o RMSE da inflação em \(h=1\) de 4,74 para
+3,83 (\(\approx 19\%\))** e melhora também a TPM — a inércia cura exatamente a fraqueza de curto prazo
+do baseline. Em \(h=4\) os dois praticamente empatam (inflação 3,51 vs 3,38; hiato 2,86 vs 2,90).
+Em nível, a híbrida segura a inflação mais alta no curto prazo (4,2% no 1º trimestre vs 3,3% do
+baseline, mais condizente com os 5,7% observados), mas **converge para a mesma previsão de 1 ano**
+(\(\approx 3,5\%\)). Portanto, a previsão-resposta de 1 ano é **robusta à escolha do modelo**.
 
 ![Avaliação de previsões](../outputs/figures/forecast_oos_comparison.png)
 
-Restrições estruturais ajudam no médio prazo, mas prejudicam o *nowcasting*. O exercício é “pseudo”
-fora da amostra porque usa dados revisados e hiato HP da amostra completa.
+Restrições estruturais ajudam no médio prazo, mas prejudicam o *nowcasting*; a inércia da híbrida
+ataca justamente o curto prazo. O exercício é “pseudo” fora da amostra porque usa dados revisados e
+hiato HP da amostra completa.
 
 ### 17.6 Economia pequena e aberta e NKPC híbrida
 
