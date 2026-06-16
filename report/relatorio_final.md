@@ -537,6 +537,39 @@ penalização pelo parâmetro extra. Contudo, é uma aproximação gaussiana **l
 priors, amostra, tratamento da Covid e forma da posterior. Não é uma evidência marginal calculada por
 *bridge sampling* ou pelas cadeias MCMC dos dois modelos.
 
+### 17.9 Atualizações de método (v2): Kalman e convergência à meta
+
+Duas mudanças metodológicas posteriores melhoram a coerência do exercício. Primeiro, o **hiato do
+produto passa a vir de um filtro de Kalman** (componentes não observados: tendência suave I(2) +
+ciclo AR(2)), substituindo o HP em todo o projeto (inclusive nos *gaps* de câmbio e cobre); a queda da
+COVID fica no ciclo (≈−10% em 2020Q2). Segundo, o observável de inflação passa a ser **centrado na
+meta de 3%** (e não na média amostral de 3,79%): o estado estacionário do modelo vira a meta, de modo
+que a previsão incondicional e os cenários condicionais **convergem para 3% por construção** (a
+inflação projetada vai de 2,5% a 3,0% em oito trimestres). O juro segue centrado na média (≈4,1%, o
+neutro realizado). Reprocessamento via `reprocess_dataset.py` a partir do cache. Uma consequência: com
+a re-centragem, o modo de $\phi_\pi$ fica na fronteira de determinação (≈1), o que torna a aproximação
+de Laplace da Seção 17.8 numericamente frágil; as tabelas bayesianas reportadas usam a centragem
+original, e a conclusão qualitativa (a favor da inércia) é robusta.
+
+### 17.10 Núcleos da inflação: o que mais empurrou o IPC
+
+Com as componentes do IPC chileno (OECD via FRED, até ~2023), a inflação por núcleo mostra que o surto
+de 2021–23 foi **liderado pela energia** (pico anual de ≈24%), à frente da cheia (14%), dos serviços
+(12%) e do núcleo (11%). A energia é a mais volátil (oscilações de ±20 p.p.); núcleo e serviços
+subiram menos, porém de forma **persistente**, acima da banda de tolerância de 2–4%. Isso casa com o
+modelo: a energia volátil é um **choque de custo** ($\varepsilon^\pi$), enquanto a persistência de
+núcleo/serviços é a **inércia** que a NKPC híbrida captura (`build_inflation_cores.py`).
+
+### 17.11 Atividade e mercado de trabalho
+
+Com séries do FRED (desemprego, desemprego jovem, emprego, participação, produção industrial) e o hiato
+do modelo, monta-se um **spider chart no estilo do FED de Atlanta** (cada indicador em percentil de sua
+história, atual vs pré-pandemia). O Chile está forte em **emprego (92º percentil)** e participação
+(76º), mas fraco em **desemprego** (34º; 8,7%) e atividade (32º; hiato ≈0): mais gente trabalhando e
+mais gente procurando emprego, sem sinais de superaquecimento — coerente, por Okun, com o hiato
+levemente negativo. Não há vagas/admissões para o Chile no FRED; o spider usa os equivalentes
+disponíveis (`build_labor_activity.py`).
+
 ## 18. Implicações de política monetária
 
 O modelo sintetiza quatro mensagens. Primeiro, uma resposta ativa à inflação é central para a

@@ -86,7 +86,8 @@ Run from the repository root, after providing BCCh credentials:
 ```powershell
 python -m pip install -r requirements.txt
 
-python python/build_chile_dataset.py      # real BCCh data -> data/clean/
+python python/build_chile_dataset.py      # real BCCh data -> data/clean/ (Kalman gap, target-centred)
+python python/reprocess_dataset.py        # Kalman gap + target-centred observables from cache (no creds)
 python python/estimate_rhoi_chile.py      # AR(1) persistence rho_i (HAC)
 python python/estimate_taylor_rule.py     # reduced-form Taylor rule (OLS + IV/2SLS)
 python python/estimate_nkpc.py            # Phillips-curve slope kappa (OLS + IV)
@@ -109,6 +110,8 @@ python python/run_history.py               # smoother + historical decomposition
 python python/run_history.py --mod nk_chile_history_hybrid.mod  # hybrid decomposition
 python python/plot_history.py              # narrative + policy counterfactual
 python python/plot_ipc_decomposition.py    # IPC inflation decomposition (baseline + hybrid)
+python python/build_inflation_cores.py     # IPC by core (energy/core/services) vs target (FRED)
+python python/build_labor_activity.py      # labour market + activity + Atlanta-Fed spider (FRED)
 python python/analyze_svar.py              # recursive SVAR versus DSGE
 python python/estimate_time_varying_rstar.py
 python python/evaluate_forecasts.py        # pseudo-out-of-sample comparison (baseline + hybrid)

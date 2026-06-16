@@ -43,7 +43,14 @@ chart estilo FED Atlanta; **DSGE convergir à meta por construção** (hoje reve
 - [x] WP5 — conclusões de política: 2 slides (diagnóstico + implicações) antes do "Obrigado".
   Síntese: energia puxou o surto; inflação com memória; economia no potencial; convergência à meta;
   gradualismo domina; φπ~1 é o risco. Apresentação agora 45 quadros.
-- [ ] WP6 — atualizar Comprehend/relatório/HTML/Roteiro + push final
+- [x] WP6 — entregáveis atualizados: README (novos scripts), relatório (Seções 17.9-17.11: método
+  Kalman/meta, núcleos, trabalho), Roteiro (+seção v2, 6 págs), Comprehend (+adendo v2, 42 págs),
+  HTML (4 figuras núcleos/trabalho + figuras regeneradas), Apresentação (55 págs/45 quadros + nota
+  bayesiana). **Pendência conhecida:** MCMC/comparação bayesiana NÃO re-rodados com a nova centragem
+  (Hessiana mal-condicionada: φπ na fronteira ≈1; eigvalsh não converge). Slides 29-30 usam a
+  centragem original, com nota de transparência; conclusão qualitativa (a favor da inércia) é robusta.
+
+## CONCLUÍDO — todas as 6 WPs feitas e pushadas (commits WP0-WP6).
 
 ## Numeração atual da apresentação (39 quadros, antes da v2)
 20 Como prevê · 21 incondicional · 22 condicionais · 23 choques · 24 decomp geral · 25 decomp IPC ·

@@ -1713,4 +1713,37 @@ evidência, diagnósticos numéricos e cautela. Cada número apresentado pode se
 parâmetro, equação, script ou arquivo de output documentado neste manual.
 \end{resumo}
 
+% ======================================================================
+\section{Adendo v2: método, núcleos e mercado de trabalho}
+% ======================================================================
+
+\textbf{Hiato por Kalman (não HP).} O hiato do produto deixou de usar o filtro HP e passou a um modelo
+de \emph{componentes não observados} (filtro de Kalman): tendência suave I(2) mais ciclo AR(2). É uma
+extração de sinal estatística, não uma regra mecânica; a queda da COVID fica no \emph{ciclo}
+($\approx-10\%$ em 2020). O mesmo se aplicou aos \emph{gaps} de câmbio e cobre.
+
+\textbf{Convergência à meta.} Antes, a inflação era medida como desvio da \emph{média amostral}
+(3,8\%), e o modelo revertia a 3,8\%. Agora é medida como desvio da \emph{meta de 3\%}: o estado
+estacionário do modelo \emph{é} a meta, então a previsão converge a 3\% \textbf{por construção} ---
+como deve ser num regime de metas. A inflação projetada sobe de 2,5\% a 3,0\% em oito trimestres, e os
+cenários condicionais também revertem à meta.
+
+\textbf{Núcleos da inflação.} Quebrando o IPC (energia, núcleo, serviços; OECD via FRED até 2023), o
+surto de 2021--23 foi \textbf{liderado pela energia} (pico de 24\% a.a.), à frente da cheia (14\%),
+serviços (12\%) e núcleo (11\%). A energia volátil é um choque de \textbf{custo} ($\varepsilon^\pi$); a
+persistência de núcleo/serviços é a \textbf{inércia} que a NKPC híbrida captura. Energia e serviços
+ficaram \emph{fora} da banda de tolerância de 2--4\%.
+
+\textbf{Mercado de trabalho (spider FED Atlanta).} Cada indicador (desemprego, emprego, participação,
+produção industrial, hiato) entra em \emph{percentil} da sua história, atual vs pré-pandemia. O Chile
+está forte em \textbf{emprego (92º percentil)} e participação (76º), mas fraco em \textbf{desemprego}
+(34º; 8,7\%) e atividade (32º): mais gente trabalhando \emph{e} mais gente procurando emprego, sem
+superaquecimento. Pela \textbf{lei de Okun}, o desemprego elevado casa com o hiato $\approx 0$. (Não há
+vagas/admissões para o Chile no FRED.)
+
+\textbf{SVAR é mesmo um SVAR.} O ``SVAR'' do projeto é um VAR de forma reduzida \emph{mais} uma
+identificação recursiva de \textbf{Cholesky} (ordem $[x,\pi,i]$): o choque monetário é a inovação
+ortogonal do juro. É a identificação estrutural mais simples --- sem restrições de sinal ou de longo
+prazo.
+
 \end{document}

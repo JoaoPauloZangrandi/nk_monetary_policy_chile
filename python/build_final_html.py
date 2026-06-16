@@ -724,6 +724,24 @@ def build() -> None:
                 "horizon", "variable", "model", "rmse", "relative_rmse_vs_random_walk"
             ])}
 
+            <h3>Núcleos da inflação e mercado de trabalho (FRED)</h3>
+            {image("ipc_cores_panel.png", "IPC por núcleo",
+                "Inflação por núcleo vs a banda de 2–4%",
+                "Energia muito volátil; núcleo e serviços persistentes e acima da banda no surto "
+                "recente. Componentes OECD/FRED até ~2023.")}
+            {image("ipc_cores_drivers.png", "Quem mais empurrou a inflação",
+                "Drivers do surto de 2021–23 por núcleo",
+                "A energia liderou (pico de 24% a.a.), à frente da cheia (14%), serviços (12%) e "
+                "núcleo (11%). Energia = choque de custo; núcleo/serviços = inércia da híbrida.")}
+            {image("labor_activity_dashboard.png", "Mercado de trabalho e atividade",
+                "Desemprego, emprego, participação e o hiato do modelo",
+                "Emprego e participação em máximas; desemprego ainda 8,7%; hiato (Kalman) ≈0. Sem "
+                "dados de vagas/admissões para o Chile no FRED. Okun: desemprego inverso ao hiato.")}
+            {image("labor_spider.png", "Spider do mercado de trabalho",
+                "Spider estilo FED Atlanta (percentis vs história)",
+                "Forte em emprego (92º percentil) e participação (76º); fraco em desemprego (34º) e "
+                "atividade (32º); atual vs pré-pandemia.")}
+
             <h3>3. Economia aberta e inércia inflacionária</h3>
             {image("open_economy_data.png", "Câmbio e cobre usados na extensão",
                 "Figura 20 — Canais externos relevantes para o Chile",
