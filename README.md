@@ -109,7 +109,8 @@ python python/run_history.py               # smoother + historical decomposition
 python python/plot_history.py              # narrative + policy counterfactual
 python python/analyze_svar.py              # recursive SVAR versus DSGE
 python python/estimate_time_varying_rstar.py
-python python/evaluate_forecasts.py        # pseudo-out-of-sample comparison
+python python/evaluate_forecasts.py        # pseudo-out-of-sample comparison (baseline + hybrid)
+python python/plot_hybrid_test.py          # hybrid inertia IRF + OOS-accuracy figure
 python python/build_open_economy_dataset.py
 python python/generate_macro_extension_models.py
 python python/run_macro_extensions.py      # open economy + hybrid NKPC

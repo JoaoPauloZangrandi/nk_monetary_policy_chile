@@ -325,29 +325,13 @@
 \end{frame}
 
 \begin{frame}{A previsão é robusta? O teste da NKPC híbrida}
-  \begin{itemize}
-    \item Testamos também a \textbf{NKPC híbrida} (a que os dados preferem, com inércia de inflação)
-          no \textbf{mesmo} teste fora-da-amostra.
-    \item \textbf{Curto prazo (1 trimestre):} a híbrida corta o erro de previsão da inflação em
-          \textbf{$\approx$19\%} --- a inércia cura a fraqueza do baseline.
-    \item \textbf{Horizonte de 1 ano:} \textbf{empate} --- os dois modelos convergem.
-  \end{itemize}
+  \centering\includegraphics[width=\linewidth,height=0.68\textheight,keepaspectratio]{figures/hybrid_test.png}
   \vspace{1mm}
-  \begin{center}\footnotesize
-  \begin{tabular}{lcc}
-    \toprule
-    Inflação prevista & Baseline & Híbrida \\
-    \midrule
-    1 trimestre & 3,3\% & 4,2\% \\
-    \textbf{1 ano} & \textbf{3,7\%} & \textbf{3,5\%} \\
-    2 anos & 3,8\% & 3,8\% \\
-    \bottomrule
-  \end{tabular}
-  \end{center}
-  \begin{exampleblock}{Conclusão}
-    A previsão de \textbf{1 ano é robusta} à escolha do modelo. Para o próximo trimestre, a híbrida
-    (com inércia) é a ferramenta melhor.
-  \end{exampleblock}
+  {\footnotesize\raggedright
+  A \textbf{híbrida} dá memória à inflação (persistência 0,05$\to$0,38). No mesmo teste
+  fora-da-amostra ela \textbf{corta o erro da inflação de 1 trimestre em $\approx$19\%}, mas
+  \textbf{empata em 1 ano}. Logo, a previsão-resposta de \textbf{1 ano é robusta} à escolha do modelo;
+  para o próximo trimestre, a híbrida é a melhor ferramenta.\par}
 \end{frame}
 
 \section{Síntese}
