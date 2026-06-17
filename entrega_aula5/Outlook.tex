@@ -1,0 +1,185 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=2.2cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\graphicspath{{figures/}}
+\definecolor{accent}{RGB}{30,78,121}
+\setlist{leftmargin=1.4em}
+
+\title{\textbf{\textcolor{accent}{Outlook --- Inflação, Atividade e Política
+Monetária no Chile}}\\[2mm]
+\large Panorama com dados do Banco Central de Chile até \textbf{maio/2026} e
+projeções do modelo Novo-Keynesiano de 3 equações}
+\author{Daniel Colli e João Zangrandi}
+\date{16 de junho de 2026}
+
+\begin{document}
+\maketitle
+\vspace{-4mm}
+
+\section*{Sumário executivo}
+\begin{itemize}[nosep]
+  \item \textbf{Inflação ainda acima da meta.} A inflação cheia (IPC) roda a
+  \textbf{$\approx$4,0\%} em 12 meses --- no \emph{topo} da banda de tolerância de
+  2--4\%. O \textbf{núcleo SAE} (sem alimentos e energia) está em \textbf{3,0\%},
+  exatamente na meta; mas \textbf{serviços} (4,8\%) seguem \emph{fora} da banda.
+  \item \textbf{O momentum recente é desfavorável.} As médias móveis de curto prazo
+  (MM3M) estão \emph{acima} da variação anual: a inflação \emph{na margem} acelera,
+  puxada pela \textbf{energia} (re-aceleração de 2025--26, $\approx$5\%/mês),
+  associada à normalização de tarifas elétricas.
+  \item \textbf{O modelo projeta convergência a 3\%.} A previsão incondicional do
+  modelo NK vai de $\approx$2,5\% (2026Q2) para \textbf{3,0\%} em 2 anos --- a
+  inflação reverte à meta \emph{por construção}, com a TPM recuando para
+  $\approx$4,1\% e o hiato do produto fechando.
+  \item \textbf{Atividade no potencial, trabalho misto.} O hiato do produto está
+  \emph{$\approx$0} (economia rodando perto do potencial). O mercado de trabalho é
+  forte em emprego/participação, mas o \textbf{desemprego (8,7\%)} é o ponto fraco.
+  \item \textbf{Política:} gradualismo. O choque de custo (energia) tende a ser
+  ``olhado através''; o risco real é a \textbf{persistência de serviços} (inércia).
+\end{itemize}
+
+\section{Inflação corrente: onde estamos, por núcleo}
+A Figura~\ref{fig:mom} mostra, para cada núcleo do IPC, a \textbf{variação mensal}
+(MoM, barras), suas \textbf{médias móveis} de 3 e 6 meses (MM3M/MM6M, eixo esquerdo,
+\%/mês) e a \textbf{variação anual} (YoY, linha preta, eixo direito) contra a banda
+de 2--4\%. Os dados são reais, do Banco Central de Chile (IPC Analíticos empalmados,
+base 2023=100), até \textbf{maio/2026}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\linewidth]{ipc_cores_momentum.png}
+  \caption{IPC chileno por núcleo --- MoM (barras) e MM3M/MM6M (eixo esq.) vs YoY e
+  banda 2--4\% (eixo dir.). Fonte: BCCh.}
+  \label{fig:mom}
+\end{figure}
+
+Leitura: o \textbf{núcleo SAE} ancorou em 3,0\% (na meta) --- a âncora nominal do
+regime de metas funciona. Mas \textbf{serviços} (4,8\%) continuam acima da banda,
+sinal clássico de \emph{inércia} (preços de serviços têm forte componente de
+indexação à inflação passada). A \textbf{energia} (14,8\% YoY) é o núcleo mais
+volátil e, crucialmente, suas barras MoM e a MM3M voltaram a subir em 2025--26 ---
+é a fonte da reaceleração recente da cheia.
+
+\section{O que empurra a inflação? A energia (de novo)}
+A Figura~\ref{fig:drivers} resume os \emph{drivers}: à esquerda, a inflação anual por
+núcleo desde 2021; à direita, o \textbf{momentum recente} (MM3M, \%/mês) ordenado.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.96\linewidth]{ipc_cores_drivers_bcch.png}
+  \caption{Drivers: YoY por núcleo (esq.) e ranking de momentum recente MM3M (dir.).
+  Fonte: BCCh, até maio/2026.}
+  \label{fig:drivers}
+\end{figure}
+
+A \textbf{energia} lidera tanto o surto de 2022 (pico $\approx$25\% a.a.) quanto a
+reaceleração de 2025--26 --- é o \textbf{choque de custo} ($\varepsilon^\pi$) por
+excelência no modelo. \textbf{Serviços} é o componente \textbf{persistente} (a
+inércia que a NKPC híbrida, com indexação, captura). O \textbf{núcleo} ancorado perto
+de 3\% confirma que as expectativas seguem ancoradas. Em linguagem do modelo:
+\emph{choque de custo (energia) + inércia (serviços)} --- exatamente as duas forças
+que a curva de Phillips Novo-Keynesiana separa.
+
+\section{Projeção do modelo Novo-Keynesiano}
+O modelo de 3 equações (IS, Phillips, regra de Taylor), estimado com dados do BCCh e
+com a inflação \emph{re-centrada na meta de 3\%}, produz a projeção da
+Figura~\ref{fig:outlook} e da Tabela~\ref{tab:fc}. A inflação observável foi definida
+como desvio da meta, de modo que o estado estacionário do modelo \emph{é} a meta ---
+e a previsão converge a 3\% \textbf{por construção}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\linewidth]{forecast_outlook.png}
+  \caption{Previsão (níveis): inflação, TPM e hiato revertendo à meta/neutralidade.
+  Fonte: elaboração própria a partir do modelo estimado com dados do BCCh.}
+  \label{fig:outlook}
+\end{figure}
+
+\begin{table}[h]
+  \centering
+  \caption{Previsão incondicional (níveis anualizados).}
+  \label{tab:fc}
+  \begin{tabular}{lccc}
+    \toprule
+    Horizonte & Inflação YoY (\%) & TPM (\% a.a.) & Hiato (\%) \\
+    \midrule
+    2026Q2 (h=1) & 2,5 & 4,4 & $-0,4$ \\
+    2027Q1 (h=4) & 2,9 & 4,2 & $-0,1$ \\
+    2028Q1 (h=8) & \textbf{3,0} & 4,1 & $0,0$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\textbf{Nuance importante.} O modelo estrutural \emph{reverte} à meta; já o
+\emph{momentum} de alta-frequência dos núcleos (energia) aponta \textbf{risco de alta
+de curto prazo} que um modelo trimestral suaviza. A versão \textbf{híbrida} da
+Phillips (com indexação) captura parte dessa persistência e, fora da amostra, melhora
+a previsão de inflação de 1 trimestre frente à NKPC puramente \emph{forward-looking}.
+Em horizontes curtos, porém, referências ingênuas (passeio aleatório) seguem
+competitivas --- como é usual; o valor do modelo está na \textbf{narrativa econômica}
+e na convergência coerente à meta.
+
+\section{Atividade e mercado de trabalho}
+O hiato do produto, estimado por \textbf{filtro de Kalman} (componentes não
+observados), está praticamente fechado ($\approx 0$ em 2026Q1) --- a economia roda
+perto do potencial, o que limita a pressão de demanda sobre a inflação (o termo
+$\kappa x_t$ da Phillips é pequeno). A Figura~\ref{fig:spider} traz o
+\emph{spider chart} estilo \emph{FED de Atlanta}: o mercado de trabalho é forte em
+\textbf{emprego} e \textbf{participação}, mas fraco em \textbf{desemprego} (8,7\%) e
+atividade industrial.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.74\linewidth]{labor_spider.png}
+  \caption{Spider do mercado de trabalho (percentis vs história; atual vs
+  pré-pandemia). Fonte: FRED/OECD para o Chile.}
+  \label{fig:spider}
+\end{figure}
+
+Pela lei de Okun, o desemprego acima do pré-pandemia é consistente com um hiato
+levemente negativo --- ou seja, \emph{não há} excesso de demanda puxando a inflação;
+o problema inflacionário é de \textbf{custos (energia)} e \textbf{inércia
+(serviços)}, não de superaquecimento.
+
+\section{Implicações para a política monetária}
+\begin{enumerate}[nosep]
+  \item \textbf{Olhar através da energia, vigiar os serviços.} Choques de energia são
+  voláteis e tendem a se reverter; reagir a cada oscilação injetaria volatilidade
+  desnecessária no produto. O foco deve ser o \textbf{núcleo/serviços}, onde mora a
+  persistência.
+  \item \textbf{Gradualismo.} Com o hiato fechado e o núcleo na meta, há espaço para
+  a TPM seguir convergindo ao neutro ($\approx$4\%) de forma gradual, sem cortes
+  abruptos enquanto serviços e o momentum de cheia não cederem.
+  \item \textbf{Ancoragem é o ativo.} O núcleo em 3\% indica expectativas ancoradas
+  --- o principal trunfo do regime de metas. Preservá-lo exige não validar a inércia
+  de serviços com uma postura excessivamente frouxa.
+\end{enumerate}
+
+\section{Riscos}
+\begin{itemize}[nosep]
+  \item \textbf{Energia/tarifas (alta):} novas correções tarifárias ou choques de
+  combustível mantêm a cheia acima da meta por mais tempo.
+  \item \textbf{Persistência de serviços (alta):} indexação e mercado de trabalho
+  ainda apertado em emprego podem manter serviços fora da banda.
+  \item \textbf{Determinação (estrutural):} a estimativa do coeficiente de reação da
+  Taylor ($\phi_\pi$) fica próxima de 1 --- o limiar de determinação (princípio de
+  Taylor). Uma reação fraca demais a desvios de inflação é o principal risco de
+  \emph{regime}, não de conjuntura.
+\end{itemize}
+
+\vfill
+{\footnotesize\noindent\textbf{Fontes e método.} Inflação e núcleos: Banco Central de
+Chile (IPC Analíticos empalmados, base 2023=100, SieteRestWS), até maio/2026. TPM, PIB
+e hiato: BCCh; hiato por filtro de Kalman (componentes não observados). Atividade e
+trabalho: FRED/OECD para o Chile. Projeções: modelo NK de 3 equações estimado e
+simulado em Dynare/Octave, inflação re-centrada na meta de 3\%. Todo o código está no
+documento \emph{Código Final}.\par}
+
+\end{document}

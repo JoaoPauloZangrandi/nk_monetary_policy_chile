@@ -86,10 +86,18 @@ núcleo; amend; depois **1 doc "Código Final"** (todo o código) + **1 doc "Out
   texto. Renderizados e verificados plenamente visíveis. Build OK (45 frames).
 - **[x] amend (commit/push) da atualização dos núcleos.**
 
-## Pendências (v3)
-- [ ] **Código Final:** 1 documento com TODO o código (Python + Dynare `.mod`), comentado.
-- [ ] **Outlook:** 1 documento (panorama: inflação/núcleos, atividade/trabalho, previsão, política).
-- (opcional) propagar núcleos BCCh recentes ao relatório (Seção 17.10) e HTML (hoje citam FRED-2023).
+## Pendências (v3) — CONCLUÍDAS
+- [x] **Código Final:** `entrega_aula5/Codigo_Final.{tex,pdf}` (108 págs, 49 arquivos Python+Dynare,
+  TOC agrupado, listings com syntax highlight). Gerado por `python/build_codigo_final.py`
+  (translitera não-ASCII do código p/ ASCII; prose mantém acentos via inputenc utf8).
+- [x] **Outlook:** `entrega_aula5/Outlook.{tex,pdf}` (4 págs): sumário executivo, inflação por núcleo
+  (figs BCCh), drivers, previsão NK (converge a 3%; tabela), atividade/trabalho (spider), implicações
+  de política, riscos (φπ≈1). Autores Daniel Colli e João Zangrandi.
+- (opcional, não feito) propagar núcleos BCCh recentes ao relatório (Seção 17.10) e HTML (citam FRED-2023).
+
+## Segurança
+- Credenciais BCCh em `data/raw/bcch_credentials.json` (git-ignored, confirmado fora do commit).
+  Usuário compartilhou a senha no chat → **recomendado rotacionar no si3.bcentral.cl** (pull já concluído).
 
 ## Gotcha desta sessão
 - BCCh API: response decodificado utf-8/replace → títulos com acento viram `�` (só display; valores
