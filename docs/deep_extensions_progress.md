@@ -65,5 +65,33 @@ direta · 32 robustez híbrida · 33 obrigado · 34–39 apêndice.
 - Octave 11 + Dynare 7.1. FRED CSV: `https://fred.stlouisfed.org/graph/fredgraph.csv?id=<ID>`.
 - Verificar cada slide novo renderizando com pdftocairo (figura+texto plenamente visíveis).
 
-## Próximo passo
-WP1: criar `kalman_gap` em common.py; `reprocess_dataset.py`.
+## v3 — dados recentes + núcleos no formato MoM/MM3M/MM6M/YoY (2026-06-16)
+Pedido: inflação mais recente possível; núcleos com **MoM (barras) + MM3M/MM6M/YoY (linhas)** por
+núcleo; amend; depois **1 doc "Código Final"** (todo o código) + **1 doc "Outlook"** (autoexplicativo).
+
+- **Fonte recente:** FRED/OECD congelaram em **2023-12** (Chile remudou base p/ 2023=100, COICOP 2018).
+  Única fonte dos núcleos recentes = **BCCh SieteRestWS** (creds do usuário em
+  `data/raw/bcch_credentials.json`, git-ignored — `*credentials*.json` + `data/raw/*`). IPC Analíticos
+  empalmados base 2023=100, variação mensal: geral `F074.IPC.VAR.Z.EP23.C.M`, SAE (núcleo)
+  `F074.IPCSAE.VAR.Z.EP23.Z.M`, serviços `F074.IPCS.VAR.Z.EP23.Z.M`, bens `F074.IPCB.VAR.Z.EP23.Z.M`,
+  energia `F074.IPCE.VAR.Z.EP23.Z.M`, alimentos `F074.IPCA.VAR.Z.EP23.Z.M`.
+- **Scripts novos:** `discover_ipc_series.py` (resolve ids via SearchSeries, MONTHLY),
+  `build_inflation_cores_bcch.py` (puxa; MoM=var. mensal, MM3M/MM6M=médias móveis mensais, YoY=12m;
+  figura momentum twin-axis [esq. %/mês, dir. YoY %a.a. + banda 2-4%] + figura drivers).
+  Saídas: `chile_inflation_cores_bcch.csv`, `ipc_cores_momentum.png`, `ipc_cores_drivers_bcch.png`.
+- **Dados (até mai/2026):** Cheia YoY 4,0% (MM3M 0,8%/mês); SAE **3,0% (na meta)**; Serviços 4,8% (fora);
+  Bens 3,4%; **Energia 14,8% (MM3M 5,1%/mês = re-aceleração)**; Alimentos 2,4%. Energia lidera o
+  momentum; serviços é o persistente.
+- **Slides:** Apresentacao.tex — frames 27-28 (págs PDF 35-36) trocados p/ figuras BCCh recentes +
+  texto. Renderizados e verificados plenamente visíveis. Build OK (45 frames).
+- **[x] amend (commit/push) da atualização dos núcleos.**
+
+## Pendências (v3)
+- [ ] **Código Final:** 1 documento com TODO o código (Python + Dynare `.mod`), comentado.
+- [ ] **Outlook:** 1 documento (panorama: inflação/núcleos, atividade/trabalho, previsão, política).
+- (opcional) propagar núcleos BCCh recentes ao relatório (Seção 17.10) e HTML (hoje citam FRED-2023).
+
+## Gotcha desta sessão
+- BCCh API: response decodificado utf-8/replace → títulos com acento viram `�` (só display; valores
+  numéricos/datas são ASCII, dados OK). Console Windows cp1252 quebra `print` de acentos → rodar com
+  `PYTHONIOENCODING=utf-8`.

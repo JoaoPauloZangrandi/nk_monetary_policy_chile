@@ -110,7 +110,9 @@ python python/run_history.py               # smoother + historical decomposition
 python python/run_history.py --mod nk_chile_history_hybrid.mod  # hybrid decomposition
 python python/plot_history.py              # narrative + policy counterfactual
 python python/plot_ipc_decomposition.py    # IPC inflation decomposition (baseline + hybrid)
-python python/build_inflation_cores.py     # IPC by core (energy/core/services) vs target (FRED)
+python python/build_inflation_cores.py     # IPC by core (energy/core/services) vs target (FRED, to 2023)
+python python/discover_ipc_series.py       # resolve BCCh IPC core series ids (needs BCCh creds)
+python python/build_inflation_cores_bcch.py # IPC cores momentum (MoM/MM3M/MM6M/YoY), real BCCh to 2026
 python python/build_labor_activity.py      # labour market + activity + Atlanta-Fed spider (FRED)
 python python/analyze_svar.py              # recursive SVAR versus DSGE
 python python/estimate_time_varying_rstar.py
